@@ -1,0 +1,839 @@
+{
+  "lesson": {
+    "variation": {
+      "id": "18573b71-1751-4a5e-8509-9db4500a145e",
+      "name": "Jorden Van Foreest \u2013 Rasmus Svane | Bundesliga 2016/17",
+      "startingPosition": {
+        "fen": "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
+      },
+      "moveTrainerId": "6445752b-f404-4d8f-9397-4fb03f690d8e",
+      "chapterId": "fdde3620-96eb-4f48-806b-68e51249e4a2",
+      "type": "COURSE_VARIATION_TYPE_INFORMATIONAL",
+      "isLearned": true,
+      "videoStart": 438000,
+      "videoEnd": 955000,
+      "accessType": "VARIATION_ACCESS_TYPE_FULL_ACCESS",
+      "moveCount": 36,
+      "previewPosition": {
+        "fen": "rnbqkbnr/pppppppp/8/8/3P4/8/PPP1PPPP/RNBQKBNR b KQkq d3 0 1"
+      },
+      "learnerColor": "COLOR_WHITE"
+    },
+    "whitePlayer": {
+      "name": "dawsonbooth",
+      "picture": {
+        "url": "https://images.chesscomfiles.com/uploads/v1/user/36571416.3e7fc3ee.200x200o.eeb3a071e70f.jpeg"
+      }
+    },
+    "blackPlayer": {
+      "name": "Aman Hambleton",
+      "picture": {
+        "url": "https://assets-courses.chess.com/image/users/570770_user_medium_opt.jpeg"
+      }
+    },
+    "plies": [
+      {
+        "id": "6565eea2-6c11-4c1d-ad97-87a250cd4b7b",
+        "moveNumber": 1,
+        "san": "d4",
+        "position": {
+          "fen": "rnbqkbnr/pppppppp/8/8/3P4/8/PPP1PPPP/RNBQKBNR b KQkq d3 0 1"
+        },
+        "color": "COLOR_WHITE",
+        "preComment": "{\"data\":[{\"key\":\"C\",\"state\":\"\",\"val\":\"This game by Jorden is the game that made me want to play the London System back in 2016 when it was just budding in popularity.\"}]}"
+      },
+      {
+        "id": "bd6d435d-4650-4a1a-9227-a8b1e6bdac42",
+        "moveNumber": 1,
+        "san": "d5",
+        "position": {
+          "fen": "rnbqkbnr/ppp1pppp/8/3p4/3P4/8/PPP1PPPP/RNBQKBNR w KQkq d6 0 2"
+        },
+        "color": "COLOR_BLACK"
+      },
+      {
+        "id": "7a2aa36d-e07e-46fb-8965-76321e3cd9d1",
+        "moveNumber": 2,
+        "san": "Bf4",
+        "position": {
+          "fen": "rnbqkbnr/ppp1pppp/8/3p4/3P1B2/8/PPP1PPPP/RN1QKBNR b KQkq - 1 2"
+        },
+        "color": "COLOR_WHITE"
+      },
+      {
+        "id": "c908f830-29f8-473f-bc3a-078ee804b098",
+        "moveNumber": 2,
+        "san": "Nf6",
+        "position": {
+          "fen": "rnbqkb1r/ppp1pppp/5n2/3p4/3P1B2/8/PPP1PPPP/RN1QKBNR w KQkq - 2 3"
+        },
+        "color": "COLOR_BLACK"
+      },
+      {
+        "id": "28d02cdf-9a7d-4b36-a134-ffd1e6cc70fb",
+        "moveNumber": 3,
+        "san": "e3",
+        "position": {
+          "fen": "rnbqkb1r/ppp1pppp/5n2/3p4/3P1B2/4P3/PPP2PPP/RN1QKBNR b KQkq - 0 3"
+        },
+        "color": "COLOR_WHITE"
+      },
+      {
+        "id": "78ca4f2b-737e-4a7c-b01e-a5bfe14fdbe9",
+        "moveNumber": 3,
+        "san": "e6",
+        "position": {
+          "fen": "rnbqkb1r/ppp2ppp/4pn2/3p4/3P1B2/4P3/PPP2PPP/RN1QKBNR w KQkq - 0 4"
+        },
+        "color": "COLOR_BLACK"
+      },
+      {
+        "id": "bd0ebfe3-bbfb-4cc0-bdc4-b1bc75fc66b5",
+        "moveNumber": 4,
+        "san": "Nd2",
+        "position": {
+          "fen": "rnbqkb1r/ppp2ppp/4pn2/3p4/3P1B2/4P3/PPPN1PPP/R2QKBNR b KQkq - 1 4"
+        },
+        "color": "COLOR_WHITE"
+      },
+      {
+        "id": "8b8aeec5-7c34-496b-8950-cee39bee141c",
+        "moveNumber": 4,
+        "san": "c5",
+        "position": {
+          "fen": "rnbqkb1r/pp3ppp/4pn2/2pp4/3P1B2/4P3/PPPN1PPP/R2QKBNR w KQkq c6 0 5",
+          "arrows": [
+            {
+              "squareFrom": "SQUARE_C2",
+              "squareTo": "SQUARE_C3",
+              "type": "COURSE_DRAWING_ARROW_TYPE_SECONDARY"
+            }
+          ]
+        },
+        "color": "COLOR_BLACK"
+      },
+      {
+        "id": "0b4f16f8-89ec-4d7f-bcb6-f5485290128f",
+        "moveNumber": 5,
+        "san": "Ngf3",
+        "position": {
+          "fen": "rnbqkb1r/pp3ppp/4pn2/2pp4/3P1B2/4PN2/PPPN1PPP/R2QKB1R b KQkq - 1 5"
+        },
+        "color": "COLOR_WHITE",
+        "postComment": "{\"data\":[{\"key\":\"C\",\"state\":\"V\",\"val\":\"We prefer the move order with @@SANStart@@c3@@SANEnd@@ first, but the game transposes on the next move.\"}]}"
+      },
+      {
+        "id": "d1579ce8-2341-4422-8507-618faf4953bf",
+        "moveNumber": 5,
+        "san": "Nc6",
+        "position": {
+          "fen": "r1bqkb1r/pp3ppp/2n1pn2/2pp4/3P1B2/4PN2/PPPN1PPP/R2QKB1R w KQkq - 2 6"
+        },
+        "color": "COLOR_BLACK"
+      },
+      {
+        "id": "6108968d-d1a8-46e7-a1f6-f33290c04a11",
+        "moveNumber": 6,
+        "san": "c3",
+        "position": {
+          "fen": "r1bqkb1r/pp3ppp/2n1pn2/2pp4/3P1B2/2P1PN2/PP1N1PPP/R2QKB1R b KQkq - 0 6"
+        },
+        "color": "COLOR_WHITE"
+      },
+      {
+        "id": "fafbc27c-c72e-4e64-8296-affd8336f3d3",
+        "moveNumber": 6,
+        "san": "Bd6",
+        "position": {
+          "fen": "r1bqk2r/pp3ppp/2nbpn2/2pp4/3P1B2/2P1PN2/PP1N1PPP/R2QKB1R w KQkq - 1 7"
+        },
+        "color": "COLOR_BLACK"
+      },
+      {
+        "id": "61979d4c-8913-4958-a53c-44f5fd1717f2",
+        "moveNumber": 7,
+        "san": "Bg3",
+        "position": {
+          "fen": "r1bqk2r/pp3ppp/2nbpn2/2pp4/3P4/2P1PNB1/PP1N1PPP/R2QKB1R b KQkq - 2 7"
+        },
+        "color": "COLOR_WHITE",
+        "postComment": "{\"data\":[{\"key\":\"C\",\"state\":\"V\",\"val\":\"The main line of the London System!\"}]}"
+      },
+      {
+        "id": "ca34ed9d-72d6-4e5a-a0e3-12e008941b82",
+        "moveNumber": 7,
+        "san": "O-O",
+        "position": {
+          "fen": "r1bq1rk1/pp3ppp/2nbpn2/2pp4/3P4/2P1PNB1/PP1N1PPP/R2QKB1R w KQ - 3 8"
+        },
+        "color": "COLOR_BLACK"
+      },
+      {
+        "id": "f1e29d9a-731a-4d32-a832-aad9b5227521",
+        "moveNumber": 8,
+        "san": "Bd3",
+        "position": {
+          "fen": "r1bq1rk1/pp3ppp/2nbpn2/2pp4/3P4/2PBPNB1/PP1N1PPP/R2QK2R b KQ - 4 8"
+        },
+        "color": "COLOR_WHITE"
+      },
+      {
+        "id": "39758850-fe03-4602-bf5b-1be6a28ae1da",
+        "moveNumber": 8,
+        "san": "b6",
+        "position": {
+          "fen": "r1bq1rk1/p4ppp/1pnbpn2/2pp4/3P4/2PBPNB1/PP1N1PPP/R2QK2R w KQ - 0 9"
+        },
+        "color": "COLOR_BLACK"
+      },
+      {
+        "id": "a6daa14e-7978-4ed6-a89a-62027e5ee897",
+        "moveNumber": 9,
+        "san": "e4",
+        "position": {
+          "fen": "r1bq1rk1/p4ppp/1pnbpn2/2pp4/3PP3/2PB1NB1/PP1N1PPP/R2QK2R b KQ - 0 9"
+        },
+        "color": "COLOR_WHITE",
+        "postComment": "{\"data\":[{\"key\":\"C\",\"state\":\"V\",\"val\":\"A much more direct and energetic move than @@SANStart@@Ne5@@SANEnd@@. The most common response is @@SANStart@@dxe4@@SANEnd@@, which already concedes a comfortable opening advantage to White. The best move was played in this game, but Black will need to be well-prepared because the following move is not one that you can calculate at the board...\"},{\"key\":\"V\",\"state\":\"V\",\"val\":[{\"key\":\"S\",\"state\":\"V\",\"val\":\"9.Ne5?!\"},{\"key\":\"S\",\"state\":\"V\",\"val\":\"Bb7\"},{\"key\":\"S\",\"state\":\"V\",\"val\":\"10.f4\"},{\"key\":\"S\",\"state\":\"V\",\"val\":\"Ne7\"},{\"key\":\"S\",\"state\":\"V\",\"val\":\"11.O-O\"},{\"key\":\"S\",\"state\":\"V\",\"val\":\"Nf5\"},{\"key\":\"S\",\"state\":\"V\",\"val\":\"12.Bf2\"},{\"key\":\"S\",\"state\":\"V\",\"val\":\"Be7!\"},{\"key\":\"S\",\"state\":\"V\",\"val\":\"13.g4\"},{\"key\":\"S\",\"state\":\"V\",\"val\":\"Nd6\"},{\"key\":\"S\",\"state\":\"V\",\"val\":\"14.g5\"},{\"key\":\"S\",\"state\":\"V\",\"val\":\"Nfe4\\u2a71\"},{\"state\":\"VV\",\"key\":\"C\",\"val\":\"This used to be the main line in this variation, and despite White's aggression on the kingside, it's clear that Black is the one who has benefited the most. When playing a stonewall structure in the London with @@SANStart@@f4@@SANEnd@@, it's crucial that we always maintain control of the @@SANStart@@e4@@SANEnd@@ square at all times. That has been completely forgotten in this position, and Black stands better with @@SANStart@@f6@@SANEnd@@ coming on the next move.\"}],\"line\":false}]}"
+      },
+      {
+        "id": "9ce4b605-bc5b-4ddb-9b7f-d91a40cb6082",
+        "moveNumber": 9,
+        "san": "Be7",
+        "position": {
+          "fen": "r1bq1rk1/p3bppp/1pn1pn2/2pp4/3PP3/2PB1NB1/PP1N1PPP/R2QK2R w KQ - 1 10",
+          "nags": [
+            {
+              "type": "primary",
+              "nagId": 1
+            }
+          ]
+        },
+        "color": "COLOR_BLACK"
+      },
+      {
+        "id": "1497fbc2-7bc5-40eb-881c-6c4e251e3b08",
+        "moveNumber": 10,
+        "san": "e5",
+        "position": {
+          "fen": "r1bq1rk1/p3bppp/1pn1pn2/2ppP3/3P4/2PB1NB1/PP1N1PPP/R2QK2R b KQ - 0 10"
+        },
+        "color": "COLOR_WHITE"
+      },
+      {
+        "id": "22559d0b-9b2b-4ee8-8c9a-7fdba154d006",
+        "moveNumber": 10,
+        "san": "Nh5",
+        "position": {
+          "fen": "r1bq1rk1/p3bppp/1pn1p3/2ppP2n/3P4/2PB1NB1/PP1N1PPP/R2QK2R w KQ - 1 11",
+          "highlights": [
+            {
+              "square": "SQUARE_G3",
+              "type": "COURSE_DRAWING_SQUARE_TYPE_TERTIARY"
+            }
+          ]
+        },
+        "color": "COLOR_BLACK",
+        "postComment": "{\"data\":[{\"key\":\"C\",\"state\":\"V\",\"val\":\"This move will 'win' our dark squared bishop. It's time to react with something that your opponents will never expect unless they have studied this variation before. Chances are, however, that they will be familiar if they have made it this far.\"}]}"
+      },
+      {
+        "id": "779a2aaf-2d95-45c1-a58a-b2346e1cb4d6",
+        "moveNumber": 11,
+        "san": "Ng5",
+        "position": {
+          "fen": "r1bq1rk1/p3bppp/1pn1p3/2ppP1Nn/3P4/2PB2B1/PP1N1PPP/R2QK2R b KQ - 2 11",
+          "nags": [
+            {
+              "type": "primary",
+              "nagId": 1
+            }
+          ]
+        },
+        "color": "COLOR_WHITE",
+        "postComment": "{\"data\":[{\"key\":\"C\",\"state\":\"V\",\"val\":\"This move was a novelty at the top level when this game was played in 2016, and the engine still approves of this variation today.\"}]}"
+      },
+      {
+        "id": "8a0236fd-1efe-40ed-b6da-c4cd2f247b87",
+        "moveNumber": 11,
+        "san": "Bxg5",
+        "position": {
+          "fen": "r1bq1rk1/p4ppp/1pn1p3/2ppP1bn/3P4/2PB2B1/PP1N1PPP/R2QK2R w KQ - 0 12"
+        },
+        "color": "COLOR_BLACK",
+        "postComment": "{\"data\":[{\"key\":\"V\",\"state\":\"V\",\"val\":[{\"key\":\"S\",\"state\":\"V\",\"val\":\"11...g6\"},{\"key\":\"S\",\"state\":\"V\",\"val\":\"12.Nxh7!\"},{\"key\":\"S\",\"state\":\"V\",\"val\":\"Kxh7\"},{\"key\":\"S\",\"state\":\"V\",\"val\":\"13.Qxh5+\"},{\"key\":\"S\",\"state\":\"V\",\"val\":\"Kg7\"},{\"key\":\"S\",\"state\":\"V\",\"val\":\"14.Qg4\\u00b1\"}],\"line\":false}]}"
+      },
+      {
+        "id": "523cee3d-6a51-4e8c-8058-66a52ffb4db0",
+        "moveNumber": 12,
+        "san": "Qxh5",
+        "position": {
+          "fen": "r1bq1rk1/p4ppp/1pn1p3/2ppP1bQ/3P4/2PB2B1/PP1N1PPP/R3K2R b KQ - 0 12",
+          "arrows": [
+            {
+              "squareFrom": "SQUARE_H5",
+              "squareTo": "SQUARE_H7",
+              "type": "COURSE_DRAWING_ARROW_TYPE_SECONDARY"
+            }
+          ]
+        },
+        "color": "COLOR_WHITE"
+      },
+      {
+        "id": "020136b7-2c67-4f45-808b-bff191de7876",
+        "moveNumber": 12,
+        "san": "g6",
+        "position": {
+          "fen": "r1bq1rk1/p4p1p/1pn1p1p1/2ppP1bQ/3P4/2PB2B1/PP1N1PPP/R3K2R w KQ - 0 13"
+        },
+        "color": "COLOR_BLACK"
+      },
+      {
+        "id": "1f8865eb-218d-4b54-af09-e8841eeeb842",
+        "moveNumber": 13,
+        "san": "Qe2",
+        "position": {
+          "fen": "r1bq1rk1/p4p1p/1pn1p1p1/2ppP1b1/3P4/2PB2B1/PP1NQPPP/R3K2R b KQ - 1 13"
+        },
+        "color": "COLOR_WHITE"
+      },
+      {
+        "id": "48fd6ab6-d93e-4b6a-b3f2-244acca43dc7",
+        "moveNumber": 13,
+        "san": "cxd4",
+        "position": {
+          "fen": "r1bq1rk1/p4p1p/1pn1p1p1/3pP1b1/3p4/2PB2B1/PP1NQPPP/R3K2R w KQ - 0 14"
+        },
+        "color": "COLOR_BLACK"
+      },
+      {
+        "id": "7a7ca140-19db-4c54-9ce8-870805cbcf9c",
+        "moveNumber": 14,
+        "san": "h4",
+        "position": {
+          "fen": "r1bq1rk1/p4p1p/1pn1p1p1/3pP1b1/3p3P/2PB2B1/PP1NQPP1/R3K2R b KQ h3 0 14",
+          "arrows": [
+            {
+              "squareFrom": "SQUARE_D4",
+              "squareTo": "SQUARE_C3",
+              "type": "COURSE_DRAWING_ARROW_TYPE_TERTIARY"
+            },
+            {
+              "squareFrom": "SQUARE_B2",
+              "squareTo": "SQUARE_C3",
+              "type": "COURSE_DRAWING_ARROW_TYPE_TERTIARY"
+            },
+            {
+              "squareFrom": "SQUARE_H4",
+              "squareTo": "SQUARE_H5",
+              "type": "COURSE_DRAWING_ARROW_TYPE_SECONDARY"
+            }
+          ]
+        },
+        "color": "COLOR_WHITE",
+        "postComment": "{\"data\":[{\"key\":\"C\",\"state\":\"V\",\"val\":\"This entire variation is based on sacrificing the d-pawn in exchange for a huge initiative and a kingside attack.\"}]}"
+      },
+      {
+        "id": "c7c78b79-d2a5-467e-9c06-d9582a21a375",
+        "moveNumber": 14,
+        "san": "Bxd2+",
+        "position": {
+          "fen": "r1bq1rk1/p4p1p/1pn1p1p1/3pP3/3p3P/2PB2B1/PP1bQPP1/R3K2R w KQ - 0 15"
+        },
+        "color": "COLOR_BLACK"
+      },
+      {
+        "id": "6ca7e981-5959-4798-977e-ca107bcbee9b",
+        "moveNumber": 15,
+        "san": "Qxd2",
+        "position": {
+          "fen": "r1bq1rk1/p4p1p/1pn1p1p1/3pP3/3p3P/2PB2B1/PP1Q1PP1/R3K2R b KQ - 0 15"
+        },
+        "color": "COLOR_WHITE"
+      },
+      {
+        "id": "f3f22fc5-09de-46ba-b3f3-49ed87eebffa",
+        "moveNumber": 15,
+        "san": "dxc3",
+        "position": {
+          "fen": "r1bq1rk1/p4p1p/1pn1p1p1/3pP3/7P/2pB2B1/PP1Q1PP1/R3K2R w KQ - 0 16"
+        },
+        "color": "COLOR_BLACK"
+      },
+      {
+        "id": "7ceca91d-fd9d-4077-8b20-9cff531ac101",
+        "moveNumber": 16,
+        "san": "bxc3",
+        "position": {
+          "fen": "r1bq1rk1/p4p1p/1pn1p1p1/3pP3/7P/2PB2B1/P2Q1PP1/R3K2R b KQ - 0 16",
+          "arrows": [
+            {
+              "squareFrom": "SQUARE_H4",
+              "squareTo": "SQUARE_H5",
+              "type": "COURSE_DRAWING_ARROW_TYPE_SECONDARY"
+            },
+            {
+              "squareFrom": "SQUARE_G3",
+              "squareTo": "SQUARE_F4",
+              "type": "COURSE_DRAWING_ARROW_TYPE_TERTIARY"
+            },
+            {
+              "squareFrom": "SQUARE_F4",
+              "squareTo": "SQUARE_G5",
+              "type": "COURSE_DRAWING_ARROW_TYPE_TERTIARY"
+            },
+            {
+              "squareFrom": "SQUARE_G5",
+              "squareTo": "SQUARE_F6",
+              "type": "COURSE_DRAWING_ARROW_TYPE_TERTIARY"
+            }
+          ]
+        },
+        "color": "COLOR_WHITE",
+        "postComment": "{\"data\":[{\"key\":\"C\",\"state\":\"V\",\"val\":\"The dark squares on Black's kingside have been irreparably weakened, and the extra pawn will not become relevant until an eventual endgame. White wants to play @@SANStart@@h5@@SANEnd@@, @@SANStart@@Qh6@@SANEnd@@, and deliver checkmate on the h-file. @@SANStart@@Bf4@@SANEnd@@-@@SANStart@@g5@@SANEnd@@-@@SANStart@@f6@@SANEnd@@ is a useful manoeuvre to keep in mind.\"}]}"
+      },
+      {
+        "id": "1effd47a-41a4-4ba4-9ff1-0d8cef00c984",
+        "moveNumber": 16,
+        "san": "d4",
+        "position": {
+          "fen": "r1bq1rk1/p4p1p/1pn1p1p1/4P3/3p3P/2PB2B1/P2Q1PP1/R3K2R w KQ - 0 17"
+        },
+        "color": "COLOR_BLACK"
+      },
+      {
+        "id": "2bab066a-3199-47b9-a52e-55a0f6d7cede",
+        "moveNumber": 17,
+        "san": "c4",
+        "position": {
+          "fen": "r1bq1rk1/p4p1p/1pn1p1p1/4P3/2Pp3P/3B2B1/P2Q1PP1/R3K2R b KQ - 0 17"
+        },
+        "color": "COLOR_WHITE",
+        "postComment": "{\"data\":[{\"key\":\"C\",\"state\":\"V\",\"val\":\"Keeping the center as closed as possible. The theoretical chapter ends <a class=\\\"commentMoveSmall\\\" href=\\\"\\/courses\\/train\\/6445752b-f404-4d8f-9397-4fb03f690d8e\\/variations\\/61a8f947-2ce4-4eb6-988a-80e0f6cef286\\\" target=\\\"_blank\\\" rel=\\\"noopener\\\" data-tippy-content=\\\"Link to variation\\\">here<\\/a>.\"}]}"
+      },
+      {
+        "id": "719676b1-5d81-4207-a357-ba323e0f468e",
+        "moveNumber": 17,
+        "san": "Qe7",
+        "position": {
+          "fen": "r1b2rk1/p3qp1p/1pn1p1p1/4P3/2Pp3P/3B2B1/P2Q1PP1/R3K2R w KQ - 1 18"
+        },
+        "color": "COLOR_BLACK"
+      },
+      {
+        "id": "229b0f37-15b1-4426-966a-9f855e5813d6",
+        "moveNumber": 18,
+        "san": "Rb1",
+        "position": {
+          "fen": "r1b2rk1/p3qp1p/1pn1p1p1/4P3/2Pp3P/3B2B1/P2Q1PP1/1R2K2R b K - 2 18",
+          "highlights": [
+            {
+              "square": "SQUARE_B4",
+              "type": "COURSE_DRAWING_SQUARE_TYPE_TERTIARY"
+            }
+          ],
+          "arrows": [
+            {
+              "squareFrom": "SQUARE_E7",
+              "squareTo": "SQUARE_B4",
+              "type": "COURSE_DRAWING_ARROW_TYPE_TERTIARY"
+            }
+          ]
+        },
+        "color": "COLOR_WHITE"
+      },
+      {
+        "id": "87df8334-2721-43ff-b328-ee162cc8e889",
+        "moveNumber": 18,
+        "san": "h5",
+        "position": {
+          "fen": "r1b2rk1/p3qp2/1pn1p1p1/4P2p/2Pp3P/3B2B1/P2Q1PP1/1R2K2R w K h6 0 19"
+        },
+        "color": "COLOR_BLACK"
+      },
+      {
+        "id": "6e1e5ee0-2272-45b4-bb0a-766df7d125ad",
+        "moveNumber": 19,
+        "san": "Bf4",
+        "position": {
+          "fen": "r1b2rk1/p3qp2/1pn1p1p1/4P2p/2Pp1B1P/3B4/P2Q1PP1/1R2K2R b K - 1 19"
+        },
+        "color": "COLOR_WHITE",
+        "postComment": "{\"data\":[{\"key\":\"C\",\"state\":\"V\",\"val\":\"Beginning the journey to the @@SANStart@@f6@@SANEnd@@-square. White's compensation for the sacrificed pawn comes from the fantastic control of the dark squares in the position, and they should be exploited as soon as possible.\"}]}"
+      },
+      {
+        "id": "a93cc5ad-1c37-44f9-9a77-ea6d6ad23a99",
+        "moveNumber": 19,
+        "san": "Bb7",
+        "position": {
+          "fen": "r4rk1/pb2qp2/1pn1p1p1/4P2p/2Pp1B1P/3B4/P2Q1PP1/1R2K2R w K - 2 20"
+        },
+        "color": "COLOR_BLACK",
+        "postComment": "{\"data\":[{\"key\":\"V\",\"state\":\"V\",\"val\":[{\"key\":\"S\",\"state\":\"V\",\"val\":\"19...Ba6\"},{\"key\":\"S\",\"state\":\"V\",\"val\":\"20.Bg5\"},{\"key\":\"S\",\"state\":\"V\",\"val\":\"Qc5\"},{\"key\":\"S\",\"state\":\"V\",\"val\":\"21.Bf6\"},{\"key\":\"S\",\"state\":\"V\",\"val\":\"Qa5=\"},{\"state\":\"VV\",\"key\":\"C\",\"val\":\"This is a more resilient attempt. @@SANStart@@Qc5@@SANEnd@@ threatened three things at once: the @@SANStart@@c4@@SANEnd@@-pawn, the @@SANStart@@e5@@SANEnd@@-pawn, and @@SANStart@@Qa5@@SANEnd@@ to force a queen trade.\"}],\"line\":false}]}"
+      },
+      {
+        "id": "b9ea8a90-3ee3-4128-9087-94ebda93d94e",
+        "moveNumber": 20,
+        "san": "O-O",
+        "position": {
+          "fen": "r4rk1/pb2qp2/1pn1p1p1/4P2p/2Pp1B1P/3B4/P2Q1PP1/1R3RK1 b - - 3 20"
+        },
+        "color": "COLOR_WHITE"
+      },
+      {
+        "id": "0cf63486-0d4a-43da-86d4-821b496ff521",
+        "moveNumber": 20,
+        "san": "Rfc8",
+        "position": {
+          "fen": "r1r3k1/pb2qp2/1pn1p1p1/4P2p/2Pp1B1P/3B4/P2Q1PP1/1R3RK1 w - - 4 21"
+        },
+        "color": "COLOR_BLACK",
+        "postComment": "{\"data\":[{\"key\":\"V\",\"state\":\"V\",\"val\":[{\"key\":\"S\",\"state\":\"V\",\"val\":\"20...Qxh4??\"},{\"key\":\"S\",\"state\":\"V\",\"val\":\"21.Bg5\"},{\"key\":\"S\",\"state\":\"V\",\"val\":\"Qg4\"},{\"key\":\"S\",\"state\":\"V\",\"val\":\"22.f3\"},{\"key\":\"S\",\"state\":\"V\",\"val\":\"Qg3\"},{\"key\":\"S\",\"state\":\"V\",\"val\":\"23.Bf6\"},{\"key\":\"S\",\"state\":\"V\",\"val\":\"Kh7\"},{\"key\":\"S\",\"state\":\"V\",\"val\":\"24.Rbe1+-\"},{\"state\":\"VV\",\"key\":\"C\",\"val\":\"The Black queen is currently trapped on @@SANStart@@g3@@SANEnd@@, and it appears as though either @@SANStart@@Re4@@SANEnd@@-@@SANStart@@h4@@SANEnd@@-@@SANStart@@h3@@SANEnd@@ or @@SANStart@@Re4@@SANEnd@@ and @@SANStart@@Bh4@@SANEnd@@ will win material in the near future.\"}],\"line\":false}]}"
+      },
+      {
+        "id": "7089a4ca-697a-4bba-8d1f-4ba5a4a9b398",
+        "moveNumber": 21,
+        "san": "Bg5",
+        "position": {
+          "fen": "r1r3k1/pb2qp2/1pn1p1p1/4P1Bp/2Pp3P/3B4/P2Q1PP1/1R3RK1 b - - 5 21"
+        },
+        "color": "COLOR_WHITE"
+      },
+      {
+        "id": "806f6956-9643-4989-aede-bfb973e37ba7",
+        "moveNumber": 21,
+        "san": "Qf8",
+        "position": {
+          "fen": "r1r2qk1/pb3p2/1pn1p1p1/4P1Bp/2Pp3P/3B4/P2Q1PP1/1R3RK1 w - - 6 22"
+        },
+        "color": "COLOR_BLACK"
+      },
+      {
+        "id": "5799b4b8-421f-48ce-8332-7656e63585da",
+        "moveNumber": 22,
+        "san": "Bf6",
+        "position": {
+          "fen": "r1r2qk1/pb3p2/1pn1pBp1/4P2p/2Pp3P/3B4/P2Q1PP1/1R3RK1 b - - 7 22"
+        },
+        "color": "COLOR_WHITE"
+      },
+      {
+        "id": "a18efe14-90ea-4d8f-b709-e0ed3089c4c9",
+        "moveNumber": 22,
+        "san": "Ne7",
+        "position": {
+          "fen": "r1r2qk1/pb2np2/1p2pBp1/4P2p/2Pp3P/3B4/P2Q1PP1/1R3RK1 w - - 8 23"
+        },
+        "color": "COLOR_BLACK"
+      },
+      {
+        "id": "3facc6ea-5847-4e60-9500-5f49a9a6c724",
+        "moveNumber": 23,
+        "san": "Qg5",
+        "position": {
+          "fen": "r1r2qk1/pb2np2/1p2pBp1/4P1Qp/2Pp3P/3B4/P4PP1/1R3RK1 b - - 9 23"
+        },
+        "color": "COLOR_WHITE"
+      },
+      {
+        "id": "399032e8-7cfa-474f-a515-1a6a86be15dc",
+        "moveNumber": 23,
+        "san": "Nf5",
+        "position": {
+          "fen": "r1r2qk1/pb3p2/1p2pBp1/4PnQp/2Pp3P/3B4/P4PP1/1R3RK1 w - - 10 24"
+        },
+        "color": "COLOR_BLACK"
+      },
+      {
+        "id": "670d096e-1e8f-4fed-a874-b65c0576f41d",
+        "moveNumber": 24,
+        "san": "Bxf5",
+        "position": {
+          "fen": "r1r2qk1/pb3p2/1p2pBp1/4PBQp/2Pp3P/8/P4PP1/1R3RK1 b - - 0 24"
+        },
+        "color": "COLOR_WHITE"
+      },
+      {
+        "id": "9b71087b-462b-4acc-a480-9b4628e06d4f",
+        "moveNumber": 24,
+        "san": "exf5",
+        "position": {
+          "fen": "r1r2qk1/pb3p2/1p3Bp1/4PpQp/2Pp3P/8/P4PP1/1R3RK1 w - - 0 25"
+        },
+        "color": "COLOR_BLACK"
+      },
+      {
+        "id": "3fe4e80f-2f73-4021-a0b9-a0928a96b6b1",
+        "moveNumber": 25,
+        "san": "e6",
+        "position": {
+          "fen": "r1r2qk1/pb3p2/1p2PBp1/5pQp/2Pp3P/8/P4PP1/1R3RK1 b - - 0 25",
+          "nags": [
+            {
+              "type": "primary",
+              "nagId": 1
+            }
+          ]
+        },
+        "color": "COLOR_WHITE"
+      },
+      {
+        "id": "14071d31-673a-4dc8-b3b4-5abae25b1728",
+        "moveNumber": 25,
+        "san": "Kh7",
+        "position": {
+          "fen": "r1r2q2/pb3p1k/1p2PBp1/5pQp/2Pp3P/8/P4PP1/1R3RK1 w - - 1 26"
+        },
+        "color": "COLOR_BLACK"
+      },
+      {
+        "id": "9ff42719-3c2d-4c53-921b-ec2860dd3273",
+        "moveNumber": 26,
+        "san": "e7",
+        "position": {
+          "fen": "r1r2q2/pb2Pp1k/1p3Bp1/5pQp/2Pp3P/8/P4PP1/1R3RK1 b - - 0 26"
+        },
+        "color": "COLOR_WHITE"
+      },
+      {
+        "id": "be36d152-09fc-475c-91e4-92d9240d7f32",
+        "moveNumber": 26,
+        "san": "Qe8",
+        "position": {
+          "fen": "r1r1q3/pb2Pp1k/1p3Bp1/5pQp/2Pp3P/8/P4PP1/1R3RK1 w - - 1 27"
+        },
+        "color": "COLOR_BLACK"
+      },
+      {
+        "id": "3adece49-fb5c-4b1d-8704-24f4850e9896",
+        "moveNumber": 27,
+        "san": "Rfd1",
+        "position": {
+          "fen": "r1r1q3/pb2Pp1k/1p3Bp1/5pQp/2Pp3P/8/P4PP1/1R1R2K1 b - - 2 27"
+        },
+        "color": "COLOR_WHITE"
+      },
+      {
+        "id": "a69d516e-44d1-4cbd-9182-54274bdfc624",
+        "moveNumber": 27,
+        "san": "Rxc4",
+        "position": {
+          "fen": "r3q3/pb2Pp1k/1p3Bp1/5pQp/2rp3P/8/P4PP1/1R1R2K1 w - - 0 28"
+        },
+        "color": "COLOR_BLACK"
+      },
+      {
+        "id": "db2f2738-e854-4c30-b6bf-adbe76399a4d",
+        "moveNumber": 28,
+        "san": "Rxd4",
+        "position": {
+          "fen": "r3q3/pb2Pp1k/1p3Bp1/5pQp/2rR3P/8/P4PP1/1R4K1 b - - 0 28"
+        },
+        "color": "COLOR_WHITE"
+      },
+      {
+        "id": "70ca0d4a-1304-44c7-aad6-ce7fbd7be2c1",
+        "moveNumber": 28,
+        "san": "Rxd4",
+        "position": {
+          "fen": "r3q3/pb2Pp1k/1p3Bp1/5pQp/3r3P/8/P4PP1/1R4K1 w - - 0 29"
+        },
+        "color": "COLOR_BLACK"
+      },
+      {
+        "id": "c5941841-aa5b-43ef-a724-3437ac07eda5",
+        "moveNumber": 29,
+        "san": "Bxd4",
+        "position": {
+          "fen": "r3q3/pb2Pp1k/1p4p1/5pQp/3B3P/8/P4PP1/1R4K1 b - - 0 29"
+        },
+        "color": "COLOR_WHITE"
+      },
+      {
+        "id": "906075fb-0bcf-40b3-b5a0-2725573c382b",
+        "moveNumber": 29,
+        "san": "Qc6",
+        "position": {
+          "fen": "r7/pb2Pp1k/1pq3p1/5pQp/3B3P/8/P4PP1/1R4K1 w - - 1 30"
+        },
+        "color": "COLOR_BLACK"
+      },
+      {
+        "id": "6f36864a-2252-42b0-ab0a-ee4db398cedb",
+        "moveNumber": 30,
+        "san": "Rd1",
+        "position": {
+          "fen": "r7/pb2Pp1k/1pq3p1/5pQp/3B3P/8/P4PP1/3R2K1 b - - 2 30",
+          "arrows": [
+            {
+              "squareFrom": "SQUARE_D1",
+              "squareTo": "SQUARE_D8",
+              "type": "COURSE_DRAWING_ARROW_TYPE_SECONDARY"
+            }
+          ]
+        },
+        "color": "COLOR_WHITE"
+      },
+      {
+        "id": "a2cc3742-6d50-477e-89e5-581f14ae6230",
+        "moveNumber": 30,
+        "san": "Qd6",
+        "position": {
+          "fen": "r7/pb2Pp1k/1p1q2p1/5pQp/3B3P/8/P4PP1/3R2K1 w - - 3 31"
+        },
+        "color": "COLOR_BLACK"
+      },
+      {
+        "id": "3d38fee9-6d23-413a-91f9-16c636168339",
+        "moveNumber": 31,
+        "san": "Rd2",
+        "position": {
+          "fen": "r7/pb2Pp1k/1p1q2p1/5pQp/3B3P/8/P2R1PP1/6K1 b - - 4 31"
+        },
+        "color": "COLOR_WHITE"
+      },
+      {
+        "id": "a12af0f2-e0d2-4d1c-bc7e-71906d0e2903",
+        "moveNumber": 31,
+        "san": "Re8",
+        "position": {
+          "fen": "4r3/pb2Pp1k/1p1q2p1/5pQp/3B3P/8/P2R1PP1/6K1 w - - 5 32"
+        },
+        "color": "COLOR_BLACK"
+      },
+      {
+        "id": "14d059de-77e6-4466-a830-9cbb92da2c8d",
+        "moveNumber": 32,
+        "san": "Be3",
+        "position": {
+          "fen": "4r3/pb2Pp1k/1p1q2p1/5pQp/7P/4B3/P2R1PP1/6K1 b - - 6 32"
+        },
+        "color": "COLOR_WHITE"
+      },
+      {
+        "id": "02f36c22-f324-4414-9d0c-b117df81936b",
+        "moveNumber": 32,
+        "san": "Qxe7",
+        "position": {
+          "fen": "4r3/pb2qp1k/1p4p1/5pQp/7P/4B3/P2R1PP1/6K1 w - - 0 33"
+        },
+        "color": "COLOR_BLACK"
+      },
+      {
+        "id": "2b37cbc2-ba96-430b-a4c8-7aa3c86bcdfd",
+        "moveNumber": 33,
+        "san": "Qh6+",
+        "position": {
+          "fen": "4r3/pb2qp1k/1p4pQ/5p1p/7P/4B3/P2R1PP1/6K1 b - - 1 33"
+        },
+        "color": "COLOR_WHITE"
+      },
+      {
+        "id": "3d5ffeea-6769-41e9-8906-69a608850933",
+        "moveNumber": 33,
+        "san": "Kg8",
+        "position": {
+          "fen": "4r1k1/pb2qp2/1p4pQ/5p1p/7P/4B3/P2R1PP1/6K1 w - - 2 34"
+        },
+        "color": "COLOR_BLACK"
+      },
+      {
+        "id": "3d2815c8-be68-45a5-a6d5-8fe04dda4e04",
+        "moveNumber": 34,
+        "san": "Bd4",
+        "position": {
+          "fen": "4r1k1/pb2qp2/1p4pQ/5p1p/3B3P/8/P2R1PP1/6K1 b - - 3 34"
+        },
+        "color": "COLOR_WHITE"
+      },
+      {
+        "id": "82b513de-b87e-42a8-acb5-15cfb25bc975",
+        "moveNumber": 34,
+        "san": "f6",
+        "position": {
+          "fen": "4r1k1/pb2q3/1p3ppQ/5p1p/3B3P/8/P2R1PP1/6K1 w - - 0 35"
+        },
+        "color": "COLOR_BLACK"
+      },
+      {
+        "id": "f13626c5-f81f-4a34-81b4-bde3130a7c41",
+        "moveNumber": 35,
+        "san": "Qxg6+",
+        "position": {
+          "fen": "4r1k1/pb2q3/1p3pQ1/5p1p/3B3P/8/P2R1PP1/6K1 b - - 0 35"
+        },
+        "color": "COLOR_WHITE"
+      },
+      {
+        "id": "ceb888d2-517a-4314-af9b-f2895d4d0fd6",
+        "moveNumber": 35,
+        "san": "Kf8",
+        "position": {
+          "fen": "4rk2/pb2q3/1p3pQ1/5p1p/3B3P/8/P2R1PP1/6K1 w - - 1 36"
+        },
+        "color": "COLOR_BLACK"
+      },
+      {
+        "id": "93e7bc3c-88cf-4069-af8c-a366cb17e2e5",
+        "moveNumber": 36,
+        "san": "Bxf6",
+        "position": {
+          "fen": "4rk2/pb2q3/1p3BQ1/5p1p/7P/8/P2R1PP1/6K1 b - - 0 36",
+          "highlights": [
+            {
+              "square": "SQUARE_G7",
+              "type": "COURSE_DRAWING_SQUARE_TYPE_SECONDARY"
+            }
+          ],
+          "arrows": [
+            {
+              "squareFrom": "SQUARE_E7",
+              "squareTo": "SQUARE_E1",
+              "type": "COURSE_DRAWING_ARROW_TYPE_TERTIARY"
+            },
+            {
+              "squareFrom": "SQUARE_G1",
+              "squareTo": "SQUARE_H2",
+              "type": "COURSE_DRAWING_ARROW_TYPE_TERTIARY"
+            },
+            {
+              "squareFrom": "SQUARE_G6",
+              "squareTo": "SQUARE_G7",
+              "type": "COURSE_DRAWING_ARROW_TYPE_SECONDARY"
+            }
+          ]
+        },
+        "color": "COLOR_WHITE",
+        "postComment": "{\"data\":[{\"key\":\"V\",\"state\":\"\",\"val\":[{\"key\":\"C\",\"state\":\"\",\"val\":\"Black resigned because\"},{\"key\":\"S\",\"state\":\"\",\"val\":\"36...Qf7\"},{\"key\":\"S\",\"state\":\"\",\"val\":\"37.Qh6+\"},{\"key\":\"C\",\"state\":\"\",\"val\":\"leads to checkmate, while\"},{\"key\":\"S\",\"state\":\"\",\"val\":\"36...Qe1+\"},{\"key\":\"S\",\"state\":\"\",\"val\":\"37.Kh2\"},{\"state\":\"V\",\"key\":\"C\",\"val\":\"leaves @@SANStart@@Qg7@@SANEnd@@# impossible to prevent. Crazy to think that this wild attacking game started with a peaceful London System once upon a time. This variation is one of my favourites, and because it's part of the main line, it's one that you will see fairly often.\"}],\"line\":false}]}"
+      }
+    ],
+    "settings": {
+      "showVideo": true,
+      "language": "en",
+      "learnType": "COURSE_LEARN_TYPE_ALL",
+      "reviewType": "COURSE_REVIEW_TYPE_LEARNED_ORDER",
+      "repetitionAmount": 1,
+      "depth": 0,
+      "scheduleType": "COURSE_SCHEDULE_TYPE_SPACED_REPETITION",
+      "schedule": {
+        "secondsAmount": [
+          86400,
+          259200,
+          604800,
+          1209600,
+          2592000,
+          5184000,
+          7776000
+        ]
+      },
+      "autoNext": false,
+      "quizTimeLimit": true,
+      "timer": 60,
+      "assistedQuiz": true,
+      "reviewFailedBehavior": "COURSE_REVIEW_FAILED_BEHAVIOR_MOVE_TO_NEXT_CYCLE",
+      "assistedQuizPauseToRead": true
+    },
+    "userVideoPosition": 1044,
+    "firstLearnableMoveColor": "COLOR_WHITE"
+  },
+  "trainingId": "605ea0a8-9d2b-4ae3-96d3-963a355dab67"
+}

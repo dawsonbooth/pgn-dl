@@ -1,0 +1,75 @@
+{
+  "lesson": {
+    "variation": {
+      "id": "60801362-0232-47cd-86e9-02b0d3c37a84",
+      "name": "Welcome to the London!",
+      "startingPosition": {
+        "fen": "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
+      },
+      "moveTrainerId": "6445752b-f404-4d8f-9397-4fb03f690d8e",
+      "chapterId": "fdde3620-96eb-4f48-806b-68e51249e4a2",
+      "type": "COURSE_VARIATION_TYPE_INFORMATIONAL",
+      "isLearned": true,
+      "videoStart": 0,
+      "videoEnd": 101000,
+      "accessType": "VARIATION_ACCESS_TYPE_FULL_ACCESS",
+      "previewPosition": {
+        "fen": "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR b KQkq - 0 1"
+      },
+      "learnerColor": "COLOR_WHITE"
+    },
+    "whitePlayer": {
+      "name": "dawsonbooth",
+      "picture": {
+        "url": "https://images.chesscomfiles.com/uploads/v1/user/36571416.3e7fc3ee.200x200o.eeb3a071e70f.jpeg"
+      }
+    },
+    "blackPlayer": {
+      "name": "Aman Hambleton",
+      "picture": {
+        "url": "https://assets-courses.chess.com/image/users/570770_user_medium_opt.jpeg"
+      }
+    },
+    "plies": [
+      {
+        "id": "9f0aec1e-417a-4b64-ae3d-b9dac9b79f21",
+        "moveNumber": 1,
+        "san": "--",
+        "position": {
+          "fen": "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR b KQkq - 0 1"
+        },
+        "color": "COLOR_WHITE",
+        "preComment": "{\"data\":[{\"key\":\"C\",\"state\":\"V\",\"val\":\"Hello everyone! My name is Grandmaster Aman Hambleton, and I'm very happy to welcome you to my course <span class=\\\"italic\\\">Aman Hambleton's London System<\\/span>.  <br\\/><br\\/> I've been playing chess for over 25 years and professionally for more than a decade. During my professional career, I've represented Canada multiple times in the Chess Olympiad and achieved a shared first place in the biggest Canadian tournament, called the 'Canadian Open'.  <br\\/><br\\/> I've been teaching private and monthly group lessons for 15 years to this day. In addition, I've uploaded a huge library of free educational content to the chessbrah YouTube channel for more than ten years. After achieving the Grandmaster title in 2017, working on the YouTube channel and creating educational content became an absolute priority for me. <br\\/><br\\/> The London System is a very special opening for me. I used it almost exclusively in 2017 while working towards the GM title. Despite its sometimes boring, solid, or positional stereotypes, the London System is both a good first opening and a reliable weapon to confidently play for a win with White.  <br\\/><br\\/> A good repertoire needs to have a balance between positional and solid options as well as tactical skirmishes and unclear positions. As you will see, this course will deliver exactly that.\"}]}"
+      }
+    ],
+    "settings": {
+      "showVideo": true,
+      "language": "en",
+      "learnType": "COURSE_LEARN_TYPE_ALL",
+      "reviewType": "COURSE_REVIEW_TYPE_LEARNED_ORDER",
+      "repetitionAmount": 1,
+      "depth": 0,
+      "scheduleType": "COURSE_SCHEDULE_TYPE_SPACED_REPETITION",
+      "schedule": {
+        "secondsAmount": [
+          86400,
+          259200,
+          604800,
+          1209600,
+          2592000,
+          5184000,
+          7776000
+        ]
+      },
+      "autoNext": false,
+      "quizTimeLimit": true,
+      "timer": 60,
+      "assistedQuiz": true,
+      "reviewFailedBehavior": "COURSE_REVIEW_FAILED_BEHAVIOR_MOVE_TO_NEXT_CYCLE",
+      "assistedQuizPauseToRead": true
+    },
+    "userVideoPosition": 1044,
+    "firstLearnableMoveColor": "COLOR_WHITE"
+  },
+  "trainingId": "94409602-74de-4832-a03c-2a886e231ed5"
+}
