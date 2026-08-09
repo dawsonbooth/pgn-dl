@@ -63,7 +63,9 @@ def mount_sources(root: typer.Typer) -> None:
 # pretty_exceptions_show_locals is Typer's own default, pinned here: a frame
 # between the token exchange and the file it lands in holds a refresh token,
 # and a rendered traceback would print it.
-app = typer.Typer(cls=RootGroup, add_completion=False, pretty_exceptions_show_locals=False)
+app = typer.Typer(
+    cls=RootGroup, add_completion=False, pretty_exceptions_show_locals=False
+)
 mount_sources(app)
 
 
@@ -86,12 +88,16 @@ def list_sources() -> None:
 
 
 @app.command()
-def login(source: Annotated[str, typer.Argument(help="Source name, e.g. chesscom")]) -> None:
+def login(
+    source: Annotated[str, typer.Argument(help="Source name, e.g. chesscom")],
+) -> None:
     """Sign in to a source once; the session persists for later downloads."""
     fn = logins().get(source)
     if fn is None:
         known = ", ".join(sorted(logins())) or "none"
-        typer.echo(f"{source!r} needs no login, or is unknown. Sources with login: {known}")
+        typer.echo(
+            f"{source!r} needs no login, or is unknown. Sources with login: {known}"
+        )
         raise typer.Exit(code=1)
     try:
         asyncio.run(fn())

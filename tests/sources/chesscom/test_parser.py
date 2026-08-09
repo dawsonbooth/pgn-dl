@@ -129,7 +129,9 @@ _ANNOTATED_POSITION = {
 
 
 def test_position_annotations_reach_the_move_they_belong_to() -> None:
-    lesson = parse_lesson_tree(_lesson([{"san": "e4", "position": _ANNOTATED_POSITION}]))
+    lesson = parse_lesson_tree(
+        _lesson([{"san": "e4", "position": _ANNOTATED_POSITION}])
+    )
     node = lesson.root.children[0]
 
     assert [(a.from_square, a.to_square, a.type) for a in node.arrows] == [
@@ -149,7 +151,9 @@ def test_position_annotations_reach_the_move_they_belong_to() -> None:
 def test_position_annotations_survive_into_the_pgn() -> None:
     # The parser filling the fields is only half of it: they have to come out
     # as the %cal / %csl commands a GUI reads, or the drawings are lost anyway.
-    lesson = parse_lesson_tree(_lesson([{"san": "e4", "position": _ANNOTATED_POSITION}]))
+    lesson = parse_lesson_tree(
+        _lesson([{"san": "e4", "position": _ANNOTATED_POSITION}])
+    )
     collection = Collection(source="chesscom", kind="courses", slug="c", name="C")
     pgn = game_to_pgn(collection, GameItem(root=lesson.root))
 
@@ -219,7 +223,9 @@ def test_an_unplayable_mainline_move_raises_instead_of_truncating() -> None:
 def test_a_variation_replacing_its_ply_branches_where_that_ply_did() -> None:
     # "1.d4" is the same half-move as the 1.e4 it hangs off, so it is an
     # alternative to it and starts from the position 1.e4 started from.
-    post = _variation_comment([{"key": "S", "val": "1.d4"}, {"key": "S", "val": "1...d5"}])
+    post = _variation_comment(
+        [{"key": "S", "val": "1.d4"}, {"key": "S", "val": "1...d5"}]
+    )
     lesson = parse_lesson_tree(_lesson([{"san": "e4", "postComment": post}]))
 
     assert [c.san for c in lesson.root.children] == ["e4", "d4"]
@@ -231,7 +237,9 @@ def test_a_variation_continuing_its_ply_hangs_below_it_after_the_mainline() -> N
     # that move rather than a replacement for it, and belongs below it. It must
     # land after the ply that really followed: children[0] is the mainline, and
     # putting the sideline there would rewrite the game.
-    post = _variation_comment([{"key": "S", "val": "1...c5"}, {"key": "S", "val": "2.Nf3"}])
+    post = _variation_comment(
+        [{"key": "S", "val": "1...c5"}, {"key": "S", "val": "2.Nf3"}]
+    )
     lesson = parse_lesson_tree(
         _lesson([{"san": "e4", "postComment": post}, {"san": "e5"}])
     )
@@ -279,7 +287,9 @@ def test_a_line_that_goes_back_only_part_way_branches_part_way_down() -> None:
 def test_a_block_naming_a_position_that_is_neither_stays_prose() -> None:
     # Anchoring it anywhere would be a guess, and a wrong guess replays as moves
     # the author never wrote. The sentence chess.com composed is strictly better.
-    post = _variation_comment([{"key": "S", "val": "5.Nf3"}, {"key": "S", "val": "5...Nc6"}])
+    post = _variation_comment(
+        [{"key": "S", "val": "5.Nf3"}, {"key": "S", "val": "5...Nc6"}]
+    )
     lesson = parse_lesson_tree(_lesson([{"san": "e4", "postComment": post}]))
 
     assert [c.san for c in lesson.root.children] == ["e4"]

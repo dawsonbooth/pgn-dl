@@ -37,7 +37,9 @@ def test_saved_credentials_are_owner_only(tmp_path, monkeypatch) -> None:
     assert mode == 0o600, f"credentials must be owner-only, got {mode:o}"
 
 
-def test_saving_narrows_a_pre_existing_world_readable_file(tmp_path, monkeypatch) -> None:
+def test_saving_narrows_a_pre_existing_world_readable_file(
+    tmp_path, monkeypatch
+) -> None:
     # os.open's mode applies only on creation, so a file restored from a backup
     # or copied between machines could otherwise keep 0644 and hold a
     # long-lived credential world-readable.
@@ -71,7 +73,9 @@ def test_saving_twice_replaces_rather_than_appends(tmp_path, monkeypatch) -> Non
     assert json.loads(auth.credentials_path().read_text())["refresh_token"] == "SECOND"
 
 
-async def test_id_token_exchange_persists_the_rotated_refresh_token(tmp_path, monkeypatch) -> None:
+async def test_id_token_exchange_persists_the_rotated_refresh_token(
+    tmp_path, monkeypatch
+) -> None:
     monkeypatch.setenv("PGN_DL_PROFILE", str(tmp_path))
     auth.save_refresh_token("OLD")
     calls = []
@@ -131,7 +135,9 @@ async def test_a_connection_failure_is_a_fetch_error(tmp_path, monkeypatch) -> N
     assert "SECRET-REFRESH" not in str(exc.value)
 
 
-async def test_a_response_without_an_id_token_is_a_fetch_error(tmp_path, monkeypatch) -> None:
+async def test_a_response_without_an_id_token_is_a_fetch_error(
+    tmp_path, monkeypatch
+) -> None:
     monkeypatch.setenv("PGN_DL_PROFILE", str(tmp_path))
     auth.save_refresh_token("OLD")
 
@@ -144,7 +150,9 @@ async def test_a_response_without_an_id_token_is_a_fetch_error(tmp_path, monkeyp
     assert "ID token" in str(exc.value)
 
 
-def test_the_profile_path_expands_a_tilde_and_falls_back_when_unset(monkeypatch) -> None:
+def test_the_profile_path_expands_a_tilde_and_falls_back_when_unset(
+    monkeypatch,
+) -> None:
     # Anything that does not expand the value (a compose file, a systemd unit,
     # a quoted export) otherwise gets a directory literally named "~".
     monkeypatch.setenv("PGN_DL_PROFILE", "~/pgn-dl-profile")
@@ -246,7 +254,9 @@ async def test_a_real_exchange_reads_both_tokens_back(tmp_path, monkeypatch) -> 
 
     def handler(request: httpx.Request) -> httpx.Response:
         seen.append(request)
-        return httpx.Response(200, json={"id_token": "ID-1", "refresh_token": "DUMMY-ROTATED"})
+        return httpx.Response(
+            200, json={"id_token": "ID-1", "refresh_token": "DUMMY-ROTATED"}
+        )
 
     monkeypatch.setattr(httpx, "AsyncClient", _mock_client(handler))
     assert await auth.id_token() == "ID-1"
@@ -255,7 +265,9 @@ async def test_a_real_exchange_reads_both_tokens_back(tmp_path, monkeypatch) -> 
     assert auth.load_refresh_token() == "DUMMY-ROTATED"
 
 
-async def test_a_rejected_exchange_does_not_echo_the_credential_back(tmp_path, monkeypatch) -> None:
+async def test_a_rejected_exchange_does_not_echo_the_credential_back(
+    tmp_path, monkeypatch
+) -> None:
     # securetoken repeats the request in its error body, so the body is the
     # refresh token.
     monkeypatch.setenv("PGN_DL_PROFILE", str(tmp_path))
@@ -265,7 +277,12 @@ async def test_a_rejected_exchange_does_not_echo_the_credential_back(tmp_path, m
         assert DUMMY.encode() in request.content
         return httpx.Response(
             400,
-            json={"error": {"message": "TOKEN_EXPIRED", "request": request.content.decode()}},
+            json={
+                "error": {
+                    "message": "TOKEN_EXPIRED",
+                    "request": request.content.decode(),
+                }
+            },
         )
 
     monkeypatch.setattr(httpx, "AsyncClient", _mock_client(handler))
@@ -275,12 +292,16 @@ async def test_a_rejected_exchange_does_not_echo_the_credential_back(tmp_path, m
     assert "400" in str(exc.value)
 
 
-async def test_a_malformed_success_does_not_echo_the_credential_back(tmp_path, monkeypatch) -> None:
+async def test_a_malformed_success_does_not_echo_the_credential_back(
+    tmp_path, monkeypatch
+) -> None:
     monkeypatch.setenv("PGN_DL_PROFILE", str(tmp_path))
     auth.save_refresh_token(DUMMY)
 
     def handler(request: httpx.Request) -> httpx.Response:
-        return httpx.Response(200, text=f"<html>proxy could not send {request.content.decode()}")
+        return httpx.Response(
+            200, text=f"<html>proxy could not send {request.content.decode()}"
+        )
 
     monkeypatch.setattr(httpx, "AsyncClient", _mock_client(handler))
     with pytest.raises(FetchError) as exc:

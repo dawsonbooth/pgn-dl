@@ -88,7 +88,9 @@ def test_a_profile_directory_and_its_parents_are_owner_only(tmp_path: Path) -> N
         assert mode == 0o700, f"{level} is {mode:o}"
 
 
-def test_an_existing_world_readable_profile_directory_is_narrowed(tmp_path: Path) -> None:
+def test_an_existing_world_readable_profile_directory_is_narrowed(
+    tmp_path: Path,
+) -> None:
     d = tmp_path / "profile" / "chesscom"
     d.mkdir(parents=True)
     d.chmod(0o755)

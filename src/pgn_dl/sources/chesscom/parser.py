@@ -329,7 +329,8 @@ def _build_variation_lines(
         ply = _ply_number(item.raw)
         if ply is not None and ply != _board_ply(board):
             at = next(
-                (i for i, step in enumerate(line) if _board_ply(step.board) == ply), None
+                (i for i, step in enumerate(line) if _board_ply(step.board) == ply),
+                None,
             )
             if at is None:
                 return [], _block_text(block)

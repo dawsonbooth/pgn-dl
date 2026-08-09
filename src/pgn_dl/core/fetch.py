@@ -76,7 +76,11 @@ def describe_body(body: str) -> str:
     if not text:
         return "empty body"
     if text.startswith("<"):
-        return "HTML sign-in page" if _SIGN_IN.search(text[:_SIGN_IN_SCAN]) else "HTML page"
+        return (
+            "HTML sign-in page"
+            if _SIGN_IN.search(text[:_SIGN_IN_SCAN])
+            else "HTML page"
+        )
     if text[0] in "{[":
         return "JSON body"
     return "text body"

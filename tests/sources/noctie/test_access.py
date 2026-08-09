@@ -57,9 +57,7 @@ async def test_a_non_403_failure_is_not_dressed_up_as_a_paywall(
 
 
 @pytest.mark.parametrize(("extractor_cls", "url"), EXTRACTORS)
-async def test_an_id_containing_403_does_not_fake_a_paywall(
-    extractor_cls, url
-) -> None:
+async def test_an_id_containing_403_does_not_fake_a_paywall(extractor_cls, url) -> None:
     # The failing URL is embedded in the error message, so the typed status is
     # what gets matched, never the text.
     assert "403" in ID_WITH_403

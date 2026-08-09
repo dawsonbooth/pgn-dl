@@ -53,13 +53,17 @@ def save_refresh_token(token: str) -> None:
     # a link here is either an attack or an arrangement we should not silently
     # destroy, so say so instead.
     if path.is_symlink():
-        raise FetchError(f"{path} is a symbolic link; refusing to write credentials through it")
+        raise FetchError(
+            f"{path} is a symbolic link; refusing to write credentials through it"
+        )
     try:
         write_text_atomic(path, json.dumps({"refresh_token": token}))
     except OSError as exc:
         # The message, never the token: this reaches the runner and the log.
         reason = exc.strerror or type(exc).__name__
-        raise FetchError(f"could not save noctie credentials to {path}: {reason}") from None
+        raise FetchError(
+            f"could not save noctie credentials to {path}: {reason}"
+        ) from None
 
 
 def load_refresh_token() -> str:
@@ -67,7 +71,9 @@ def load_refresh_token() -> str:
     try:
         token = json.loads(path.read_text(encoding="utf-8"))["refresh_token"]
     except OSError, KeyError, ValueError:
-        raise FetchError(f"no saved noctie credentials at {path}; {_LOGIN_HINT}") from None
+        raise FetchError(
+            f"no saved noctie credentials at {path}; {_LOGIN_HINT}"
+        ) from None
     if not token:
         raise FetchError(f"saved noctie credentials are empty; {_LOGIN_HINT}")
     return token
@@ -153,8 +159,11 @@ async def login() -> None:
     private_dir(profile_dir())
     async with browser_context(profile_dir(), headless=False) as ctx:
         page = await ctx.new_page()
-        await page.goto("https://app.noctie.ai/login?redirectPath=%2Fthemes",
-                        wait_until="domcontentloaded", timeout=60000)
+        await page.goto(
+            "https://app.noctie.ai/login?redirectPath=%2Fthemes",
+            wait_until="domcontentloaded",
+            timeout=60000,
+        )
         for _ in range(_SIGN_IN_POLLS):
             await asyncio.sleep(3)
             if "/login" in page.url:

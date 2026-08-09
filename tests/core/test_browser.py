@@ -90,7 +90,9 @@ async def test_a_browser_transport_failure_is_a_fetch_error() -> None:
     fetcher = BrowserFetcher(BoomContext(exc))
 
     with pytest.raises(FetchError) as got:
-        await fetcher.get_text("https://x/y?key=sekrit", headers={"authorization": "Bearer sekrit"})
+        await fetcher.get_text(
+            "https://x/y?key=sekrit", headers={"authorization": "Bearer sekrit"}
+        )
     assert "sekrit" not in str(got.value)
 
     with pytest.raises(FetchError):
@@ -118,6 +120,7 @@ async def test_a_non_json_200_from_the_browser_is_a_fetch_error() -> None:
 async def test_ordinary_responses_pass_through() -> None:
     ok = FakeResponse(200, {}, '{"a": 1}')
     assert await _fetcher(ok).post_json("https://x/y", headers={}, json={}) == {"a": 1}
-    assert await _fetcher(FakeResponse(200, {}, "hi")).get_text(
-        "https://x/y", headers={}
-    ) == "hi"
+    assert (
+        await _fetcher(FakeResponse(200, {}, "hi")).get_text("https://x/y", headers={})
+        == "hi"
+    )

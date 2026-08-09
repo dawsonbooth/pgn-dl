@@ -40,7 +40,9 @@ PIRC = "167907e5-7abc-4d48-9b6e-c192b6a81550"  # index 40
 
 
 def _elements() -> list[dict]:
-    return json.loads((FIX / "theme_elements.json").read_text(encoding="utf-8"))["documents"]
+    return json.loads((FIX / "theme_elements.json").read_text(encoding="utf-8"))[
+        "documents"
+    ]
 
 
 def _element_doc(element_id: str) -> str:
@@ -69,7 +71,9 @@ def _theme_doc(count: int | None) -> str:
 
 def _fetcher() -> FakeFetcher:
     pages = {
-        f"{BASE}/themes/{THEME_ID}": (FIX / "theme_doc.json").read_text(encoding="utf-8"),
+        f"{BASE}/themes/{THEME_ID}": (FIX / "theme_doc.json").read_text(
+            encoding="utf-8"
+        ),
         f"{BASE}/themes/{THEME_ID}/elements": (FIX / "theme_elements.json").read_text(
             encoding="utf-8"
         ),
@@ -248,7 +252,9 @@ def test_theme_id_from_rejects_anything_else(target: str) -> None:
 
 
 def test_from_url_declines_a_foreign_url_without_raising() -> None:
-    assert ThemesExtractor.from_url("https://www.chess.com/lessons/learn-to-play") is None
+    assert (
+        ThemesExtractor.from_url("https://www.chess.com/lessons/learn-to-play") is None
+    )
     assert isinstance(ThemesExtractor.from_url(THEME_URL), ThemesExtractor)
 
 

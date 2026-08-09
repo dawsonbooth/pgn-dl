@@ -27,6 +27,7 @@ def profile_dir(source: str) -> Path:
     root = Path(os.environ.get(PROFILE_ENV) or ".profile").expanduser().resolve()
     return root / source
 
+
 _SLUG_DROP = re.compile(r"[^a-zA-Z0-9]+")
 _LEADING_INT = re.compile(r"\d+")
 
@@ -68,7 +69,11 @@ def combine_collection_dir(
     # rglob: item files nest (a course's chapter directories, a book's
     # bookmarks/ subdirectory), and all.pgn is meant to hold all of them.
     files = sorted(
-        (f for f in collection_dir.rglob("*.pgn") if f.is_file() and f.name != COMBINED_NAME),
+        (
+            f
+            for f in collection_dir.rglob("*.pgn")
+            if f.is_file() and f.name != COMBINED_NAME
+        ),
         key=lambda f: _order_key(f.relative_to(collection_dir)),
     )
     # Everything pgn-dl wrote is UTF-8, so an unreadable file is someone else's

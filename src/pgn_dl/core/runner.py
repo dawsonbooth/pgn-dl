@@ -90,9 +90,7 @@ async def _fetch_with_retry(
             return item
 
 
-def report_discovery_failure(
-    extractor: Extractor, exc: FetchError, echo: Echo
-) -> None:
+def report_discovery_failure(extractor: Extractor, exc: FetchError, echo: Echo) -> None:
     """Explain a failed cold start. Discovery is where an expired session lands.
 
     Public because the driver reports a transport it could not build the same

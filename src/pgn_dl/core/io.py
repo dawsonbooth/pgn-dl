@@ -47,7 +47,9 @@ def _report_open_root(root: Path, echo: Callable[[str], None]) -> None:
     if not mode & 0o077:
         return
     echo(f"  ! {root} is mode {mode:04o}, so other users can reach it.")
-    echo("    pgn-dl does not narrow a directory it did not create; chmod 700 it yourself.")
+    echo(
+        "    pgn-dl does not narrow a directory it did not create; chmod 700 it yourself."
+    )
 
 
 def private_dir(path: Path, *, echo: Callable[[str], None] = print) -> Path:
@@ -62,7 +64,9 @@ def private_dir(path: Path, *, echo: Callable[[str], None] = print) -> Path:
     target, and so would everything written underneath.
     """
     if path.is_symlink():
-        raise FetchError(f"{path} is a symbolic link; refusing to use it as a profile directory")
+        raise FetchError(
+            f"{path} is a symbolic link; refusing to use it as a profile directory"
+        )
     for d in (*reversed(path.parents), path):
         d.mkdir(0o700, exist_ok=True)
     # Also covers a umask that stripped a bit the owner needs.

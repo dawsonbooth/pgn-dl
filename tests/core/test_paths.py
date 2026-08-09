@@ -36,7 +36,12 @@ def _write(path: Path, marker: str) -> None:
 def test_combine_orders_by_number_not_lexically(tmp_path: Path) -> None:
     # Directories are zero-padded, but once a number overflows the pad width a
     # plain string sort misorders it (100 < 99). Combining must stay numeric.
-    for chapter, marker in [("09-a", "AAA"), ("10-b", "BBB"), ("99-y", "YYY"), ("100-z", "ZZZ")]:
+    for chapter, marker in [
+        ("09-a", "AAA"),
+        ("10-b", "BBB"),
+        ("99-y", "YYY"),
+        ("100-z", "ZZZ"),
+    ]:
         _write(tmp_path / chapter / "001-l.pgn", marker)
 
     combined = combine_collection_dir(tmp_path).read_text(encoding="utf-8")

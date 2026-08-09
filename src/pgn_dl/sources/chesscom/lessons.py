@@ -285,7 +285,9 @@ class LessonsExtractor(Extractor):
                     "path either. Download an individual lesson instead, e.g. "
                     f"{BASE}/{self.course}/<lesson>"
                 )
-            chosen = [(f"{i:03d}-{slug}", slug) for i, slug in enumerate(slugs, start=1)]
+            chosen = [
+                (f"{i:03d}-{slug}", slug) for i, slug in enumerate(slugs, start=1)
+            ]
         else:
             if slugs is not None and self.lesson in slugs:
                 idx = slugs.index(self.lesson) + 1

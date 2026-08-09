@@ -46,8 +46,12 @@ class FakeExtractor(Extractor):
     url_patterns = (re.compile(r"^https://fake\.test/"),)
     needs_browser = False
 
-    def __init__(self, count: int = 3, fail_on: set[int] | None = None,
-                 block_on: set[int] | None = None) -> None:
+    def __init__(
+        self,
+        count: int = 3,
+        fail_on: set[int] | None = None,
+        block_on: set[int] | None = None,
+    ) -> None:
         self.count = count
         self.fail_on = fail_on or set()
         self.block_on = block_on or set()
@@ -79,7 +83,10 @@ async def test_writes_one_pgn_per_item_plus_combined(tmp_path: Path) -> None:
     assert report.failed == 0
     assert not report.stopped
     assert sorted(p.name for p in coll.glob("*.pgn")) == [
-        "000-item.pgn", "001-item.pgn", "002-item.pgn", "all.pgn",
+        "000-item.pgn",
+        "001-item.pgn",
+        "002-item.pgn",
+        "all.pgn",
     ]
     assert "e4" in (coll / "000-item.pgn").read_text(encoding="utf-8")
 
@@ -108,10 +115,14 @@ async def test_one_failure_does_not_abort_the_batch(tmp_path: Path) -> None:
     assert not (coll / "001-item.pgn").exists()  # left unwritten so a re-run retries
 
 
-async def test_persistent_block_stops_cleanly_and_keeps_what_it_has(tmp_path: Path) -> None:
+async def test_persistent_block_stops_cleanly_and_keeps_what_it_has(
+    tmp_path: Path,
+) -> None:
     ex = FakeExtractor(3, block_on={0, 1, 2})
     report = await run(
-        ex, FETCHER, Options(out=tmp_path, concurrency=1, delay=0.0, backoff=0.0),
+        ex,
+        FETCHER,
+        Options(out=tmp_path, concurrency=1, delay=0.0, backoff=0.0),
         echo=lambda _: None,
     )
 
@@ -155,7 +166,9 @@ class DeniedAtDiscoveryExtractor(FakeExtractor):
     key = "fake:denied-discovery"
 
     async def discover(self, fetcher: object) -> tuple[Collection, list[ItemRef]]:
-        raise FetchError("https://fake.test/doc failed: 403 PERMISSION_DENIED", status=403)
+        raise FetchError(
+            "https://fake.test/doc failed: 403 PERMISSION_DENIED", status=403
+        )
 
 
 class BrokenAtDiscoveryExtractor(FakeExtractor):
@@ -262,12 +275,16 @@ async def test_an_unreadable_body_and_a_changed_schema_are_advised_differently(
     unreadable: list[str] = []
     await run(
         MalformedDiscoveryExtractor(json.JSONDecodeError("Expecting value", "<h", 0)),
-        FETCHER, _opts(tmp_path), echo=unreadable.append,
+        FETCHER,
+        _opts(tmp_path),
+        echo=unreadable.append,
     )
     changed: list[str] = []
     await run(
         MalformedDiscoveryExtractor(KeyError("learningSession")),
-        FETCHER, _opts(tmp_path), echo=changed.append,
+        FETCHER,
+        _opts(tmp_path),
+        echo=changed.append,
     )
 
     assert any("login fake" in line for line in unreadable)

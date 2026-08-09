@@ -53,7 +53,10 @@ def _page_with(payload: dict) -> str:
 
 
 def test_extract_lesson_decodes_the_entity_encoded_attribute() -> None:
-    assert extract_lesson(_page_with(_payload("lesson_page.json")))["path"] == "in-between-moves"
+    assert (
+        extract_lesson(_page_with(_payload("lesson_page.json")))["path"]
+        == "in-between-moves"
+    )
 
 
 def test_extract_learn_path_decodes_the_uxxxx_escaped_blob() -> None:
@@ -495,7 +498,9 @@ async def test_advanced_chess_tactics_comes_from_the_learn_path() -> None:
     ]
 
 
-async def test_discover_does_not_fetch_the_learn_path_when_a_landing_page_exists() -> None:
+async def test_discover_does_not_fetch_the_learn_path_when_a_landing_page_exists() -> (
+    None
+):
     f = _fetcher()  # learn-to-play has a landing page fixture registered
     await LessonsExtractor(COURSE_URL).discover(f)
     assert LEARN_URL not in f.gets
@@ -504,9 +509,9 @@ async def test_discover_does_not_fetch_the_learn_path_when_a_landing_page_exists
 async def test_discover_fails_when_a_course_is_in_neither_listing() -> None:
     f = FakeFetcher({LEARN_URL: (FIX / "learn_page.html").read_text()})
     with pytest.raises(FetchError) as exc:
-        await LessonsExtractor(
-            "https://www.chess.com/lessons/no-such-course"
-        ).discover(f)
+        await LessonsExtractor("https://www.chess.com/lessons/no-such-course").discover(
+            f
+        )
     msg = str(exc.value).lower()
     assert "individual lesson" in msg
     assert "landing page" in msg
@@ -587,6 +592,8 @@ async def test_a_whole_lesson_course_requests_each_lesson_page_once() -> None:
 
     assert f.gets == [
         COURSE_URL,
-        *(f"{BASE}/learn-to-play/{s}" for s in
-          ("the-king", "the-queen", "the-rook", "castling")),
+        *(
+            f"{BASE}/learn-to-play/{s}"
+            for s in ("the-king", "the-queen", "the-rook", "castling")
+        ),
     ]

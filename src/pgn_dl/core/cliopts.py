@@ -14,7 +14,8 @@ ConcurrencyOpt = Annotated[
     int, typer.Option("--concurrency", "-j", help="Parallel item requests")
 ]
 DelayOpt = Annotated[
-    float, typer.Option("--delay", help="Seconds to pause after each request (jittered)")
+    float,
+    typer.Option("--delay", help="Seconds to pause after each request (jittered)"),
 ]
 LimitOpt = Annotated[
     int | None, typer.Option("--limit", help="Stop after N items (for smoke testing)")

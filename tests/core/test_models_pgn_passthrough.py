@@ -40,8 +40,10 @@ class PgnExtractor(Extractor):
 
 async def test_prerendered_pgn_is_written_verbatim(tmp_path: Path) -> None:
     await run(
-        PgnExtractor(prerendered=True), FetcherStub(),
-        Options(out=tmp_path, concurrency=1, delay=0.0), echo=lambda _: None,
+        PgnExtractor(prerendered=True),
+        FetcherStub(),
+        Options(out=tmp_path, concurrency=1, delay=0.0),
+        echo=lambda _: None,
     )
     text = (tmp_path / "fake/things/c/001-item.pgn").read_text(encoding="utf-8")
     assert text.startswith(PRERENDERED)
@@ -53,8 +55,10 @@ async def test_prerendered_pgn_is_written_verbatim(tmp_path: Path) -> None:
 
 async def test_move_tree_path_is_unchanged(tmp_path: Path) -> None:
     await run(
-        PgnExtractor(prerendered=False), FetcherStub(),
-        Options(out=tmp_path, concurrency=1, delay=0.0), echo=lambda _: None,
+        PgnExtractor(prerendered=False),
+        FetcherStub(),
+        Options(out=tmp_path, concurrency=1, delay=0.0),
+        echo=lambda _: None,
     )
     text = (tmp_path / "fake/things/c/001-item.pgn").read_text(encoding="utf-8")
     assert '[Event "C"]' in text  # collection headers still applied

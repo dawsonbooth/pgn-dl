@@ -108,7 +108,9 @@ async def test_httpx_fetcher_posts_and_returns_json() -> None:
     transport = httpx.MockTransport(handler)
     async with httpx.AsyncClient(transport=transport) as client:
         f = HttpxFetcher(client)
-        data = await f.post_json("https://x/y", headers={"authorization": "Bearer t"}, json={"a": 1})
+        data = await f.post_json(
+            "https://x/y", headers={"authorization": "Bearer t"}, json={"a": 1}
+        )
 
     assert data == {"ok": True}
     assert seen["url"] == "https://x/y"
@@ -119,7 +121,9 @@ async def test_httpx_fetcher_posts_and_returns_json() -> None:
 
 
 async def test_httpx_fetcher_maps_challenge_to_blocked() -> None:
-    transport = httpx.MockTransport(lambda r: httpx.Response(403, text="Just a moment..."))
+    transport = httpx.MockTransport(
+        lambda r: httpx.Response(403, text="Just a moment...")
+    )
     async with httpx.AsyncClient(transport=transport) as client:
         with pytest.raises(Blocked):
             await HttpxFetcher(client).get_text("https://x/y", headers={})
@@ -129,7 +133,9 @@ async def test_a_body_that_is_not_json_is_a_fetch_error() -> None:
     # A CDN error page, a truncated body or a 204 all arrive as a 2xx that
     # check_response passes; decoding it outside the guard leaves a
     # JSONDecodeError for the caller.
-    transport = httpx.MockTransport(lambda r: httpx.Response(200, text="<html>502</html>"))
+    transport = httpx.MockTransport(
+        lambda r: httpx.Response(200, text="<html>502</html>")
+    )
     async with httpx.AsyncClient(transport=transport) as client:
         with pytest.raises(FetchError) as exc:
             await HttpxFetcher(client).post_json("https://x/y", headers={}, json={})

@@ -45,7 +45,9 @@ def test_decode_turns_typed_values_into_plain_python() -> None:
             "index": {"integerValue": "26"},
             "ok": {"booleanValue": True},
             "alt": {"arrayValue": {}},
-            "tags": {"arrayValue": {"values": [{"stringValue": "a"}, {"stringValue": "b"}]}},
+            "tags": {
+                "arrayValue": {"values": [{"stringValue": "a"}, {"stringValue": "b"}]}
+            },
         }
     ) == {"name": "Pawn Breaks", "index": 26, "ok": True, "alt": [], "tags": ["a", "b"]}
 
@@ -61,8 +63,10 @@ async def test_get_document_decodes_fields() -> None:
 async def test_list_documents_follows_next_page_token() -> None:
     base = f"{BASE}/themes/T1/elements?pageSize=300"
     page1 = json.dumps(
-        {"documents": [{"name": "a/1", "fields": {"index": {"integerValue": "1"}}}],
-         "nextPageToken": "TOK2"}
+        {
+            "documents": [{"name": "a/1", "fields": {"index": {"integerValue": "1"}}}],
+            "nextPageToken": "TOK2",
+        }
     )
     page2 = json.dumps(
         {"documents": [{"name": "a/2", "fields": {"index": {"integerValue": "2"}}}]}
@@ -158,4 +162,7 @@ async def test_a_read_that_succeeds_is_returned_as_it_is() -> None:
 def test_document_id_comes_from_the_resource_name() -> None:
     from pgn_dl.sources.noctie.firestore import document_id
 
-    assert document_id("projects/p/databases/(default)/documents/themes/abc123") == "abc123"
+    assert (
+        document_id("projects/p/databases/(default)/documents/themes/abc123")
+        == "abc123"
+    )
