@@ -122,16 +122,21 @@ def test_every_source_registers_its_sub_app() -> None:
     # app is the third thing core would otherwise have to know each source by
     # name to wire up.
     from pgn_dl.core.registry import apps
-    from pgn_dl.sources import chesscom, noctie
+    from pgn_dl.sources import chesscom, chessreps, noctie
 
     assert apps()["chesscom"] is chesscom.app
+    assert apps()["chessreps"] is chessreps.app
     assert apps()["noctie"] is noctie.app
 
 
 def test_the_root_app_mounts_the_registered_sources_in_order() -> None:
     # Alphabetical, so `--help` lists them the same way on every build whatever
     # order the source packages happened to be imported in.
-    assert [group.name for group in app.registered_groups] == ["chesscom", "noctie"]
+    assert [group.name for group in app.registered_groups] == [
+        "chesscom",
+        "chessreps",
+        "noctie",
+    ]
 
 
 def test_mounting_is_driven_by_the_registry_not_by_hard_coded_imports(

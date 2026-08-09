@@ -4,10 +4,10 @@ Download chess content into annotated PGN files you can study offline, import
 into a database, or open in any chess GUI.
 
 pgn-dl is built around sources. Each source knows how to turn one kind of URL
-into a collection of PGN games. chess.com courses, chess.com lessons, and
-noctie.ai themes and opening books are supported today; the architecture
-exists so other sites and other kinds of collection can be added without
-disturbing what already works.
+into a collection of PGN games. chess.com courses, chess.com lessons,
+noctie.ai themes and opening books, and chessreps.com opening courses are
+supported today; the architecture exists so other sites and other kinds of
+collection can be added without disturbing what already works.
 
 > **Use it only for content your own account has access to.** It automates the
 > same requests your browser makes when you study a course; it does not bypass
@@ -19,6 +19,7 @@ disturbing what already works.
 | --- | --- | --- | --- |
 | `chesscom:courses` | A chess.com course, one PGN per lesson | yes (`pgn-dl login chesscom`) | yes |
 | `chesscom:lessons` | A chess.com lesson course, one PGN per lesson | yes (`pgn-dl login chesscom`) | yes |
+| `chessreps:openings` | A chessreps.com opening course: the merged repertoire plus one PGN per line | yes (`pgn-dl login chessreps`) | login only |
 | `noctie:opening-books` | A noctie.ai opening book, one PGN game plus one per bookmark | yes (`pgn-dl login noctie`) | login only |
 | `noctie:themes` | A noctie.ai theme, one PGN per element | yes (`pgn-dl login noctie`) | login only |
 
@@ -130,6 +131,23 @@ a Firestore ID token, good for one hour, by posting to Google's
 `securetoken.googleapis.com` token endpoint. That token endpoint is the only
 place the credential is ever sent.
 
+chessreps works the same way as noctie, with the same caveat about a
+long-lived credential on disk:
+
+```sh
+uv run pgn-dl login chessreps
+```
+
+A browser window opens at the chessreps sign-in page; sign in, and the window
+closes itself as soon as it detects the session. What gets stored, at
+`.profile/chessreps/credentials.json` with the same owner-only modes, is the
+Supabase session out of the site's own cookie - an access token plus a refresh
+token. Each later run refreshes it against chessreps's own auth endpoint
+(`api.chessreps.com`) and sends the session back to chessreps.com as the same
+cookie your browser would; every download is plain HTTPS with no browser
+opened at all, and the credential never goes anywhere but chessreps's own two
+hosts.
+
 ### 2. Download
 
 Use the source subcommand:
@@ -200,6 +218,16 @@ uv run pgn-dl https://app.noctie.ai/themes/32380699-ec8a-48b4-9b3f-3e0074d74c38
 noctie's own routes are inconsistent about plurals - themes link as
 `/themes/<id>`, opening books as `/opening-book/<id>` - so pgn-dl accepts both
 the singular and the plural form of each.
+
+chessreps openings take the course URL, or just the slug out of it:
+
+```sh
+uv run pgn-dl chessreps openings https://www.chessreps.com/opening/alapin-sicilian-repertoire-ilg8hms
+uv run pgn-dl chessreps openings alapin-sicilian-repertoire-ilg8hms
+
+# bare-URL sugar works here too
+uv run pgn-dl https://www.chessreps.com/opening/alapin-sicilian-repertoire-ilg8hms
+```
 
 Options, the same for `url` and for every source subcommand:
 
@@ -333,6 +361,44 @@ twice on the sample book, whose eight bookmarks are one per reply to 1.e4 and so
 partition it, and more often wherever bookmarks nest or overlap. `all.pgn` is
 the concatenation of everything under the collection directory, bookmarks
 included.
+
+chessreps openings use the same book-plus-cuts shape, with the site's own URL
+slug (unique upstream) as the collection directory:
+
+```
+output/
+└── chessreps/
+    └── openings/
+        └── alapin-sicilian-repertoire-ilg8hms/
+            ├── all.pgn
+            ├── alapin-sicilian-repertoire.pgn   # the merged repertoire
+            └── lines/
+                ├── 001-trapped-bishop-or-uncastled-king.pgn
+                └── ...
+```
+
+The merged file is the whole repertoire as one game: every line the course
+trains, merged into a mainline plus variations in the site's own order, with
+the course blurb as the game comment. The author's per-position commentary
+becomes PGN move comments, and the site's Stockfish evaluations ride along as
+`[%eval ...]` comment commands, which Lichess and most GUIs render. A line's
+name lands twice: as a `(line: ...)` tag on its final move inside the merged
+game, and as the `Event` header of its own file under `lines/`, one small game
+per line, numbered in course order. `White` or `Black` names the course, per
+the side the repertoire is written for, and the course's chessreps id is
+preserved in a `ChessrepsOpeningId` header. As with noctie's bookmarks, every
+position therefore appears in `all.pgn` at least twice.
+
+chessreps gates access by trial rather than by refusing the request: an
+account without full access to a course is served a few lines and a flag
+saying so, not an error. pgn-dl requires a login for this source so a stale
+session cannot silently produce that subset - a signed-out answer fails the
+run with a hint to sign in again - and when the account's access genuinely is
+the trial, the download works but lands in `<slug>-trial/`, so a later
+full-access download does not get skipped by resume. One more caveat: the
+data route this source reads is SvelteKit's internal wire format rather than
+a public API, so a site redesign breaks this source loudly - the parser
+refuses shapes it does not recognize rather than guessing at them.
 
 Some content is paywalled on noctie's side: themes and opening books carry a
 `requiresTier` field, and access is enforced by noctie's own Firestore
