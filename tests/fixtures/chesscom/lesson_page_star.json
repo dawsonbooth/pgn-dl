@@ -1,0 +1,41 @@
+{
+  "id": "3cf87e6e-a5e6-11f0-a860-63d4fa1c3108",
+  "name": "The King",
+  "path": "the-king",
+  "description": "Learn how to move the king, the most important piece in chess.",
+  "glyphName": "piece-fill-king",
+  "status": "LESSON_STATUS_NOT_COMPLETED",
+  "fen": "8/8/8/8/8/8/8/4K3 w - - 0 1",
+  "questions": [
+    "[Event \"?\"]\n[Site \"?\"]\n[Date \"????.??.??\"]\n[Round \"?\"]\n[White \"?\"]\n[Black \"?\"]\n[Result \"*\"]\n[SetUp \"1\"]\n[FEN \"8/8/8/8/8/8/8/4K3 w - - 0 1\"]\n[LESSON_CHALLENGE_TYPE \"captureTheStar\"]\n[LESSON_STAR_LOCATIONS \"f2\"]\n\n{[%c_arrow e1f2;pointerFinger;true;from;e1;to;f2;persistent;true] Drag your king to capture the star.} *",
+    "[Event \"?\"]\n[Site \"?\"]\n[Date \"????.??.??\"]\n[Round \"?\"]\n[White \"?\"]\n[Black \"?\"]\n[Result \"*\"]\n[SetUp \"1\"]\n[FEN \"8/8/8/8/8/8/5K2/8 w - - 0 1\"]\n[LESSON_CHALLENGE_TYPE \"captureTheStar\"]\n[LESSON_STAR_LOCATIONS \"f4\"]\n\n{[%c_arrow f2e3;color;rgba(159%2C%20207%2C%2063%2C%200.8);animated;true;opacity;0.8;from;f2;to;e3;persistent;true,e3f4;color;rgba(159%2C%20207%2C%2063%2C%200.8);animated;true;opacity;0.8;from;e3;to;f4;persistent;true]Nice! Now capture the next star.} *",
+    "[Event \"?\"]\n[Site \"?\"]\n[Date \"????.??.??\"]\n[Round \"?\"]\n[White \"?\"]\n[Black \"?\"]\n[Result \"*\"]\n[SetUp \"1\"]\n[FEN \"8/8/8/8/5K2/8/8/8 w - - 0 1\"]\n[LESSON_CHALLENGE_TYPE \"captureTheStar\"]\n[LESSON_STAR_LOCATIONS \"d3\"]\n[LESSON_CHALLENGE_COMPLETE_TEXT \"Good job! Now you know how to move the king.\"]\n\n{Keep it up! One more star to go.} *"
+  ],
+  "isPathLesson": true,
+  "courseId": "726e1b84-a5e2-11f0-aff6-3562a4e287fb",
+  "onComplete": "LESSON_COMPLETE_ACTION_GO_TO_NEXT_LESSON",
+  "introText": "Learn how to move the king, the most important piece in chess.",
+  "outroText": "Congrats on completing your first chess lesson! Let's continue.",
+  "locale": "en_US",
+  "isLearnToPlay": true,
+  "audioCoaches": [
+    "David_coach",
+    "Nadia_coach"
+  ],
+  "content": [
+    {
+      "screens": [
+        "[Event \"?\"]\n[Site \"?\"]\n[Date \"????.??.??\"]\n[Round \"?\"]\n[White \"?\"]\n[Black \"?\"]\n[Result \"*\"]\n[SetUp \"1\"]\n[FEN \"8/8/8/8/8/8/8/4K3 w - - 0 1\"]\n\n{Let’s start with the king, the most important piece in the game.} *",
+        "[Event \"?\"]\n[Site \"?\"]\n[Date \"????.??.??\"]\n[Round \"?\"]\n[White \"?\"]\n[Black \"?\"]\n[Result \"*\"]\n[SetUp \"1\"]\n[FEN \"8/8/8/8/8/8/8/4K3 w - - 0 1\"]\n\n{[%c_arrow e1f1;color;rgba(159%2C%20207%2C%2063%2C%200.8);animated;true;opacity;0.8;from;e1;to;f1;persistent;true,e1f2;color;rgba(159%2C%20207%2C%2063%2C%200.8);animated;true;opacity;0.8;from;e1;to;f2;persistent;true,e1e2;color;rgba(159%2C%20207%2C%2063%2C%200.8);animated;true;opacity;0.8;from;e1;to;e2;persistent;true,e1d2;color;rgba(159%2C%20207%2C%2063%2C%200.8);animated;true;opacity;0.8;from;e1;to;d2;persistent;true,e1d1;color;rgba(159%2C%20207%2C%2063%2C%200.8);animated;true;opacity;0.8;from;e1;to;d1;persistent;true] The king can move one square in any direction.} *"
+      ]
+    }
+  ],
+  "animationName": "king-complete",
+  "course": {
+    "id": "726e1b84-a5e2-11f0-aff6-3562a4e287fb",
+    "path": "learn-to-play",
+    "title": "Learn To Play",
+    "imageUrl": "https://images.chesscomfiles.com/uploads/v1/lesson_course/726e1b84-a5e2-11f0-aff6-3562a4e287fb.2cc76505.728x410o.097066177c1b.png"
+  },
+  "pathConfigurationKey": "lesson_path_2026"
+}

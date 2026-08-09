@@ -1,0 +1,398 @@
+{
+  "configurationKey": "lesson_path_2026",
+  "locale": "en_US",
+  "sections": [
+    {
+      "id": "1",
+      "name": "New to Chess",
+      "description": "How to Play",
+      "level": "SECTION_LEVEL_NEW",
+      "courses": [
+        {
+          "id": "726e1b84-a5e2-11f0-aff6-3562a4e287fb",
+          "name": "Learn To Play",
+          "path": "learn-to-play",
+          "lessons": [
+            {
+              "id": "3cf87e6e-a5e6-11f0-a860-63d4fa1c3108",
+              "name": "The King",
+              "path": "the-king"
+            },
+            {
+              "id": "74305a6c-a5e8-11f0-9d04-8351ada39b55",
+              "name": "The Queen",
+              "path": "the-queen"
+            },
+            {
+              "id": "e8caf7ac-a9ed-11f0-9182-71b1f18ea722",
+              "name": "The Rook",
+              "path": "the-rook"
+            },
+            {
+              "id": "5366783e-b42a-11f0-b53c-25d81c6ef608",
+              "name": "The Bishop",
+              "path": "the-bishop"
+            },
+            {
+              "id": "172e74c4-b42b-11f0-aa91-4735b729e37e",
+              "name": "The Knight",
+              "path": "the-knight"
+            },
+            {
+              "id": "4339781a-b4f4-11f0-a70a-d5c8d63a82b9",
+              "name": "The Pawn",
+              "path": "the-pawn"
+            },
+            {
+              "id": "da2c3f4e-c487-11f0-8b0c-4dd58b585428",
+              "name": "En Passant",
+              "path": "en-passant"
+            },
+            {
+              "id": "119a7cec-b430-11f0-b7dd-af698bf13d46",
+              "name": "Capturing",
+              "path": "capturing"
+            },
+            {
+              "id": "b4488f3e-b4f7-11f0-9aaf-e73c1dc2700e",
+              "name": "Check",
+              "path": "check"
+            },
+            {
+              "id": "fdbccb9c-b4fe-11f0-8690-83431f4242a8",
+              "name": "Getting out of check",
+              "path": "getting-out-of-check"
+            },
+            {
+              "id": "21d06b30-b502-11f0-8820-af91432e36d6",
+              "name": "Checkmate",
+              "path": "checkmate"
+            },
+            {
+              "id": "3558d348-b51d-11f0-8caf-97c2e14b55e0",
+              "name": "Castling",
+              "path": "castling"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "2",
+      "name": "Beginner",
+      "description": "Fundamentals",
+      "level": "SECTION_LEVEL_BEGINNER",
+      "courses": [
+        {
+          "id": "06a0ea10-0c19-11f1-975e-4110f44490b1",
+          "name": "Playing The Game",
+          "path": "play-the-game-of-chess",
+          "lessons": [
+            {
+              "id": "0942ab3e-0c26-11f1-9646-e3f57e1cafe7",
+              "name": "Capture Pieces",
+              "path": "capture-pieces"
+            },
+            {
+              "id": "ae52418e-13f6-11f1-95a9-efa4402ea310",
+              "name": "Piece Values",
+              "path": "piece-values"
+            },
+            {
+              "id": "cb19a436-0cb9-11f1-8ac9-d5814e881a42",
+              "name": "Retreating",
+              "path": "retreating"
+            },
+            {
+              "id": "ca9ad6a0-1d8b-11f1-a766-796a9e45f89b",
+              "name": "Free pieces",
+              "path": "free-pieces"
+            },
+            {
+              "id": "3745fdae-1d85-11f1-a0bf-dfeb7a54718b",
+              "name": "Defending Pieces",
+              "path": "defending-pieces"
+            },
+            {
+              "id": "93167740-1726-11f1-a4da-b746974f3d85",
+              "name": "Capturing Decisions",
+              "path": "capturing-decisions"
+            },
+            {
+              "id": "6a4498e2-17ee-11f1-8c2d-993ceff6b4ea",
+              "name": "Counting Captures",
+              "path": "counting-captures"
+            },
+            {
+              "id": "5824f402-18b3-11f1-8fb3-3da2a261b851",
+              "name": "Saving the Correct Piece",
+              "path": "saving-the-correct-piece"
+            },
+            {
+              "id": "d264c04a-18d0-11f1-96a1-552327a44d1e",
+              "name": "Promotion",
+              "path": "promotion"
+            },
+            {
+              "id": "84929976-19a4-11f1-afe9-f575a31d162e",
+              "name": "En Passant",
+              "path": "how-to-en-passant"
+            },
+            {
+              "id": "9a14ed50-1c95-11f1-bfac-33d348b74b4d",
+              "name": "Castling",
+              "path": "how-to-castle"
+            },
+            {
+              "id": "0d0f7732-1d70-11f1-9875-495903aef7e8",
+              "name": "Check",
+              "path": "the-check"
+            },
+            {
+              "id": "19758bba-1c9e-11f1-bf13-8b447db3e706",
+              "name": "Getting Out of Check",
+              "path": "get-out-of-check"
+            },
+            {
+              "id": "40cb2766-1cb6-11f1-b294-ff5b1c302af7",
+              "name": "Checkmate",
+              "path": "the-checkmate"
+            },
+            {
+              "id": "716c7ef4-1cbd-11f1-a4a7-253c867623e9",
+              "name": "Draws",
+              "path": "draws"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "3",
+      "name": "Intermediate",
+      "description": "Key Concepts",
+      "level": "SECTION_LEVEL_INTERMEDIATE",
+      "courses": [
+        {
+          "id": "b1dc53f6-2113-11f1-b61e-91d0a963d372",
+          "name": "Openings",
+          "path": "chess-openings",
+          "lessons": [
+            {
+              "id": "7bc3d8cc-1e46-11f1-9253-ed90642523a3",
+              "name": "Control The Center",
+              "path": "how-to-control-the-center"
+            },
+            {
+              "id": "262a000a-1d7c-11f1-b983-abe9dd85fdc8",
+              "name": "Develop Your Pieces",
+              "path": "developing-your-pieces"
+            },
+            {
+              "id": "87beaff8-2116-11f1-b8df-552e131ccf44",
+              "name": "Castle to safety",
+              "path": "castle-to-safety"
+            }
+          ]
+        },
+        {
+          "id": "f7c4c396-2116-11f1-87ed-99801eff6856",
+          "name": "Tactics",
+          "path": "chess-tactics",
+          "lessons": [
+            {
+              "id": "431dda96-2124-11f1-9851-bf2aa6f24686",
+              "name": "Forks",
+              "path": "how-to-fork"
+            },
+            {
+              "id": "fa8b263c-2225-11f1-8342-5fd57880b165",
+              "name": "Pins",
+              "path": "how-to-pin"
+            },
+            {
+              "id": "4125caa6-21eb-11f1-a787-b985ef3c9b16",
+              "name": "Skewers",
+              "path": "how-to-skewer"
+            },
+            {
+              "id": "92461a04-2393-11f1-86c4-7b1d7c4eedc2",
+              "name": "Trapped Pieces",
+              "path": "trapped-pieces"
+            },
+            {
+              "id": "f0a06660-2215-11f1-943e-2f34da6ff571",
+              "name": "Discoveries",
+              "path": "discoveries"
+            }
+          ]
+        },
+        {
+          "id": "c27773c6-22a8-11f1-8a31-5d591f11bd3c",
+          "name": "Strategy",
+          "path": "chess-strategy",
+          "lessons": [
+            {
+              "id": "a7ca5adc-2241-11f1-98b0-cddf0534644c",
+              "name": "Pawn Strategy",
+              "path": "pawn-strategy"
+            },
+            {
+              "id": "cbf7dd7a-22fb-11f1-bc15-dd1b99780128",
+              "name": "Bishops",
+              "path": "bishops"
+            },
+            {
+              "id": "57313c2a-23d7-11f1-9e76-e7ac7af76698",
+              "name": "Rooks",
+              "path": "rooks"
+            },
+            {
+              "id": "8dd842c0-22e0-11f1-9a23-317f435a3022",
+              "name": "Knights",
+              "path": "knights"
+            },
+            {
+              "id": "ac7c1972-230d-11f1-82a8-69e2398550d1",
+              "name": "Queens",
+              "path": "queens"
+            }
+          ]
+        },
+        {
+          "id": "a06548dc-2378-11f1-a778-d502c84e0cc3",
+          "name": "Endgames",
+          "path": "chess-endgames",
+          "lessons": [
+            {
+              "id": "ba3125dc-23a6-11f1-bbb1-a91b9e8f7531",
+              "name": "Passed Pawns",
+              "path": "the-passed-pawns"
+            },
+            {
+              "id": "794c3ff2-23ba-11f1-a24c-33ed4a4a1b6a",
+              "name": "Defending Promotion",
+              "path": "defending-promotion"
+            },
+            {
+              "id": "2b755064-23c1-11f1-bbed-e9fd20f2d3dc",
+              "name": "Checkmate with a Queen",
+              "path": "checkmate-with-a-queen"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "4",
+      "name": "Advanced",
+      "description": "Taking Control",
+      "level": "SECTION_LEVEL_ADVANCED",
+      "courses": [
+        {
+          "id": "71c909e0-26df-11f1-a8c5-498ed6d66707",
+          "name": "Advanced Openings",
+          "path": "advanced-openings",
+          "lessons": [
+            {
+              "id": "d18ebb26-2762-11f1-a2a2-9b7dc6d4583e",
+              "name": "Strike in the Center",
+              "path": "strike-in-the-center"
+            },
+            {
+              "id": "c3738df6-2766-11f1-afb3-031a45b1e7e1",
+              "name": "Develop with Tempo",
+              "path": "develop-with-tempo"
+            },
+            {
+              "id": "81674ab8-276d-11f1-8d74-59cfe092acf7",
+              "name": "Prevent Castling",
+              "path": "prevent-castling"
+            }
+          ]
+        },
+        {
+          "id": "282a93aa-2764-11f1-a0b2-9769879e94c5",
+          "name": "Advanced Tactics",
+          "path": "advanced-chess-tactics",
+          "lessons": [
+            {
+              "id": "a48ed61c-278d-11f1-bd76-832d7fb7956f",
+              "name": "Remove the Defender",
+              "path": "remove-the-defender"
+            },
+            {
+              "id": "6f979592-288d-11f1-bc88-8517b7efdc3e",
+              "name": "In Between Moves",
+              "path": "in-between-moves"
+            },
+            {
+              "id": "9682a126-2a07-11f1-9188-49058c08998b",
+              "name": "Defense",
+              "path": "defense"
+            },
+            {
+              "id": "03dfb626-2a0f-11f1-9f16-edb328463c69",
+              "name": "Brilliant Sacrifices",
+              "path": "brilliant-sacrifices"
+            }
+          ]
+        },
+        {
+          "id": "44fede26-2789-11f1-9b1d-399ed6c0af8b",
+          "name": "Advanced Strategy",
+          "path": "advanced-strategy",
+          "lessons": [
+            {
+              "id": "51d7a416-2c1b-11f1-98e6-214140ce2bb5",
+              "name": "Smart Trades",
+              "path": "smart-trades"
+            },
+            {
+              "id": "36c04e0e-2c1f-11f1-b676-232475fcb659",
+              "name": "Tempo",
+              "path": "chess-tempo"
+            },
+            {
+              "id": "ffbe299a-2c31-11f1-ae90-fd9a9ce9d247",
+              "name": "Batteries",
+              "path": "chess-batteries"
+            },
+            {
+              "id": "a56320cc-2c36-11f1-97dd-fd8347613306",
+              "name": "Gaining Space",
+              "path": "gaining-space"
+            }
+          ]
+        },
+        {
+          "id": "64ed2454-2789-11f1-8a1b-8530147b629b",
+          "name": "Advanced Endgames",
+          "path": "advanced-chess-endgames",
+          "lessons": [
+            {
+              "id": "2fc8f15a-2c3d-11f1-b460-5d1f007956d9",
+              "name": "King and Pawn Endgames",
+              "path": "king-and-pawn-endgames"
+            },
+            {
+              "id": "6d9673c2-2c42-11f1-bbeb-bf6d89d4f195",
+              "name": "Trading into Winning Endgames",
+              "path": "trading-into-winning-endgames"
+            },
+            {
+              "id": "ce00a274-2c46-11f1-acd9-d73879c8c72b",
+              "name": "Active Pieces in the Endgame",
+              "path": "active-pieces-in-the-endgame"
+            },
+            {
+              "id": "463755c0-2c48-11f1-8d2a-eda4a78efc10",
+              "name": "Checkmate with a Rook",
+              "path": "checkmate-with-a-rook"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

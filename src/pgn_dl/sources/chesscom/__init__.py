@@ -18,6 +18,7 @@ from ...core.registry import register_app, register_login
 from ...core.runner import Options
 from .auth import login
 from .courses import CoursesExtractor
+from .lessons import LessonsExtractor
 
 register_login("chesscom", login)
 
@@ -43,4 +44,27 @@ def courses_command(
     )
 
 
-__all__ = ["CoursesExtractor", "app"]
+@app.command(name="lessons")
+def lessons_command(
+    target: Annotated[
+        str,
+        typer.Argument(help="Lesson-course or lesson URL, or 'lesson-course/lesson'"),
+    ],
+    out: OutOpt = DEFAULT_OUT,
+    concurrency: ConcurrencyOpt = DEFAULT_CONCURRENCY,
+    delay: DelayOpt = DEFAULT_DELAY,
+    limit: LimitOpt = None,
+) -> None:
+    """Download chess.com lessons (requires `pgn-dl login chesscom`).
+
+    Give a lesson-course URL to download every lesson in it, or a single lesson
+    URL. A lesson course is not a chess.com Course; those are
+    `pgn-dl chesscom courses`. Re-running with the same out dir resumes.
+    """
+    execute(
+        LessonsExtractor(target),
+        Options(out=out, concurrency=concurrency, delay=delay, limit=limit),
+    )
+
+
+__all__ = ["CoursesExtractor", "LessonsExtractor", "app"]
