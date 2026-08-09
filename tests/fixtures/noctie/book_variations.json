@@ -1,0 +1,2173 @@
+{
+  "documents": [
+    {
+      "name": "projects/chessnought/databases/(default)/documents/openingBooks/fbdadf0d-adac-4d9f-9557-83769b079737/openingBookVariations/>",
+      "fields": {
+        "order": {
+          "integerValue": "0"
+        },
+        "comment": {
+          "stringValue": " Hey there, I'm **FM Hugo Wernberg** from Sweden. Welcome to my beginner-friendly repertoire for White! It's built around *1.e4* and prepares you for all of Black's main replies.\n\n* **1...e5** *Italian Game*\n* **1...c5** *Sicilian Defense*\n* **1...e6** *French Defense*\n* **1...c6** *Caro-Kann Defense*\n* **1...d5** *Scandinavian Defense*\n* **1...g6** *Modern Defense*\n* **1...d6** *Pirc Defense*\n* **1...b6** *Owen Defense*\n\n__\n\nThere are basically two different approaches to learning chess openings: **systems vs. theory**.\n\n**Learning systems** focuses on grasping a setup for one's pieces and their central ideas for both sides. The exact move orders are often less critical in these types of openings, and one can use the same setup against many of the opponent's responses.\n\n**Studying theory**, on the other hand, focuses on openings where concrete lines and move orders are critical. These openings are often more tactical in nature, and it's equally important to grasp the tactical ideas as the positional ones.\n\nNeither is really better than the other. Even top players are split between these two camps. **It simply comes down to one's own chess style and learning preference.** The opening lines included in this repertoire focus more on learning systems rather than theory, since that fits more closely with my playing style.\n\n__\n\nWithout further ado, let's dive in! "
+        },
+        "variation": {
+          "stringValue": ">"
+        },
+        "halfMoves": {
+          "integerValue": "0"
+        }
+      }
+    },
+    {
+      "name": "projects/chessnought/databases/(default)/documents/openingBooks/fbdadf0d-adac-4d9f-9557-83769b079737/openingBookVariations/> e4",
+      "fields": {
+        "variation": {
+          "stringValue": "> e4"
+        },
+        "halfMoves": {
+          "integerValue": "1"
+        },
+        "order": {
+          "integerValue": "0"
+        }
+      }
+    },
+    {
+      "name": "projects/chessnought/databases/(default)/documents/openingBooks/fbdadf0d-adac-4d9f-9557-83769b079737/openingBookVariations/> e4 b6",
+      "fields": {
+        "variation": {
+          "stringValue": "> e4 b6"
+        },
+        "order": {
+          "integerValue": "7"
+        },
+        "comment": {
+          "stringValue": " We'll also cover a few sidelines, such as *1...b6* (**Owen Defense**), and go through the key ideas to keep in mind when facing them.\n\nThe **Owen Defense** is quite a dubious choice for Black and is very rarely seen at higher levels. However, **we still need to proceed with precision**. If we're careless and overextend, Black will strike back and dismantle our center. "
+        },
+        "halfMoves": {
+          "integerValue": "2"
+        }
+      }
+    },
+    {
+      "name": "projects/chessnought/databases/(default)/documents/openingBooks/fbdadf0d-adac-4d9f-9557-83769b079737/openingBookVariations/> e4 b6 d4",
+      "fields": {
+        "order": {
+          "integerValue": "0"
+        },
+        "variation": {
+          "stringValue": "> e4 b6 d4"
+        },
+        "halfMoves": {
+          "integerValue": "3"
+        }
+      }
+    },
+    {
+      "name": "projects/chessnought/databases/(default)/documents/openingBooks/fbdadf0d-adac-4d9f-9557-83769b079737/openingBookVariations/> e4 b6 d4 Bb7",
+      "fields": {
+        "comment": {
+          "stringValue": " My favourite approach is **defending the *e-pawn* with the bishop**, delaying the development of our *b1-knight*. This gives us the flexibility to support our center with the *c-pawn*. "
+        },
+        "order": {
+          "integerValue": "0"
+        },
+        "variation": {
+          "stringValue": "> e4 b6 d4 Bb7"
+        },
+        "halfMoves": {
+          "integerValue": "4"
+        }
+      }
+    },
+    {
+      "name": "projects/chessnought/databases/(default)/documents/openingBooks/fbdadf0d-adac-4d9f-9557-83769b079737/openingBookVariations/> e4 b6 d4 Bb7 Bd3",
+      "fields": {
+        "order": {
+          "integerValue": "0"
+        },
+        "variation": {
+          "stringValue": "> e4 b6 d4 Bb7 Bd3"
+        },
+        "halfMoves": {
+          "integerValue": "5"
+        }
+      }
+    },
+    {
+      "name": "projects/chessnought/databases/(default)/documents/openingBooks/fbdadf0d-adac-4d9f-9557-83769b079737/openingBookVariations/> e4 b6 d4 Bb7 Bd3 e6",
+      "fields": {
+        "halfMoves": {
+          "integerValue": "6"
+        },
+        "variation": {
+          "stringValue": "> e4 b6 d4 Bb7 Bd3 e6"
+        },
+        "order": {
+          "integerValue": "0"
+        },
+        "comment": {
+          "stringValue": " Let's continue developing our kingside. "
+        }
+      }
+    },
+    {
+      "name": "projects/chessnought/databases/(default)/documents/openingBooks/fbdadf0d-adac-4d9f-9557-83769b079737/openingBookVariations/> e4 b6 d4 Bb7 Bd3 e6 Nf3",
+      "fields": {
+        "order": {
+          "integerValue": "0"
+        },
+        "variation": {
+          "stringValue": "> e4 b6 d4 Bb7 Bd3 e6 Nf3"
+        },
+        "halfMoves": {
+          "integerValue": "7"
+        }
+      }
+    },
+    {
+      "name": "projects/chessnought/databases/(default)/documents/openingBooks/fbdadf0d-adac-4d9f-9557-83769b079737/openingBookVariations/> e4 b6 d4 Bb7 Bd3 e6 Nf3 Nf6",
+      "fields": {
+        "halfMoves": {
+          "integerValue": "8"
+        },
+        "variation": {
+          "stringValue": "> e4 b6 d4 Bb7 Bd3 e6 Nf3 Nf6"
+        },
+        "order": {
+          "integerValue": "1"
+        },
+        "comment": {
+          "stringValue": " Our *e-pawn* is under attack again. Just as before, we wait with the *b1-knight*. Instead, we defend it with the queen. "
+        }
+      }
+    },
+    {
+      "name": "projects/chessnought/databases/(default)/documents/openingBooks/fbdadf0d-adac-4d9f-9557-83769b079737/openingBookVariations/> e4 b6 d4 Bb7 Bd3 e6 Nf3 Nf6 Qe2",
+      "fields": {
+        "variation": {
+          "stringValue": "> e4 b6 d4 Bb7 Bd3 e6 Nf3 Nf6 Qe2"
+        },
+        "comment": {
+          "stringValue": " While it's generally best to avoid moving the queen early in the opening, **here she sits nicely on *e2*, supporting the center** with no way for Black to harass her. "
+        },
+        "order": {
+          "integerValue": "0"
+        },
+        "halfMoves": {
+          "integerValue": "9"
+        }
+      }
+    },
+    {
+      "name": "projects/chessnought/databases/(default)/documents/openingBooks/fbdadf0d-adac-4d9f-9557-83769b079737/openingBookVariations/> e4 b6 d4 Bb7 Bd3 e6 Nf3 Nf6 Qe2 Be7",
+      "fields": {
+        "nags": {
+          "arrayValue": {
+            "values": [
+              {
+                "stringValue": "$2"
+              }
+            ]
+          }
+        },
+        "halfMoves": {
+          "integerValue": "10"
+        },
+        "order": {
+          "integerValue": "1"
+        },
+        "comment": {
+          "stringValue": " This is too passive and allows us to take complete control over the center. "
+        },
+        "variation": {
+          "stringValue": "> e4 b6 d4 Bb7 Bd3 e6 Nf3 Nf6 Qe2 Be7"
+        }
+      }
+    },
+    {
+      "name": "projects/chessnought/databases/(default)/documents/openingBooks/fbdadf0d-adac-4d9f-9557-83769b079737/openingBookVariations/> e4 b6 d4 Bb7 Bd3 e6 Nf3 Nf6 Qe2 Be7 e5",
+      "fields": {
+        "comment": {
+          "stringValue": " When given the chance in the **Owen Defense**, it's usually a good idea to **play *e5* and further cramp Black's position**. White holds a clear advantage and can continue improving their position in the middlegame. "
+        },
+        "order": {
+          "integerValue": "0"
+        },
+        "variation": {
+          "stringValue": "> e4 b6 d4 Bb7 Bd3 e6 Nf3 Nf6 Qe2 Be7 e5"
+        },
+        "halfMoves": {
+          "integerValue": "11"
+        }
+      }
+    },
+    {
+      "name": "projects/chessnought/databases/(default)/documents/openingBooks/fbdadf0d-adac-4d9f-9557-83769b079737/openingBookVariations/> e4 b6 d4 Bb7 Bd3 e6 Nf3 Nf6 Qe2 d5",
+      "fields": {
+        "halfMoves": {
+          "integerValue": "10"
+        },
+        "comment": {
+          "stringValue": " Black strikes back in the center with the hope of dismantling it. Against *...d5*, **it's very important to respond with *e5***. "
+        },
+        "order": {
+          "integerValue": "0"
+        },
+        "variation": {
+          "stringValue": "> e4 b6 d4 Bb7 Bd3 e6 Nf3 Nf6 Qe2 d5"
+        }
+      }
+    },
+    {
+      "name": "projects/chessnought/databases/(default)/documents/openingBooks/fbdadf0d-adac-4d9f-9557-83769b079737/openingBookVariations/> e4 b6 d4 Bb7 Bd3 e6 Nf3 Nf6 Qe2 d5 e5",
+      "fields": {
+        "halfMoves": {
+          "integerValue": "11"
+        },
+        "order": {
+          "integerValue": "0"
+        },
+        "comment": {
+          "stringValue": " *e5* locks the center, giving us **more space and thus more squares for our pieces**. "
+        },
+        "variation": {
+          "stringValue": "> e4 b6 d4 Bb7 Bd3 e6 Nf3 Nf6 Qe2 d5 e5"
+        }
+      }
+    },
+    {
+      "name": "projects/chessnought/databases/(default)/documents/openingBooks/fbdadf0d-adac-4d9f-9557-83769b079737/openingBookVariations/> e4 b6 d4 Bb7 Bd3 e6 Nf3 Nf6 Qe2 d5 e5 Ne4",
+      "fields": {
+        "halfMoves": {
+          "integerValue": "12"
+        },
+        "comment": {
+          "stringValue": " The knight looks active on *e4*, but it doesn't really have a future. Let's continue developing. "
+        },
+        "order": {
+          "integerValue": "1"
+        },
+        "variation": {
+          "stringValue": "> e4 b6 d4 Bb7 Bd3 e6 Nf3 Nf6 Qe2 d5 e5 Ne4"
+        }
+      }
+    },
+    {
+      "name": "projects/chessnought/databases/(default)/documents/openingBooks/fbdadf0d-adac-4d9f-9557-83769b079737/openingBookVariations/> e4 b6 d4 Bb7 Bd3 e6 Nf3 Nf6 Qe2 d5 e5 Nfd7",
+      "fields": {
+        "order": {
+          "integerValue": "0"
+        },
+        "halfMoves": {
+          "integerValue": "12"
+        },
+        "variation": {
+          "stringValue": "> e4 b6 d4 Bb7 Bd3 e6 Nf3 Nf6 Qe2 d5 e5 Nfd7"
+        }
+      }
+    },
+    {
+      "name": "projects/chessnought/databases/(default)/documents/openingBooks/fbdadf0d-adac-4d9f-9557-83769b079737/openingBookVariations/> e4 b6 d4 Bb7 Bd3 e6 Nf3 c5",
+      "fields": {
+        "halfMoves": {
+          "integerValue": "8"
+        },
+        "variation": {
+          "stringValue": "> e4 b6 d4 Bb7 Bd3 e6 Nf3 c5"
+        },
+        "order": {
+          "integerValue": "0"
+        },
+        "comment": {
+          "stringValue": " If Black challenges our center, we simply reinforce it with *c3*. "
+        }
+      }
+    },
+    {
+      "name": "projects/chessnought/databases/(default)/documents/openingBooks/fbdadf0d-adac-4d9f-9557-83769b079737/openingBookVariations/> e4 b6 d4 Bb7 Bd3 e6 Nf3 c5 c3",
+      "fields": {
+        "order": {
+          "integerValue": "0"
+        },
+        "halfMoves": {
+          "integerValue": "9"
+        },
+        "variation": {
+          "stringValue": "> e4 b6 d4 Bb7 Bd3 e6 Nf3 c5 c3"
+        }
+      }
+    },
+    {
+      "name": "projects/chessnought/databases/(default)/documents/openingBooks/fbdadf0d-adac-4d9f-9557-83769b079737/openingBookVariations/> e4 b6 d4 Bb7 Bd3 e6 Nf3 c5 c3 Nf6",
+      "fields": {
+        "halfMoves": {
+          "integerValue": "10"
+        },
+        "comment": {
+          "stringValue": " Our *e-pawn* is under attack again. Pushing it is fine, but I prefer protecting it with the queen, keeping the structure flexible. "
+        },
+        "order": {
+          "integerValue": "0"
+        },
+        "variation": {
+          "stringValue": "> e4 b6 d4 Bb7 Bd3 e6 Nf3 c5 c3 Nf6"
+        }
+      }
+    },
+    {
+      "name": "projects/chessnought/databases/(default)/documents/openingBooks/fbdadf0d-adac-4d9f-9557-83769b079737/openingBookVariations/> e4 b6 d4 Bb7 Bd3 e6 Nf3 c5 c3 Nf6 Qe2",
+      "fields": {
+        "order": {
+          "integerValue": "0"
+        },
+        "halfMoves": {
+          "integerValue": "11"
+        },
+        "variation": {
+          "stringValue": "> e4 b6 d4 Bb7 Bd3 e6 Nf3 c5 c3 Nf6 Qe2"
+        }
+      }
+    },
+    {
+      "name": "projects/chessnought/databases/(default)/documents/openingBooks/fbdadf0d-adac-4d9f-9557-83769b079737/openingBookVariations/> e4 b6 d4 Bb7 Bd3 e6 Nf3 c5 c3 Nf6 Qe2 Be7",
+      "fields": {
+        "halfMoves": {
+          "integerValue": "12"
+        },
+        "variation": {
+          "stringValue": "> e4 b6 d4 Bb7 Bd3 e6 Nf3 c5 c3 Nf6 Qe2 Be7"
+        },
+        "comment": {
+          "stringValue": " When offered the chance, let's take it and claim more space in the center! "
+        },
+        "order": {
+          "integerValue": "0"
+        }
+      }
+    },
+    {
+      "name": "projects/chessnought/databases/(default)/documents/openingBooks/fbdadf0d-adac-4d9f-9557-83769b079737/openingBookVariations/> e4 b6 d4 Bb7 Bd3 e6 Nf3 c5 c3 Nf6 Qe2 cxd4",
+      "fields": {
+        "halfMoves": {
+          "integerValue": "12"
+        },
+        "variation": {
+          "stringValue": "> e4 b6 d4 Bb7 Bd3 e6 Nf3 c5 c3 Nf6 Qe2 cxd4"
+        },
+        "comment": {
+          "stringValue": " It's usually good to maintain pawn tension in chess, and releasing it is often a concession. "
+        },
+        "order": {
+          "integerValue": "1"
+        }
+      }
+    },
+    {
+      "name": "projects/chessnought/databases/(default)/documents/openingBooks/fbdadf0d-adac-4d9f-9557-83769b079737/openingBookVariations/> e4 b6 d4 Bb7 Bd3 e6 Nf3 c5 c3 Nf6 Qe2 d5",
+      "fields": {
+        "variation": {
+          "stringValue": "> e4 b6 d4 Bb7 Bd3 e6 Nf3 c5 c3 Nf6 Qe2 d5"
+        },
+        "comment": {
+          "stringValue": " In the **Owen Defense**, as soon as Black strikes back in the center with *...d5*, **it's generally a good idea to respond with *e5***. "
+        },
+        "order": {
+          "integerValue": "2"
+        },
+        "halfMoves": {
+          "integerValue": "12"
+        }
+      }
+    },
+    {
+      "name": "projects/chessnought/databases/(default)/documents/openingBooks/fbdadf0d-adac-4d9f-9557-83769b079737/openingBookVariations/> e4 c5",
+      "fields": {
+        "halfMoves": {
+          "integerValue": "2"
+        },
+        "variation": {
+          "stringValue": "> e4 c5"
+        },
+        "comment": {
+          "stringValue": " This is the **Sicilian Defense**, one of Black's best ways to challenge *1.e4* and often leads to sharp positions where the stronger player comes out on top.\n\nIt involves a great deal of sharp play and a wealth of theory. **At advanced levels, it's actually Black's most common reply to *1.e4***, though for beginners it may not appear as frequently. "
+        },
+        "order": {
+          "integerValue": "1"
+        }
+      }
+    },
+    {
+      "name": "projects/chessnought/databases/(default)/documents/openingBooks/fbdadf0d-adac-4d9f-9557-83769b079737/openingBookVariations/> e4 c5 Nc3",
+      "fields": {
+        "variation": {
+          "stringValue": "> e4 c5 Nc3"
+        },
+        "order": {
+          "integerValue": "0"
+        },
+        "comment": {
+          "stringValue": " Against *1...c5*, I recommend *2.Nc3*, going for the **Closed Sicilian**. **This variation avoids much of the sharp, tricky theory** while still carrying plenty of venom. "
+        },
+        "halfMoves": {
+          "integerValue": "3"
+        }
+      }
+    },
+    {
+      "name": "projects/chessnought/databases/(default)/documents/openingBooks/fbdadf0d-adac-4d9f-9557-83769b079737/openingBookVariations/> e4 c5 Nc3 Nc6",
+      "fields": {
+        "comment": {
+          "stringValue": " *2...Nc6* is Black's most common reply, but we can use the same setup and ideas against other moves as well.\n\n**The next few moves for White can be played almost automatically**, and there's little Black can do to prevent them. This is great, since it lets us focus more on exploring the middlegame instead of getting lost in the opening. "
+        },
+        "order": {
+          "integerValue": "0"
+        },
+        "variation": {
+          "stringValue": "> e4 c5 Nc3 Nc6"
+        },
+        "halfMoves": {
+          "integerValue": "4"
+        }
+      }
+    },
+    {
+      "name": "projects/chessnought/databases/(default)/documents/openingBooks/fbdadf0d-adac-4d9f-9557-83769b079737/openingBookVariations/> e4 c5 Nc3 Nc6 g3",
+      "fields": {
+        "halfMoves": {
+          "integerValue": "5"
+        },
+        "variation": {
+          "stringValue": "> e4 c5 Nc3 Nc6 g3"
+        },
+        "order": {
+          "integerValue": "0"
+        },
+        "comment": {
+          "stringValue": " We begin by fianchettoing our bishop. "
+        }
+      }
+    },
+    {
+      "name": "projects/chessnought/databases/(default)/documents/openingBooks/fbdadf0d-adac-4d9f-9557-83769b079737/openingBookVariations/> e4 c5 Nc3 Nc6 g3 g6",
+      "fields": {
+        "variation": {
+          "stringValue": "> e4 c5 Nc3 Nc6 g3 g6"
+        },
+        "comment": {
+          "stringValue": " *3...g6* is the most common move here, but as mentioned earlier, we can use the same setup against virtually any move Black chooses! "
+        },
+        "order": {
+          "integerValue": "0"
+        },
+        "halfMoves": {
+          "integerValue": "6"
+        }
+      }
+    },
+    {
+      "name": "projects/chessnought/databases/(default)/documents/openingBooks/fbdadf0d-adac-4d9f-9557-83769b079737/openingBookVariations/> e4 c5 Nc3 Nc6 g3 g6 Bg2",
+      "fields": {
+        "order": {
+          "integerValue": "0"
+        },
+        "variation": {
+          "stringValue": "> e4 c5 Nc3 Nc6 g3 g6 Bg2"
+        },
+        "halfMoves": {
+          "integerValue": "7"
+        }
+      }
+    },
+    {
+      "name": "projects/chessnought/databases/(default)/documents/openingBooks/fbdadf0d-adac-4d9f-9557-83769b079737/openingBookVariations/> e4 c5 Nc3 Nc6 g3 g6 Bg2 Bg7",
+      "fields": {
+        "halfMoves": {
+          "integerValue": "8"
+        },
+        "order": {
+          "integerValue": "0"
+        },
+        "comment": {
+          "stringValue": " Now let's develop our knight! "
+        },
+        "variation": {
+          "stringValue": "> e4 c5 Nc3 Nc6 g3 g6 Bg2 Bg7"
+        }
+      }
+    },
+    {
+      "name": "projects/chessnought/databases/(default)/documents/openingBooks/fbdadf0d-adac-4d9f-9557-83769b079737/openingBookVariations/> e4 c5 Nc3 Nc6 g3 g6 Bg2 Bg7 Nge2",
+      "fields": {
+        "halfMoves": {
+          "integerValue": "9"
+        },
+        "variation": {
+          "stringValue": "> e4 c5 Nc3 Nc6 g3 g6 Bg2 Bg7 Nge2"
+        },
+        "order": {
+          "integerValue": "0"
+        },
+        "comment": {
+          "stringValue": " It's important to place it on *e2*, which will allow us to push *f4* later on. "
+        }
+      }
+    },
+    {
+      "name": "projects/chessnought/databases/(default)/documents/openingBooks/fbdadf0d-adac-4d9f-9557-83769b079737/openingBookVariations/> e4 c5 Nc3 Nc6 g3 g6 Bg2 Bg7 Nge2 d6",
+      "fields": {
+        "halfMoves": {
+          "integerValue": "10"
+        },
+        "variation": {
+          "stringValue": "> e4 c5 Nc3 Nc6 g3 g6 Bg2 Bg7 Nge2 d6"
+        },
+        "comment": {
+          "stringValue": " Black strengthens their grip over the dark squares, but that doesn't bother us. Let's keep developing. "
+        },
+        "order": {
+          "integerValue": "0"
+        }
+      }
+    },
+    {
+      "name": "projects/chessnought/databases/(default)/documents/openingBooks/fbdadf0d-adac-4d9f-9557-83769b079737/openingBookVariations/> e4 c5 Nc3 Nc6 g3 g6 Bg2 Bg7 Nge2 d6 O-O",
+      "fields": {
+        "halfMoves": {
+          "integerValue": "11"
+        },
+        "variation": {
+          "stringValue": "> e4 c5 Nc3 Nc6 g3 g6 Bg2 Bg7 Nge2 d6 O-O"
+        },
+        "order": {
+          "integerValue": "0"
+        }
+      }
+    },
+    {
+      "name": "projects/chessnought/databases/(default)/documents/openingBooks/fbdadf0d-adac-4d9f-9557-83769b079737/openingBookVariations/> e4 c5 Nc3 Nc6 g3 g6 Bg2 Bg7 Nge2 d6 O-O Nf6",
+      "fields": {
+        "halfMoves": {
+          "integerValue": "12"
+        },
+        "variation": {
+          "stringValue": "> e4 c5 Nc3 Nc6 g3 g6 Bg2 Bg7 Nge2 d6 O-O Nf6"
+        },
+        "order": {
+          "integerValue": "0"
+        }
+      }
+    },
+    {
+      "name": "projects/chessnought/databases/(default)/documents/openingBooks/fbdadf0d-adac-4d9f-9557-83769b079737/openingBookVariations/> e4 c6",
+      "fields": {
+        "halfMoves": {
+          "integerValue": "2"
+        },
+        "order": {
+          "integerValue": "3"
+        },
+        "comment": {
+          "stringValue": " Against the **Caro-Kann Defense**, my favourite weapon is the **Exchange Variation**. It sidesteps much of the heavy main-line theory and **offers natural plans for us to follow**. "
+        },
+        "variation": {
+          "stringValue": "> e4 c6"
+        }
+      }
+    },
+    {
+      "name": "projects/chessnought/databases/(default)/documents/openingBooks/fbdadf0d-adac-4d9f-9557-83769b079737/openingBookVariations/> e4 c6 d4",
+      "fields": {
+        "order": {
+          "integerValue": "0"
+        },
+        "variation": {
+          "stringValue": "> e4 c6 d4"
+        },
+        "halfMoves": {
+          "integerValue": "3"
+        }
+      }
+    },
+    {
+      "name": "projects/chessnought/databases/(default)/documents/openingBooks/fbdadf0d-adac-4d9f-9557-83769b079737/openingBookVariations/> e4 c6 d4 d5",
+      "fields": {
+        "comment": {
+          "stringValue": " White has many options here, with *3.Nc3* (**Main Line**) and *3.e5* (**Advanced Variation**) being the most popular among top players.\n\nMy recommended line is the **Exchange Variation** with *3.exd5*. It leads to **straightforward play and clear plans for White**. "
+        },
+        "order": {
+          "integerValue": "0"
+        },
+        "variation": {
+          "stringValue": "> e4 c6 d4 d5"
+        },
+        "halfMoves": {
+          "integerValue": "4"
+        }
+      }
+    },
+    {
+      "name": "projects/chessnought/databases/(default)/documents/openingBooks/fbdadf0d-adac-4d9f-9557-83769b079737/openingBookVariations/> e4 c6 d4 d5 exd5",
+      "fields": {
+        "order": {
+          "integerValue": "0"
+        },
+        "halfMoves": {
+          "integerValue": "5"
+        },
+        "variation": {
+          "stringValue": "> e4 c6 d4 d5 exd5"
+        }
+      }
+    },
+    {
+      "name": "projects/chessnought/databases/(default)/documents/openingBooks/fbdadf0d-adac-4d9f-9557-83769b079737/openingBookVariations/> e4 c6 d4 d5 exd5 cxd5",
+      "fields": {
+        "halfMoves": {
+          "integerValue": "6"
+        },
+        "variation": {
+          "stringValue": "> e4 c6 d4 d5 exd5 cxd5"
+        },
+        "comment": {
+          "stringValue": " Generally speaking, exchange variations tend to have a reputation for being drawish and boring. **That's not the case here in the Caro-Kann.** We have an asymmetrical pawn structure and rich positional ideas in the middlegame to play for! "
+        },
+        "order": {
+          "integerValue": "0"
+        }
+      }
+    },
+    {
+      "name": "projects/chessnought/databases/(default)/documents/openingBooks/fbdadf0d-adac-4d9f-9557-83769b079737/openingBookVariations/> e4 c6 d4 d5 exd5 cxd5 Bd3",
+      "fields": {
+        "order": {
+          "integerValue": "0"
+        },
+        "comment": {
+          "stringValue": " The bishop stands well on *d3*, supporting the center from behind the *d4-pawn*. "
+        },
+        "variation": {
+          "stringValue": "> e4 c6 d4 d5 exd5 cxd5 Bd3"
+        },
+        "halfMoves": {
+          "integerValue": "7"
+        }
+      }
+    },
+    {
+      "name": "projects/chessnought/databases/(default)/documents/openingBooks/fbdadf0d-adac-4d9f-9557-83769b079737/openingBookVariations/> e4 c6 d4 d5 exd5 cxd5 Bd3 Nc6",
+      "fields": {
+        "halfMoves": {
+          "integerValue": "8"
+        },
+        "variation": {
+          "stringValue": "> e4 c6 d4 d5 exd5 cxd5 Bd3 Nc6"
+        },
+        "comment": {
+          "stringValue": " Let's defend our *d4-pawn* while also creating a strong pawn chain. "
+        },
+        "order": {
+          "integerValue": "0"
+        }
+      }
+    },
+    {
+      "name": "projects/chessnought/databases/(default)/documents/openingBooks/fbdadf0d-adac-4d9f-9557-83769b079737/openingBookVariations/> e4 c6 d4 d5 exd5 cxd5 Bd3 Nc6 c3",
+      "fields": {
+        "halfMoves": {
+          "integerValue": "9"
+        },
+        "variation": {
+          "stringValue": "> e4 c6 d4 d5 exd5 cxd5 Bd3 Nc6 c3"
+        },
+        "order": {
+          "integerValue": "0"
+        },
+        "comment": {
+          "stringValue": " Our *b2-c3-d4* pawn chain is a prelude to a potential kingside attack. Remember: **play on the side that your pawn chain is pointing toward!** "
+        }
+      }
+    },
+    {
+      "name": "projects/chessnought/databases/(default)/documents/openingBooks/fbdadf0d-adac-4d9f-9557-83769b079737/openingBookVariations/> e4 c6 d4 d5 exd5 cxd5 Bd3 Nc6 c3 Nf6",
+      "fields": {
+        "halfMoves": {
+          "integerValue": "10"
+        },
+        "order": {
+          "integerValue": "0"
+        },
+        "comment": {
+          "stringValue": " We'd like to continue development with *Nf3*, but here it allows *...Bg4* with an annoying pin. Let's prevent that with a prophylactic move. "
+        },
+        "variation": {
+          "stringValue": "> e4 c6 d4 d5 exd5 cxd5 Bd3 Nc6 c3 Nf6"
+        }
+      }
+    },
+    {
+      "name": "projects/chessnought/databases/(default)/documents/openingBooks/fbdadf0d-adac-4d9f-9557-83769b079737/openingBookVariations/> e4 c6 d4 d5 exd5 cxd5 Bd3 Nc6 c3 Nf6 h3",
+      "fields": {
+        "order": {
+          "integerValue": "0"
+        },
+        "variation": {
+          "stringValue": "> e4 c6 d4 d5 exd5 cxd5 Bd3 Nc6 c3 Nf6 h3"
+        },
+        "halfMoves": {
+          "integerValue": "11"
+        }
+      }
+    },
+    {
+      "name": "projects/chessnought/databases/(default)/documents/openingBooks/fbdadf0d-adac-4d9f-9557-83769b079737/openingBookVariations/> e4 c6 d4 d5 exd5 cxd5 Bd3 Nc6 c3 Nf6 h3 e5",
+      "fields": {
+        "order": {
+          "integerValue": "1"
+        },
+        "halfMoves": {
+          "integerValue": "12"
+        },
+        "variation": {
+          "stringValue": "> e4 c6 d4 d5 exd5 cxd5 Bd3 Nc6 c3 Nf6 h3 e5"
+        }
+      }
+    },
+    {
+      "name": "projects/chessnought/databases/(default)/documents/openingBooks/fbdadf0d-adac-4d9f-9557-83769b079737/openingBookVariations/> e4 c6 d4 d5 exd5 cxd5 Bd3 Nc6 c3 Nf6 h3 e6",
+      "fields": {
+        "halfMoves": {
+          "integerValue": "12"
+        },
+        "variation": {
+          "stringValue": "> e4 c6 d4 d5 exd5 cxd5 Bd3 Nc6 c3 Nf6 h3 e6"
+        },
+        "order": {
+          "integerValue": "2"
+        },
+        "comment": {
+          "stringValue": " A very popular move for Black, aiming to develop their *h8-bishop* and castle. However, it locks in their *c8-bishop*. "
+        }
+      }
+    },
+    {
+      "name": "projects/chessnought/databases/(default)/documents/openingBooks/fbdadf0d-adac-4d9f-9557-83769b079737/openingBookVariations/> e4 c6 d4 d5 exd5 cxd5 Bd3 Nc6 c3 Nf6 h3 g6",
+      "fields": {
+        "halfMoves": {
+          "integerValue": "12"
+        },
+        "variation": {
+          "stringValue": "> e4 c6 d4 d5 exd5 cxd5 Bd3 Nc6 c3 Nf6 h3 g6"
+        },
+        "order": {
+          "integerValue": "0"
+        }
+      }
+    },
+    {
+      "name": "projects/chessnought/databases/(default)/documents/openingBooks/fbdadf0d-adac-4d9f-9557-83769b079737/openingBookVariations/> e4 d5",
+      "fields": {
+        "comment": {
+          "stringValue": " It's also important to cover the **Scandinavian Defense**. While it's somewhat dubious and rarely seen among top players, **it remains a surprisingly common choice from beginner all the way up to advanced levels**.\n\nAgainst it, we exchange pawns, develop naturally, and **aim to castle queenside before launching an attack on Black's king**. "
+        },
+        "order": {
+          "integerValue": "4"
+        },
+        "variation": {
+          "stringValue": "> e4 d5"
+        },
+        "halfMoves": {
+          "integerValue": "2"
+        }
+      }
+    },
+    {
+      "name": "projects/chessnought/databases/(default)/documents/openingBooks/fbdadf0d-adac-4d9f-9557-83769b079737/openingBookVariations/> e4 d5 exd5",
+      "fields": {
+        "halfMoves": {
+          "integerValue": "3"
+        },
+        "variation": {
+          "stringValue": "> e4 d5 exd5"
+        },
+        "order": {
+          "integerValue": "0"
+        }
+      }
+    },
+    {
+      "name": "projects/chessnought/databases/(default)/documents/openingBooks/fbdadf0d-adac-4d9f-9557-83769b079737/openingBookVariations/> e4 d5 exd5 Qxd5",
+      "fields": {
+        "variation": {
+          "stringValue": "> e4 d5 exd5 Qxd5"
+        },
+        "order": {
+          "integerValue": "0"
+        },
+        "comment": {
+          "stringValue": " The queen has already moved once and is now forced to move again. **Bringing it out so early is never a good plan**, especially when it allows us to develop our pieces with tempo! "
+        },
+        "halfMoves": {
+          "integerValue": "4"
+        }
+      }
+    },
+    {
+      "name": "projects/chessnought/databases/(default)/documents/openingBooks/fbdadf0d-adac-4d9f-9557-83769b079737/openingBookVariations/> e4 d5 exd5 Qxd5 Nc3",
+      "fields": {
+        "order": {
+          "integerValue": "0"
+        },
+        "variation": {
+          "stringValue": "> e4 d5 exd5 Qxd5 Nc3"
+        },
+        "halfMoves": {
+          "integerValue": "5"
+        }
+      }
+    },
+    {
+      "name": "projects/chessnought/databases/(default)/documents/openingBooks/fbdadf0d-adac-4d9f-9557-83769b079737/openingBookVariations/> e4 d5 exd5 Qxd5 Nc3 Qa5",
+      "fields": {
+        "comment": {
+          "stringValue": " This is the main line, but only the second most popular choice in the Lichess database. When given the chance, it's usually wise to claim the center! "
+        },
+        "order": {
+          "integerValue": "0"
+        },
+        "variation": {
+          "stringValue": "> e4 d5 exd5 Qxd5 Nc3 Qa5"
+        },
+        "halfMoves": {
+          "integerValue": "6"
+        }
+      }
+    },
+    {
+      "name": "projects/chessnought/databases/(default)/documents/openingBooks/fbdadf0d-adac-4d9f-9557-83769b079737/openingBookVariations/> e4 d5 exd5 Qxd5 Nc3 Qa5 d4",
+      "fields": {
+        "order": {
+          "integerValue": "0"
+        },
+        "halfMoves": {
+          "integerValue": "7"
+        },
+        "variation": {
+          "stringValue": "> e4 d5 exd5 Qxd5 Nc3 Qa5 d4"
+        }
+      }
+    },
+    {
+      "name": "projects/chessnought/databases/(default)/documents/openingBooks/fbdadf0d-adac-4d9f-9557-83769b079737/openingBookVariations/> e4 d5 exd5 Qxd5 Nc3 Qa5 d4 Nf6",
+      "fields": {
+        "variation": {
+          "stringValue": "> e4 d5 exd5 Qxd5 Nc3 Qa5 d4 Nf6"
+        },
+        "halfMoves": {
+          "integerValue": "8"
+        },
+        "order": {
+          "integerValue": "0"
+        }
+      }
+    },
+    {
+      "name": "projects/chessnought/databases/(default)/documents/openingBooks/fbdadf0d-adac-4d9f-9557-83769b079737/openingBookVariations/> e4 d5 exd5 Qxd5 Nc3 Qa5 d4 Nf6 Nf3",
+      "fields": {
+        "order": {
+          "integerValue": "0"
+        },
+        "halfMoves": {
+          "integerValue": "9"
+        },
+        "variation": {
+          "stringValue": "> e4 d5 exd5 Qxd5 Nc3 Qa5 d4 Nf6 Nf3"
+        }
+      }
+    },
+    {
+      "name": "projects/chessnought/databases/(default)/documents/openingBooks/fbdadf0d-adac-4d9f-9557-83769b079737/openingBookVariations/> e4 d5 exd5 Qxd5 Nc3 Qa5 d4 Nf6 Nf3 Bg4",
+      "fields": {
+        "variation": {
+          "stringValue": "> e4 d5 exd5 Qxd5 Nc3 Qa5 d4 Nf6 Nf3 Bg4"
+        },
+        "order": {
+          "integerValue": "1"
+        },
+        "comment": {
+          "stringValue": " In the **Scandinavian**, we're rarely afraid of *...Bg4*. We can simply harass the bishop right away and ask where it wants to go. "
+        },
+        "halfMoves": {
+          "integerValue": "10"
+        },
+        "nags": {
+          "arrayValue": {
+            "values": [
+              {
+                "stringValue": "$6"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "name": "projects/chessnought/databases/(default)/documents/openingBooks/fbdadf0d-adac-4d9f-9557-83769b079737/openingBookVariations/> e4 d5 exd5 Qxd5 Nc3 Qa5 d4 Nf6 Nf3 Bg4 h3",
+      "fields": {
+        "variation": {
+          "stringValue": "> e4 d5 exd5 Qxd5 Nc3 Qa5 d4 Nf6 Nf3 Bg4 h3"
+        },
+        "halfMoves": {
+          "integerValue": "11"
+        },
+        "order": {
+          "integerValue": "0"
+        }
+      }
+    },
+    {
+      "name": "projects/chessnought/databases/(default)/documents/openingBooks/fbdadf0d-adac-4d9f-9557-83769b079737/openingBookVariations/> e4 d5 exd5 Qxd5 Nc3 Qa5 d4 Nf6 Nf3 Bg4 h3 Bh5",
+      "fields": {
+        "halfMoves": {
+          "integerValue": "12"
+        },
+        "variation": {
+          "stringValue": "> e4 d5 exd5 Qxd5 Nc3 Qa5 d4 Nf6 Nf3 Bg4 h3 Bh5"
+        },
+        "comment": {
+          "stringValue": " In the **Scandinavian**, we almost always meet *...Bh5* with *g4*, **claiming space on the kingside and winning the bishop pair**. "
+        },
+        "order": {
+          "integerValue": "0"
+        }
+      }
+    },
+    {
+      "name": "projects/chessnought/databases/(default)/documents/openingBooks/fbdadf0d-adac-4d9f-9557-83769b079737/openingBookVariations/> e4 d5 exd5 Qxd5 Nc3 Qa5 d4 Nf6 Nf3 Bg4 h3 Bxf3",
+      "fields": {
+        "halfMoves": {
+          "integerValue": "12"
+        },
+        "variation": {
+          "stringValue": "> e4 d5 exd5 Qxd5 Nc3 Qa5 d4 Nf6 Nf3 Bg4 h3 Bxf3"
+        },
+        "order": {
+          "integerValue": "1"
+        }
+      }
+    },
+    {
+      "name": "projects/chessnought/databases/(default)/documents/openingBooks/fbdadf0d-adac-4d9f-9557-83769b079737/openingBookVariations/> e4 d5 exd5 Qxd5 Nc3 Qa5 d4 Nf6 Nf3 Bg4 h3 Qh5",
+      "fields": {
+        "comment": {
+          "stringValue": " Black tries to be clever, claiming our *h-pawn* is pinned since our rook is unguarded, but they're in for a surprise! "
+        },
+        "order": {
+          "integerValue": "2"
+        },
+        "variation": {
+          "stringValue": "> e4 d5 exd5 Qxd5 Nc3 Qa5 d4 Nf6 Nf3 Bg4 h3 Qh5"
+        },
+        "nags": {
+          "arrayValue": {
+            "values": [
+              {
+                "stringValue": "$4"
+              }
+            ]
+          }
+        },
+        "halfMoves": {
+          "integerValue": "12"
+        }
+      }
+    },
+    {
+      "name": "projects/chessnought/databases/(default)/documents/openingBooks/fbdadf0d-adac-4d9f-9557-83769b079737/openingBookVariations/> e4 d5 exd5 Qxd5 Nc3 Qa5 d4 Nf6 Nf3 c6",
+      "fields": {
+        "order": {
+          "integerValue": "0"
+        },
+        "comment": {
+          "stringValue": " This is Black's best approach, staying solid while hoping we'll overextend. We do have to be a bit careful here. It may look like we can develop however we want, but **it's important to place our pieces on their best squares**. "
+        },
+        "variation": {
+          "stringValue": "> e4 d5 exd5 Qxd5 Nc3 Qa5 d4 Nf6 Nf3 c6"
+        },
+        "halfMoves": {
+          "integerValue": "10"
+        }
+      }
+    },
+    {
+      "name": "projects/chessnought/databases/(default)/documents/openingBooks/fbdadf0d-adac-4d9f-9557-83769b079737/openingBookVariations/> e4 d5 exd5 Qxd5 Nc3 Qa5 d4 Nf6 Nf3 c6 Bc4",
+      "fields": {
+        "halfMoves": {
+          "integerValue": "11"
+        },
+        "order": {
+          "integerValue": "0"
+        },
+        "comment": {
+          "stringValue": " The *c1-bishop* is most active on the *a2-g8* diagonal. If disturbed, it can always drop back to *b3*. Remember, in the **Scandinavian**, **we're not afraid of Black's *...Bg4* pin**. "
+        },
+        "variation": {
+          "stringValue": "> e4 d5 exd5 Qxd5 Nc3 Qa5 d4 Nf6 Nf3 c6 Bc4"
+        }
+      }
+    },
+    {
+      "name": "projects/chessnought/databases/(default)/documents/openingBooks/fbdadf0d-adac-4d9f-9557-83769b079737/openingBookVariations/> e4 d5 exd5 Qxd5 Nc3 Qa5 d4 Nf6 Nf3 c6 Bc4 Bf5",
+      "fields": {
+        "halfMoves": {
+          "integerValue": "12"
+        },
+        "variation": {
+          "stringValue": "> e4 d5 exd5 Qxd5 Nc3 Qa5 d4 Nf6 Nf3 c6 Bc4 Bf5"
+        },
+        "comment": {
+          "stringValue": " Here it's best to play *Bd2*, breaking the pin on our knight. This also sets up **a nasty discovered attack on Black's queen** if they're not careful. "
+        },
+        "order": {
+          "integerValue": "0"
+        }
+      }
+    },
+    {
+      "name": "projects/chessnought/databases/(default)/documents/openingBooks/fbdadf0d-adac-4d9f-9557-83769b079737/openingBookVariations/> e4 d5 exd5 Qxd5 Nc3 Qd8",
+      "fields": {
+        "variation": {
+          "stringValue": "> e4 d5 exd5 Qxd5 Nc3 Qd8"
+        },
+        "order": {
+          "integerValue": "1"
+        },
+        "comment": {
+          "stringValue": " This is the most common move in the Lichess database, but it simply hands us a comfortable game. Let's claim the center first. "
+        },
+        "halfMoves": {
+          "integerValue": "6"
+        }
+      }
+    },
+    {
+      "name": "projects/chessnought/databases/(default)/documents/openingBooks/fbdadf0d-adac-4d9f-9557-83769b079737/openingBookVariations/> e4 d5 exd5 Qxd5 Nc3 Qd8 d4",
+      "fields": {
+        "order": {
+          "integerValue": "0"
+        },
+        "variation": {
+          "stringValue": "> e4 d5 exd5 Qxd5 Nc3 Qd8 d4"
+        },
+        "halfMoves": {
+          "integerValue": "7"
+        }
+      }
+    },
+    {
+      "name": "projects/chessnought/databases/(default)/documents/openingBooks/fbdadf0d-adac-4d9f-9557-83769b079737/openingBookVariations/> e4 d5 exd5 Qxd5 Nc3 Qd8 d4 Nf6",
+      "fields": {
+        "halfMoves": {
+          "integerValue": "8"
+        },
+        "order": {
+          "integerValue": "0"
+        },
+        "comment": {
+          "stringValue": " Since we're handed the center and easy development, I recommend aiming for a more aggressive approach with queenside castling. First, let's develop our other knight. "
+        },
+        "variation": {
+          "stringValue": "> e4 d5 exd5 Qxd5 Nc3 Qd8 d4 Nf6"
+        }
+      }
+    },
+    {
+      "name": "projects/chessnought/databases/(default)/documents/openingBooks/fbdadf0d-adac-4d9f-9557-83769b079737/openingBookVariations/> e4 d5 exd5 Qxd5 Nc3 Qd8 d4 Nf6 Nf3",
+      "fields": {
+        "order": {
+          "integerValue": "0"
+        },
+        "variation": {
+          "stringValue": "> e4 d5 exd5 Qxd5 Nc3 Qd8 d4 Nf6 Nf3"
+        },
+        "halfMoves": {
+          "integerValue": "9"
+        }
+      }
+    },
+    {
+      "name": "projects/chessnought/databases/(default)/documents/openingBooks/fbdadf0d-adac-4d9f-9557-83769b079737/openingBookVariations/> e4 d5 exd5 Qxd5 Nc3 Qd8 d4 Nf6 Nf3 Bg4",
+      "fields": {
+        "comment": {
+          "stringValue": " This is the main line. It's fine to allow this pin since Black can't exploit it yet, and we can harass the bishop immediately. "
+        },
+        "order": {
+          "integerValue": "0"
+        },
+        "variation": {
+          "stringValue": "> e4 d5 exd5 Qxd5 Nc3 Qd8 d4 Nf6 Nf3 Bg4"
+        },
+        "halfMoves": {
+          "integerValue": "10"
+        }
+      }
+    },
+    {
+      "name": "projects/chessnought/databases/(default)/documents/openingBooks/fbdadf0d-adac-4d9f-9557-83769b079737/openingBookVariations/> e4 d5 exd5 Qxd5 Nc3 Qd8 d4 Nf6 Nf3 Bg4 h3",
+      "fields": {
+        "halfMoves": {
+          "integerValue": "11"
+        },
+        "variation": {
+          "stringValue": "> e4 d5 exd5 Qxd5 Nc3 Qd8 d4 Nf6 Nf3 Bg4 h3"
+        },
+        "order": {
+          "integerValue": "0"
+        }
+      }
+    },
+    {
+      "name": "projects/chessnought/databases/(default)/documents/openingBooks/fbdadf0d-adac-4d9f-9557-83769b079737/openingBookVariations/> e4 d5 exd5 Qxd5 Nc3 Qd8 d4 Nf6 Nf3 Bg4 h3 Bh5",
+      "fields": {
+        "nags": {
+          "arrayValue": {
+            "values": [
+              {
+                "stringValue": "$2"
+              }
+            ]
+          }
+        },
+        "halfMoves": {
+          "integerValue": "12"
+        },
+        "comment": {
+          "stringValue": " A very common move, but it's a mistake. We get to expand on the kingside with tempo! "
+        },
+        "order": {
+          "integerValue": "1"
+        },
+        "variation": {
+          "stringValue": "> e4 d5 exd5 Qxd5 Nc3 Qd8 d4 Nf6 Nf3 Bg4 h3 Bh5"
+        }
+      }
+    },
+    {
+      "name": "projects/chessnought/databases/(default)/documents/openingBooks/fbdadf0d-adac-4d9f-9557-83769b079737/openingBookVariations/> e4 d5 exd5 Qxd5 Nc3 Qd8 d4 Nf6 Nf3 Bg4 h3 Bxf3",
+      "fields": {
+        "halfMoves": {
+          "integerValue": "12"
+        },
+        "variation": {
+          "stringValue": "> e4 d5 exd5 Qxd5 Nc3 Qd8 d4 Nf6 Nf3 Bg4 h3 Bxf3"
+        },
+        "comment": {
+          "stringValue": " Retreating the bishop doesn't really make sense for Black. **We've won the bishop pair**, which will benefit us greatly in an open position like this. "
+        },
+        "order": {
+          "integerValue": "0"
+        }
+      }
+    },
+    {
+      "name": "projects/chessnought/databases/(default)/documents/openingBooks/fbdadf0d-adac-4d9f-9557-83769b079737/openingBookVariations/> e4 d5 exd5 Qxd5 Nc3 Qd8 d4 Nf6 Nf3 e6",
+      "fields": {
+        "comment": {
+          "stringValue": " The most common move among beginners. Black remains passive, so we can proceed with our plan of queenside castling. "
+        },
+        "order": {
+          "integerValue": "1"
+        },
+        "variation": {
+          "stringValue": "> e4 d5 exd5 Qxd5 Nc3 Qd8 d4 Nf6 Nf3 e6"
+        },
+        "halfMoves": {
+          "integerValue": "10"
+        }
+      }
+    },
+    {
+      "name": "projects/chessnought/databases/(default)/documents/openingBooks/fbdadf0d-adac-4d9f-9557-83769b079737/openingBookVariations/> e4 d5 exd5 Qxd5 Nc3 Qd8 d4 Nf6 Nf3 e6 Bg5",
+      "fields": {
+        "halfMoves": {
+          "integerValue": "11"
+        },
+        "variation": {
+          "stringValue": "> e4 d5 exd5 Qxd5 Nc3 Qd8 d4 Nf6 Nf3 e6 Bg5"
+        },
+        "order": {
+          "integerValue": "0"
+        },
+        "comment": {
+          "stringValue": " The most active square for our bishop. "
+        }
+      }
+    },
+    {
+      "name": "projects/chessnought/databases/(default)/documents/openingBooks/fbdadf0d-adac-4d9f-9557-83769b079737/openingBookVariations/> e4 d5 exd5 Qxd5 Nc3 Qd8 d4 Nf6 Nf3 e6 Bg5 Be7",
+      "fields": {
+        "halfMoves": {
+          "integerValue": "12"
+        },
+        "variation": {
+          "stringValue": "> e4 d5 exd5 Qxd5 Nc3 Qd8 d4 Nf6 Nf3 e6 Bg5 Be7"
+        },
+        "order": {
+          "integerValue": "0"
+        },
+        "comment": {
+          "stringValue": " Let's develop our other bishop, and soon we'll have the option to castle either way. "
+        }
+      }
+    },
+    {
+      "name": "projects/chessnought/databases/(default)/documents/openingBooks/fbdadf0d-adac-4d9f-9557-83769b079737/openingBookVariations/> e4 d6",
+      "fields": {
+        "halfMoves": {
+          "integerValue": "2"
+        },
+        "comment": {
+          "stringValue": " We'll also cover a few sidelines, such as *1...d6* (**Pirc Defense**), and go through the key ideas to keep in mind when facing them.\n\n**The Pirc Defense often transposes into the Modern Defense**, so we can usually use the same setup and ideas. If it doesn't transpose, I have you covered! "
+        },
+        "order": {
+          "integerValue": "6"
+        },
+        "variation": {
+          "stringValue": "> e4 d6"
+        }
+      }
+    },
+    {
+      "name": "projects/chessnought/databases/(default)/documents/openingBooks/fbdadf0d-adac-4d9f-9557-83769b079737/openingBookVariations/> e4 d6 d4",
+      "fields": {
+        "halfMoves": {
+          "integerValue": "3"
+        },
+        "variation": {
+          "stringValue": "> e4 d6 d4"
+        },
+        "order": {
+          "integerValue": "0"
+        }
+      }
+    },
+    {
+      "name": "projects/chessnought/databases/(default)/documents/openingBooks/fbdadf0d-adac-4d9f-9557-83769b079737/openingBookVariations/> e4 d6 d4 Nf6",
+      "fields": {
+        "halfMoves": {
+          "integerValue": "4"
+        },
+        "comment": {
+          "stringValue": " Black attacks our *e4-pawn*, so let's defend it while developing a piece. "
+        },
+        "order": {
+          "integerValue": "0"
+        },
+        "variation": {
+          "stringValue": "> e4 d6 d4 Nf6"
+        }
+      }
+    },
+    {
+      "name": "projects/chessnought/databases/(default)/documents/openingBooks/fbdadf0d-adac-4d9f-9557-83769b079737/openingBookVariations/> e4 d6 d4 Nf6 Nc3",
+      "fields": {
+        "variation": {
+          "stringValue": "> e4 d6 d4 Nf6 Nc3"
+        },
+        "halfMoves": {
+          "integerValue": "5"
+        },
+        "order": {
+          "integerValue": "0"
+        }
+      }
+    },
+    {
+      "name": "projects/chessnought/databases/(default)/documents/openingBooks/fbdadf0d-adac-4d9f-9557-83769b079737/openingBookVariations/> e4 d6 d4 Nf6 Nc3 e5",
+      "fields": {
+        "halfMoves": {
+          "integerValue": "6"
+        },
+        "variation": {
+          "stringValue": "> e4 d6 d4 Nf6 Nc3 e5"
+        },
+        "comment": {
+          "stringValue": " Black tries to strike directly in the center. Any other move will most likely transpose into the **Modern Defense**.\n\nWhile *dxe5* is a viable option leading to a queenless middlegame, **I prefer the simple *Nf3*, which maintains the initiative and develops naturally**. "
+        },
+        "order": {
+          "integerValue": "0"
+        }
+      }
+    },
+    {
+      "name": "projects/chessnought/databases/(default)/documents/openingBooks/fbdadf0d-adac-4d9f-9557-83769b079737/openingBookVariations/> e4 d6 d4 Nf6 Nc3 e5 Nf3",
+      "fields": {
+        "variation": {
+          "stringValue": "> e4 d6 d4 Nf6 Nc3 e5 Nf3"
+        },
+        "halfMoves": {
+          "integerValue": "7"
+        },
+        "order": {
+          "integerValue": "0"
+        }
+      }
+    },
+    {
+      "name": "projects/chessnought/databases/(default)/documents/openingBooks/fbdadf0d-adac-4d9f-9557-83769b079737/openingBookVariations/> e4 d6 d4 Nf6 Nc3 e5 Nf3 Nbd7",
+      "fields": {
+        "halfMoves": {
+          "integerValue": "8"
+        },
+        "variation": {
+          "stringValue": "> e4 d6 d4 Nf6 Nc3 e5 Nf3 Nbd7"
+        },
+        "comment": {
+          "stringValue": " This is the main line and Black's best move, maintaining tension and keeping flexibility. It's, however, only the second most popular move in the Lichess database.\n\nHere, I have a fun move for you. "
+        },
+        "order": {
+          "integerValue": "0"
+        }
+      }
+    },
+    {
+      "name": "projects/chessnought/databases/(default)/documents/openingBooks/fbdadf0d-adac-4d9f-9557-83769b079737/openingBookVariations/> e4 d6 d4 Nf6 Nc3 e5 Nf3 Nbd7 Rg1",
+      "fields": {
+        "variation": {
+          "stringValue": "> e4 d6 d4 Nf6 Nc3 e5 Nf3 Nbd7 Rg1"
+        },
+        "order": {
+          "integerValue": "0"
+        },
+        "comment": {
+          "stringValue": " What?! You may wonder whether this doesn't break all opening principles. While it certainly looks odd, ***Rg1* actually makes perfect sense**. Since we intend to castle queenside anyway, we don't mind giving up kingside castling rights.\n\nFurthermore, **we're ready to launch an immediate attack with *g4***. "
+        },
+        "halfMoves": {
+          "integerValue": "9"
+        }
+      }
+    },
+    {
+      "name": "projects/chessnought/databases/(default)/documents/openingBooks/fbdadf0d-adac-4d9f-9557-83769b079737/openingBookVariations/> e4 d6 d4 Nf6 Nc3 e5 Nf3 Nbd7 Rg1 c6",
+      "fields": {
+        "comment": {
+          "stringValue": " Let's follow through with our plan. "
+        },
+        "order": {
+          "integerValue": "0"
+        },
+        "variation": {
+          "stringValue": "> e4 d6 d4 Nf6 Nc3 e5 Nf3 Nbd7 Rg1 c6"
+        },
+        "halfMoves": {
+          "integerValue": "10"
+        }
+      }
+    },
+    {
+      "name": "projects/chessnought/databases/(default)/documents/openingBooks/fbdadf0d-adac-4d9f-9557-83769b079737/openingBookVariations/> e4 d6 d4 Nf6 Nc3 e5 Nf3 Nbd7 Rg1 c6 g4",
+      "fields": {
+        "halfMoves": {
+          "integerValue": "11"
+        },
+        "variation": {
+          "stringValue": "> e4 d6 d4 Nf6 Nc3 e5 Nf3 Nbd7 Rg1 c6 g4"
+        },
+        "comment": {
+          "stringValue": " I promise you *g4* will make your opponent sweat. "
+        },
+        "order": {
+          "integerValue": "0"
+        }
+      }
+    },
+    {
+      "name": "projects/chessnought/databases/(default)/documents/openingBooks/fbdadf0d-adac-4d9f-9557-83769b079737/openingBookVariations/> e4 d6 d4 Nf6 Nc3 e5 Nf3 Nbd7 Rg1 c6 g4 h6",
+      "fields": {
+        "order": {
+          "integerValue": "0"
+        },
+        "halfMoves": {
+          "integerValue": "12"
+        },
+        "variation": {
+          "stringValue": "> e4 d6 d4 Nf6 Nc3 e5 Nf3 Nbd7 Rg1 c6 g4 h6"
+        }
+      }
+    },
+    {
+      "name": "projects/chessnought/databases/(default)/documents/openingBooks/fbdadf0d-adac-4d9f-9557-83769b079737/openingBookVariations/> e4 d6 d4 Nf6 Nc3 e5 Nf3 exd4",
+      "fields": {
+        "variation": {
+          "stringValue": "> e4 d6 d4 Nf6 Nc3 e5 Nf3 exd4"
+        },
+        "comment": {
+          "stringValue": " It's seldom a good idea to be the one who releases pawn tension. Here, we get to keep our extra space. "
+        },
+        "order": {
+          "integerValue": "1"
+        },
+        "halfMoves": {
+          "integerValue": "8"
+        }
+      }
+    },
+    {
+      "name": "projects/chessnought/databases/(default)/documents/openingBooks/fbdadf0d-adac-4d9f-9557-83769b079737/openingBookVariations/> e4 d6 d4 Nf6 Nc3 e5 Nf3 exd4 Nxd4",
+      "fields": {
+        "halfMoves": {
+          "integerValue": "9"
+        },
+        "variation": {
+          "stringValue": "> e4 d6 d4 Nf6 Nc3 e5 Nf3 exd4 Nxd4"
+        },
+        "order": {
+          "integerValue": "0"
+        }
+      }
+    },
+    {
+      "name": "projects/chessnought/databases/(default)/documents/openingBooks/fbdadf0d-adac-4d9f-9557-83769b079737/openingBookVariations/> e4 d6 d4 Nf6 Nc3 e5 Nf3 exd4 Nxd4 Be7",
+      "fields": {
+        "halfMoves": {
+          "integerValue": "10"
+        },
+        "order": {
+          "integerValue": "0"
+        },
+        "comment": {
+          "stringValue": " Here, I prefer to first develop our *f1-bishop*, since in certain situations we'd like to have the option of castling queenside. "
+        },
+        "variation": {
+          "stringValue": "> e4 d6 d4 Nf6 Nc3 e5 Nf3 exd4 Nxd4 Be7"
+        }
+      }
+    },
+    {
+      "name": "projects/chessnought/databases/(default)/documents/openingBooks/fbdadf0d-adac-4d9f-9557-83769b079737/openingBookVariations/> e4 d6 d4 Nf6 Nc3 e5 Nf3 exd4 Nxd4 Be7 Bf4",
+      "fields": {
+        "variation": {
+          "stringValue": "> e4 d6 d4 Nf6 Nc3 e5 Nf3 exd4 Nxd4 Be7 Bf4"
+        },
+        "halfMoves": {
+          "integerValue": "11"
+        },
+        "order": {
+          "integerValue": "0"
+        }
+      }
+    },
+    {
+      "name": "projects/chessnought/databases/(default)/documents/openingBooks/fbdadf0d-adac-4d9f-9557-83769b079737/openingBookVariations/> e4 d6 d4 Nf6 Nc3 e5 Nf3 exd4 Nxd4 Be7 Bf4 O-O",
+      "fields": {
+        "order": {
+          "integerValue": "0"
+        },
+        "variation": {
+          "stringValue": "> e4 d6 d4 Nf6 Nc3 e5 Nf3 exd4 Nxd4 Be7 Bf4 O-O"
+        },
+        "halfMoves": {
+          "integerValue": "12"
+        }
+      }
+    },
+    {
+      "name": "projects/chessnought/databases/(default)/documents/openingBooks/fbdadf0d-adac-4d9f-9557-83769b079737/openingBookVariations/> e4 e5",
+      "fields": {
+        "halfMoves": {
+          "integerValue": "2"
+        },
+        "variation": {
+          "stringValue": "> e4 e5"
+        },
+        "order": {
+          "integerValue": "0"
+        },
+        "comment": {
+          "stringValue": " This is the most common response you'll face. Against *1...e5*, I recommend the **Italian Game**, which often leads to **middlegames full of rich positional ideas** without requiring you to memorize an overwhelming amount of theory. "
+        }
+      }
+    },
+    {
+      "name": "projects/chessnought/databases/(default)/documents/openingBooks/fbdadf0d-adac-4d9f-9557-83769b079737/openingBookVariations/> e4 e5 Nf3",
+      "fields": {
+        "halfMoves": {
+          "integerValue": "3"
+        },
+        "comment": {
+          "stringValue": " The most common and natural move for White, attacking Black's *e5-pawn*. "
+        },
+        "order": {
+          "integerValue": "0"
+        },
+        "variation": {
+          "stringValue": "> e4 e5 Nf3"
+        }
+      }
+    },
+    {
+      "name": "projects/chessnought/databases/(default)/documents/openingBooks/fbdadf0d-adac-4d9f-9557-83769b079737/openingBookVariations/> e4 e5 Nf3 Nc6",
+      "fields": {
+        "halfMoves": {
+          "integerValue": "4"
+        },
+        "variation": {
+          "stringValue": "> e4 e5 Nf3 Nc6"
+        },
+        "comment": {
+          "stringValue": " Black defends the pawn. Here, the most popular move is *3.Bb5*, the **Ruy Lopez** or **Spanish Opening**. It's arguably White's main choice here, but **it requires knowing a great deal of theory** and a lot of studying.\n\nInstead, I recommend *3.Bc4*, leading to the **Italian Game**. It often leads to **middlegames rich in positional ideas** while avoiding the need to memorize excessive theory. "
+        },
+        "order": {
+          "integerValue": "0"
+        }
+      }
+    },
+    {
+      "name": "projects/chessnought/databases/(default)/documents/openingBooks/fbdadf0d-adac-4d9f-9557-83769b079737/openingBookVariations/> e4 e5 Nf3 Nc6 Bc4",
+      "fields": {
+        "halfMoves": {
+          "integerValue": "5"
+        },
+        "variation": {
+          "stringValue": "> e4 e5 Nf3 Nc6 Bc4"
+        },
+        "order": {
+          "integerValue": "0"
+        },
+        "comment": {
+          "stringValue": " This leads to the starting position of the **Italian Game**. "
+        }
+      }
+    },
+    {
+      "name": "projects/chessnought/databases/(default)/documents/openingBooks/fbdadf0d-adac-4d9f-9557-83769b079737/openingBookVariations/> e4 e5 Nf3 Nc6 Bc4 Nf6",
+      "fields": {
+        "variation": {
+          "stringValue": "> e4 e5 Nf3 Nc6 Bc4 Nf6"
+        },
+        "order": {
+          "integerValue": "0"
+        },
+        "comment": {
+          "stringValue": " This is called the **Two Knights Defense**. Black may also choose *3...Bc5*, the **Giuoco Piano**, but the game will usually transpose once White plays *4.d3*. "
+        },
+        "halfMoves": {
+          "integerValue": "6"
+        }
+      }
+    },
+    {
+      "name": "projects/chessnought/databases/(default)/documents/openingBooks/fbdadf0d-adac-4d9f-9557-83769b079737/openingBookVariations/> e4 e5 Nf3 Nc6 Bc4 Nf6 d3",
+      "fields": {
+        "halfMoves": {
+          "integerValue": "7"
+        },
+        "order": {
+          "integerValue": "0"
+        },
+        "comment": {
+          "stringValue": " We simply defend our *e4-pawn*. "
+        },
+        "variation": {
+          "stringValue": "> e4 e5 Nf3 Nc6 Bc4 Nf6 d3"
+        }
+      }
+    },
+    {
+      "name": "projects/chessnought/databases/(default)/documents/openingBooks/fbdadf0d-adac-4d9f-9557-83769b079737/openingBookVariations/> e4 e5 Nf3 Nc6 Bc4 Nf6 d3 Bc5",
+      "fields": {
+        "variation": {
+          "stringValue": "> e4 e5 Nf3 Nc6 Bc4 Nf6 d3 Bc5"
+        },
+        "comment": {
+          "stringValue": " Interestingly, this position is called the **Giuoco Pianissimo** in Italian, meaning \"very quiet game.\" But if Black is expecting something calm, **they might be in for a surprise!** "
+        },
+        "order": {
+          "integerValue": "0"
+        },
+        "halfMoves": {
+          "integerValue": "8"
+        }
+      }
+    },
+    {
+      "name": "projects/chessnought/databases/(default)/documents/openingBooks/fbdadf0d-adac-4d9f-9557-83769b079737/openingBookVariations/> e4 e5 Nf3 Nc6 Bc4 Nf6 d3 Bc5 O-O",
+      "fields": {
+        "variation": {
+          "stringValue": "> e4 e5 Nf3 Nc6 Bc4 Nf6 d3 Bc5 O-O"
+        },
+        "order": {
+          "integerValue": "0"
+        },
+        "comment": {
+          "stringValue": " We could also begin with *5.c3*, but it feels more natural to castle first. "
+        },
+        "halfMoves": {
+          "integerValue": "9"
+        }
+      }
+    },
+    {
+      "name": "projects/chessnought/databases/(default)/documents/openingBooks/fbdadf0d-adac-4d9f-9557-83769b079737/openingBookVariations/> e4 e5 Nf3 Nc6 Bc4 Nf6 d3 Bc5 O-O O-O",
+      "fields": {
+        "variation": {
+          "stringValue": "> e4 e5 Nf3 Nc6 Bc4 Nf6 d3 Bc5 O-O O-O"
+        },
+        "comment": {
+          "stringValue": "Now that both sides have castled, let's go over White's plans. **The main objective is to prepare the *d4* break.** To support it, White usually plays *c3*, reroutes the knight from *b1* to *g3*, and places a rook on *e1*. "
+        },
+        "order": {
+          "integerValue": "0"
+        },
+        "halfMoves": {
+          "integerValue": "10"
+        }
+      }
+    },
+    {
+      "name": "projects/chessnought/databases/(default)/documents/openingBooks/fbdadf0d-adac-4d9f-9557-83769b079737/openingBookVariations/> e4 e5 Nf3 Nc6 Bc4 Nf6 d3 Bc5 O-O O-O Re1",
+      "fields": {
+        "halfMoves": {
+          "integerValue": "11"
+        },
+        "variation": {
+          "stringValue": "> e4 e5 Nf3 Nc6 Bc4 Nf6 d3 Bc5 O-O O-O Re1"
+        },
+        "order": {
+          "integerValue": "0"
+        },
+        "comment": {
+          "stringValue": " I recommend starting with *Re1*, a sideline that **prevents Black from immediately pushing *...d5***. "
+        }
+      }
+    },
+    {
+      "name": "projects/chessnought/databases/(default)/documents/openingBooks/fbdadf0d-adac-4d9f-9557-83769b079737/openingBookVariations/> e4 e5 Nf3 Nc6 Bc4 Nf6 d3 Bc5 O-O O-O Re1 d6",
+      "fields": {
+        "variation": {
+          "stringValue": "> e4 e5 Nf3 Nc6 Bc4 Nf6 d3 Bc5 O-O O-O Re1 d6"
+        },
+        "order": {
+          "integerValue": "0"
+        },
+        "comment": {
+          "stringValue": " The position looks very symmetrical, but that's about to change. "
+        },
+        "halfMoves": {
+          "integerValue": "12"
+        }
+      }
+    },
+    {
+      "name": "projects/chessnought/databases/(default)/documents/openingBooks/fbdadf0d-adac-4d9f-9557-83769b079737/openingBookVariations/> e4 e5 Nf3 Nc6 Bc4 Nf6 d3 d5",
+      "fields": {
+        "halfMoves": {
+          "integerValue": "8"
+        },
+        "nags": {
+          "arrayValue": {
+            "values": [
+              {
+                "stringValue": "$6"
+              }
+            ]
+          }
+        },
+        "variation": {
+          "stringValue": "> e4 e5 Nf3 Nc6 Bc4 Nf6 d3 d5"
+        },
+        "comment": {
+          "stringValue": " This immediate *...d5* push has grown more popular lately, and at first glance it might look annoying. No need to worry, though: **this early pawn push is actually bad for Black**, as it weakens their position. "
+        },
+        "order": {
+          "integerValue": "1"
+        }
+      }
+    },
+    {
+      "name": "projects/chessnought/databases/(default)/documents/openingBooks/fbdadf0d-adac-4d9f-9557-83769b079737/openingBookVariations/> e4 e5 Nf3 Nc6 Bc4 Nf6 d3 d5 exd5",
+      "fields": {
+        "halfMoves": {
+          "integerValue": "9"
+        },
+        "comment": {
+          "stringValue": " We simply accept the pawn trade. "
+        },
+        "order": {
+          "integerValue": "0"
+        },
+        "variation": {
+          "stringValue": "> e4 e5 Nf3 Nc6 Bc4 Nf6 d3 d5 exd5"
+        }
+      }
+    },
+    {
+      "name": "projects/chessnought/databases/(default)/documents/openingBooks/fbdadf0d-adac-4d9f-9557-83769b079737/openingBookVariations/> e4 e5 Nf3 Nc6 Bc4 Nf6 d3 d5 exd5 Nxd5",
+      "fields": {
+        "order": {
+          "integerValue": "0"
+        },
+        "halfMoves": {
+          "integerValue": "10"
+        },
+        "variation": {
+          "stringValue": "> e4 e5 Nf3 Nc6 Bc4 Nf6 d3 d5 exd5 Nxd5"
+        }
+      }
+    },
+    {
+      "name": "projects/chessnought/databases/(default)/documents/openingBooks/fbdadf0d-adac-4d9f-9557-83769b079737/openingBookVariations/> e4 e5 Nf3 Nc6 Bc4 Nf6 d3 d5 exd5 Nxd5 O-O",
+      "fields": {
+        "halfMoves": {
+          "integerValue": "11"
+        },
+        "variation": {
+          "stringValue": "> e4 e5 Nf3 Nc6 Bc4 Nf6 d3 d5 exd5 Nxd5 O-O"
+        },
+        "order": {
+          "integerValue": "0"
+        },
+        "comment": {
+          "stringValue": " After castling, we can soon start targeting Black's *e5-pawn*. "
+        }
+      }
+    },
+    {
+      "name": "projects/chessnought/databases/(default)/documents/openingBooks/fbdadf0d-adac-4d9f-9557-83769b079737/openingBookVariations/> e4 e5 Nf3 Nc6 Bc4 Nf6 d3 d5 exd5 Nxd5 O-O Bg4",
+      "fields": {
+        "halfMoves": {
+          "integerValue": "12"
+        },
+        "order": {
+          "integerValue": "0"
+        },
+        "comment": {
+          "stringValue": "Black pins our knight, trying to relieve some pressure from *e5*. "
+        },
+        "variation": {
+          "stringValue": "> e4 e5 Nf3 Nc6 Bc4 Nf6 d3 d5 exd5 Nxd5 O-O Bg4"
+        }
+      }
+    },
+    {
+      "name": "projects/chessnought/databases/(default)/documents/openingBooks/fbdadf0d-adac-4d9f-9557-83769b079737/openingBookVariations/> e4 e6",
+      "fields": {
+        "comment": {
+          "stringValue": " Against the **French Defense**, we go for *2.d3*, the **King's Indian Attack**. This variation gives White **clear, straightforward plans and attacking chances**, while also pulling Black out of their comfort zone. "
+        },
+        "order": {
+          "integerValue": "2"
+        },
+        "variation": {
+          "stringValue": "> e4 e6"
+        },
+        "halfMoves": {
+          "integerValue": "2"
+        }
+      }
+    },
+    {
+      "name": "projects/chessnought/databases/(default)/documents/openingBooks/fbdadf0d-adac-4d9f-9557-83769b079737/openingBookVariations/> e4 e6 d3",
+      "fields": {
+        "halfMoves": {
+          "integerValue": "3"
+        },
+        "comment": {
+          "stringValue": " This move will certainly annoy many **French Defense** players. "
+        },
+        "order": {
+          "integerValue": "0"
+        },
+        "variation": {
+          "stringValue": "> e4 e6 d3"
+        }
+      }
+    },
+    {
+      "name": "projects/chessnought/databases/(default)/documents/openingBooks/fbdadf0d-adac-4d9f-9557-83769b079737/openingBookVariations/> e4 e6 d3 d5",
+      "fields": {
+        "variation": {
+          "stringValue": "> e4 e6 d3 d5"
+        },
+        "order": {
+          "integerValue": "0"
+        },
+        "comment": {
+          "stringValue": " It's important to play *Nd2* here to **stop *...dxe4***, which would lead to an early queen trade and a boring endgame. No quick draws here! "
+        },
+        "halfMoves": {
+          "integerValue": "4"
+        }
+      }
+    },
+    {
+      "name": "projects/chessnought/databases/(default)/documents/openingBooks/fbdadf0d-adac-4d9f-9557-83769b079737/openingBookVariations/> e4 e6 d3 d5 Nd2",
+      "fields": {
+        "halfMoves": {
+          "integerValue": "5"
+        },
+        "variation": {
+          "stringValue": "> e4 e6 d3 d5 Nd2"
+        },
+        "order": {
+          "integerValue": "0"
+        }
+      }
+    },
+    {
+      "name": "projects/chessnought/databases/(default)/documents/openingBooks/fbdadf0d-adac-4d9f-9557-83769b079737/openingBookVariations/> e4 e6 d3 d5 Nd2 Nf6",
+      "fields": {
+        "order": {
+          "integerValue": "0"
+        },
+        "comment": {
+          "stringValue": " Here, we want to fianchetto our *c1-bishop*, develop our *g1-knight* to *f3*, and then castle. We'll play these moves in more or less the same order regardless of what Black does. "
+        },
+        "variation": {
+          "stringValue": "> e4 e6 d3 d5 Nd2 Nf6"
+        },
+        "halfMoves": {
+          "integerValue": "6"
+        }
+      }
+    },
+    {
+      "name": "projects/chessnought/databases/(default)/documents/openingBooks/fbdadf0d-adac-4d9f-9557-83769b079737/openingBookVariations/> e4 e6 d3 d5 Nd2 Nf6 Ngf3",
+      "fields": {
+        "halfMoves": {
+          "integerValue": "7"
+        },
+        "variation": {
+          "stringValue": "> e4 e6 d3 d5 Nd2 Nf6 Ngf3"
+        },
+        "order": {
+          "integerValue": "0"
+        }
+      }
+    },
+    {
+      "name": "projects/chessnought/databases/(default)/documents/openingBooks/fbdadf0d-adac-4d9f-9557-83769b079737/openingBookVariations/> e4 e6 d3 d5 Nd2 Nf6 Ngf3 c5",
+      "fields": {
+        "halfMoves": {
+          "integerValue": "8"
+        },
+        "order": {
+          "integerValue": "0"
+        },
+        "comment": {
+          "stringValue": " Black grabs some more space, but don't let that bother us. We continue with our plan! "
+        },
+        "variation": {
+          "stringValue": "> e4 e6 d3 d5 Nd2 Nf6 Ngf3 c5"
+        }
+      }
+    },
+    {
+      "name": "projects/chessnought/databases/(default)/documents/openingBooks/fbdadf0d-adac-4d9f-9557-83769b079737/openingBookVariations/> e4 e6 d3 d5 Nd2 Nf6 Ngf3 c5 g3",
+      "fields": {
+        "order": {
+          "integerValue": "0"
+        },
+        "variation": {
+          "stringValue": "> e4 e6 d3 d5 Nd2 Nf6 Ngf3 c5 g3"
+        },
+        "halfMoves": {
+          "integerValue": "9"
+        }
+      }
+    },
+    {
+      "name": "projects/chessnought/databases/(default)/documents/openingBooks/fbdadf0d-adac-4d9f-9557-83769b079737/openingBookVariations/> e4 e6 d3 d5 Nd2 Nf6 Ngf3 c5 g3 Nc6",
+      "fields": {
+        "order": {
+          "integerValue": "0"
+        },
+        "halfMoves": {
+          "integerValue": "10"
+        },
+        "variation": {
+          "stringValue": "> e4 e6 d3 d5 Nd2 Nf6 Ngf3 c5 g3 Nc6"
+        }
+      }
+    },
+    {
+      "name": "projects/chessnought/databases/(default)/documents/openingBooks/fbdadf0d-adac-4d9f-9557-83769b079737/openingBookVariations/> e4 e6 d3 d5 Nd2 Nf6 Ngf3 c5 g3 Nc6 Bg2",
+      "fields": {
+        "order": {
+          "integerValue": "0"
+        },
+        "variation": {
+          "stringValue": "> e4 e6 d3 d5 Nd2 Nf6 Ngf3 c5 g3 Nc6 Bg2"
+        },
+        "halfMoves": {
+          "integerValue": "11"
+        }
+      }
+    },
+    {
+      "name": "projects/chessnought/databases/(default)/documents/openingBooks/fbdadf0d-adac-4d9f-9557-83769b079737/openingBookVariations/> e4 e6 d3 d5 Nd2 Nf6 Ngf3 c5 g3 Nc6 Bg2 Be7",
+      "fields": {
+        "order": {
+          "integerValue": "0"
+        },
+        "variation": {
+          "stringValue": "> e4 e6 d3 d5 Nd2 Nf6 Ngf3 c5 g3 Nc6 Bg2 Be7"
+        },
+        "halfMoves": {
+          "integerValue": "12"
+        }
+      }
+    },
+    {
+      "name": "projects/chessnought/databases/(default)/documents/openingBooks/fbdadf0d-adac-4d9f-9557-83769b079737/openingBookVariations/> e4 e6 d3 d5 Nd2 dxe4",
+      "fields": {
+        "variation": {
+          "stringValue": "> e4 e6 d3 d5 Nd2 dxe4"
+        },
+        "comment": {
+          "stringValue": " It's generally a good idea to maintain pawn tension unless you have a concrete reason to exchange. Here, releasing it benefits us, as we gain more central space. "
+        },
+        "order": {
+          "integerValue": "1"
+        },
+        "halfMoves": {
+          "integerValue": "6"
+        },
+        "nags": {
+          "arrayValue": {
+            "values": [
+              {
+                "stringValue": "$6"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "name": "projects/chessnought/databases/(default)/documents/openingBooks/fbdadf0d-adac-4d9f-9557-83769b079737/openingBookVariations/> e4 e6 d3 d5 Nd2 dxe4 dxe4",
+      "fields": {
+        "halfMoves": {
+          "integerValue": "7"
+        },
+        "variation": {
+          "stringValue": "> e4 e6 d3 d5 Nd2 dxe4 dxe4"
+        },
+        "comment": {
+          "stringValue": " From here we can continue developing naturally and enjoy a pleasant middlegame with more space. "
+        },
+        "order": {
+          "integerValue": "0"
+        }
+      }
+    },
+    {
+      "name": "projects/chessnought/databases/(default)/documents/openingBooks/fbdadf0d-adac-4d9f-9557-83769b079737/openingBookVariations/> e4 g6",
+      "fields": {
+        "halfMoves": {
+          "integerValue": "2"
+        },
+        "variation": {
+          "stringValue": "> e4 g6"
+        },
+        "order": {
+          "integerValue": "5"
+        },
+        "comment": {
+          "stringValue": " We'll also cover a few sidelines, such as *1...g6* (**Modern Defense**), and go through the key ideas to keep in mind when facing them.\n\nThe **Modern Defense** is likely the sideline you'll encounter most often. It gives White **plenty of ways to seek an advantage**, which also explains its popularity for Black, since there are many variations where White can easily get lost. To avoid this, **I suggest a straightforward approach: develop our pieces to natural squares that reinforce White's strong center**. "
+        }
+      }
+    },
+    {
+      "name": "projects/chessnought/databases/(default)/documents/openingBooks/fbdadf0d-adac-4d9f-9557-83769b079737/openingBookVariations/> e4 g6 d4",
+      "fields": {
+        "variation": {
+          "stringValue": "> e4 g6 d4"
+        },
+        "halfMoves": {
+          "integerValue": "3"
+        },
+        "order": {
+          "integerValue": "0"
+        }
+      }
+    },
+    {
+      "name": "projects/chessnought/databases/(default)/documents/openingBooks/fbdadf0d-adac-4d9f-9557-83769b079737/openingBookVariations/> e4 g6 d4 Bg7",
+      "fields": {
+        "halfMoves": {
+          "integerValue": "4"
+        },
+        "variation": {
+          "stringValue": "> e4 g6 d4 Bg7"
+        },
+        "comment": {
+          "stringValue": " White can develop in so many ways here, and it's easy to get lost in the details. I recommend learning a setup where **we place our pieces on good, active squares without overextending**. "
+        },
+        "order": {
+          "integerValue": "0"
+        }
+      }
+    },
+    {
+      "name": "projects/chessnought/databases/(default)/documents/openingBooks/fbdadf0d-adac-4d9f-9557-83769b079737/openingBookVariations/> e4 g6 d4 Bg7 Nf3",
+      "fields": {
+        "order": {
+          "integerValue": "0"
+        },
+        "variation": {
+          "stringValue": "> e4 g6 d4 Bg7 Nf3"
+        },
+        "halfMoves": {
+          "integerValue": "5"
+        }
+      }
+    },
+    {
+      "name": "projects/chessnought/databases/(default)/documents/openingBooks/fbdadf0d-adac-4d9f-9557-83769b079737/openingBookVariations/> e4 g6 d4 Bg7 Nf3 d6",
+      "fields": {
+        "halfMoves": {
+          "integerValue": "6"
+        },
+        "variation": {
+          "stringValue": "> e4 g6 d4 Bg7 Nf3 d6"
+        },
+        "comment": {
+          "stringValue": " Here, I recommend *Be3*. While it may not be the most popular move, I think it offers great flexibility. **Against the Modern Defense, the *e3-square* is often a good home for the *f1-bishop*.** By delaying the development of the *b1-knight*, we sometimes have the option of playing *c3* or *c4* to reinforce our center. "
+        },
+        "order": {
+          "integerValue": "0"
+        }
+      }
+    },
+    {
+      "name": "projects/chessnought/databases/(default)/documents/openingBooks/fbdadf0d-adac-4d9f-9557-83769b079737/openingBookVariations/> e4 g6 d4 Bg7 Nf3 d6 Be3",
+      "fields": {
+        "order": {
+          "integerValue": "0"
+        },
+        "halfMoves": {
+          "integerValue": "7"
+        },
+        "variation": {
+          "stringValue": "> e4 g6 d4 Bg7 Nf3 d6 Be3"
+        }
+      }
+    },
+    {
+      "name": "projects/chessnought/databases/(default)/documents/openingBooks/fbdadf0d-adac-4d9f-9557-83769b079737/openingBookVariations/> e4 g6 d4 Bg7 Nf3 d6 Be3 Nf6",
+      "fields": {
+        "halfMoves": {
+          "integerValue": "8"
+        },
+        "comment": {
+          "stringValue": " If Black attacks our pawn, we simply defend with *Nc3*. "
+        },
+        "order": {
+          "integerValue": "0"
+        },
+        "variation": {
+          "stringValue": "> e4 g6 d4 Bg7 Nf3 d6 Be3 Nf6"
+        }
+      }
+    },
+    {
+      "name": "projects/chessnought/databases/(default)/documents/openingBooks/fbdadf0d-adac-4d9f-9557-83769b079737/openingBookVariations/> e4 g6 d4 Bg7 Nf3 d6 Be3 Nf6 Nc3",
+      "fields": {
+        "order": {
+          "integerValue": "0"
+        },
+        "variation": {
+          "stringValue": "> e4 g6 d4 Bg7 Nf3 d6 Be3 Nf6 Nc3"
+        },
+        "halfMoves": {
+          "integerValue": "9"
+        }
+      }
+    },
+    {
+      "name": "projects/chessnought/databases/(default)/documents/openingBooks/fbdadf0d-adac-4d9f-9557-83769b079737/openingBookVariations/> e4 g6 d4 Bg7 Nf3 d6 Be3 Nf6 Nc3 O-O",
+      "fields": {
+        "variation": {
+          "stringValue": "> e4 g6 d4 Bg7 Nf3 d6 Be3 Nf6 Nc3 O-O"
+        },
+        "comment": {
+          "stringValue": " There's no rush to complete development, since Black still needs time to prepare their *...c5* or *...e5* pawn breaks. Instead, **I recommend playing prophylactic moves that strengthen our position**. "
+        },
+        "order": {
+          "integerValue": "0"
+        },
+        "halfMoves": {
+          "integerValue": "10"
+        }
+      }
+    },
+    {
+      "name": "projects/chessnought/databases/(default)/documents/openingBooks/fbdadf0d-adac-4d9f-9557-83769b079737/openingBookVariations/> e4 g6 d4 Bg7 Nf3 d6 Be3 Nf6 Nc3 O-O h3",
+      "fields": {
+        "comment": {
+          "stringValue": " *h3* removes once and for all the possibility of Black's minor pieces landing on *g4*. "
+        },
+        "order": {
+          "integerValue": "0"
+        },
+        "variation": {
+          "stringValue": "> e4 g6 d4 Bg7 Nf3 d6 Be3 Nf6 Nc3 O-O h3"
+        },
+        "halfMoves": {
+          "integerValue": "11"
+        }
+      }
+    },
+    {
+      "name": "projects/chessnought/databases/(default)/documents/openingBooks/fbdadf0d-adac-4d9f-9557-83769b079737/openingBookVariations/> e4 g6 d4 Bg7 Nf3 d6 Be3 Nf6 Nc3 O-O h3 Nbd7",
+      "fields": {
+        "halfMoves": {
+          "integerValue": "12"
+        },
+        "variation": {
+          "stringValue": "> e4 g6 d4 Bg7 Nf3 d6 Be3 Nf6 Nc3 O-O h3 Nbd7"
+        },
+        "order": {
+          "integerValue": "2"
+        },
+        "comment": {
+          "stringValue": " A thematic move in the **Modern Defense**. Black keeps their position flexible, retaining the option to break with both *...c5* and *...e5*. We won't let that happen! "
+        }
+      }
+    },
+    {
+      "name": "projects/chessnought/databases/(default)/documents/openingBooks/fbdadf0d-adac-4d9f-9557-83769b079737/openingBookVariations/> e4 g6 d4 Bg7 Nf3 d6 Be3 Nf6 Nc3 O-O h3 Nc6",
+      "fields": {
+        "halfMoves": {
+          "integerValue": "12"
+        },
+        "variation": {
+          "stringValue": "> e4 g6 d4 Bg7 Nf3 d6 Be3 Nf6 Nc3 O-O h3 Nc6"
+        },
+        "comment": {
+          "stringValue": " With this move, Black reveals their intention: playing *...e5* next. Let's stop that! "
+        },
+        "order": {
+          "integerValue": "1"
+        }
+      }
+    },
+    {
+      "name": "projects/chessnought/databases/(default)/documents/openingBooks/fbdadf0d-adac-4d9f-9557-83769b079737/openingBookVariations/> e4 g6 d4 Bg7 Nf3 d6 Be3 Nf6 Nc3 O-O h3 c6",
+      "fields": {
+        "halfMoves": {
+          "integerValue": "12"
+        },
+        "variation": {
+          "stringValue": "> e4 g6 d4 Bg7 Nf3 d6 Be3 Nf6 Nc3 O-O h3 c6"
+        },
+        "order": {
+          "integerValue": "0"
+        },
+        "comment": {
+          "stringValue": " This is considered the main move. Black keeps their position flexible while aiming for a queenside expansion. Let's nip that idea in the bud! "
+        }
+      }
+    }
+  ]
+}

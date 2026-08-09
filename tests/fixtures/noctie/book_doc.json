@@ -1,0 +1,161 @@
+{
+  "name": "projects/chessnought/databases/(default)/documents/openingBooks/fbdadf0d-adac-4d9f-9557-83769b079737",
+  "fields": {
+    "name": {
+      "stringValue": "Beginner's Guide to 1. e4"
+    },
+    "bookmarks": {
+      "arrayValue": {
+        "values": [
+          {
+            "mapValue": {
+              "fields": {
+                "name": {
+                  "stringValue": "1...e5 - King's Pawn Game"
+                },
+                "description": {
+                  "stringValue": ""
+                },
+                "variation": {
+                  "stringValue": "> e4 e5"
+                }
+              }
+            }
+          },
+          {
+            "mapValue": {
+              "fields": {
+                "variation": {
+                  "stringValue": "> e4 c5"
+                },
+                "description": {
+                  "stringValue": ""
+                },
+                "name": {
+                  "stringValue": "1...c5 - Sicilian Defense"
+                }
+              }
+            }
+          },
+          {
+            "mapValue": {
+              "fields": {
+                "name": {
+                  "stringValue": "1...e6 - French Defense"
+                },
+                "variation": {
+                  "stringValue": "> e4 e6"
+                },
+                "description": {
+                  "stringValue": ""
+                }
+              }
+            }
+          },
+          {
+            "mapValue": {
+              "fields": {
+                "description": {
+                  "stringValue": ""
+                },
+                "variation": {
+                  "stringValue": "> e4 c6"
+                },
+                "name": {
+                  "stringValue": "1...c6 - Caro-Kann Defense"
+                }
+              }
+            }
+          },
+          {
+            "mapValue": {
+              "fields": {
+                "name": {
+                  "stringValue": "1...d5 - Scandinavian Defense"
+                },
+                "variation": {
+                  "stringValue": "> e4 d5"
+                },
+                "description": {
+                  "stringValue": ""
+                }
+              }
+            }
+          },
+          {
+            "mapValue": {
+              "fields": {
+                "variation": {
+                  "stringValue": "> e4 g6"
+                },
+                "description": {
+                  "stringValue": ""
+                },
+                "name": {
+                  "stringValue": "1...g6 - Modern Defense"
+                }
+              }
+            }
+          },
+          {
+            "mapValue": {
+              "fields": {
+                "variation": {
+                  "stringValue": "> e4 d6"
+                },
+                "description": {
+                  "stringValue": ""
+                },
+                "name": {
+                  "stringValue": "1...d6 - Pirc Defense"
+                }
+              }
+            }
+          },
+          {
+            "mapValue": {
+              "fields": {
+                "variation": {
+                  "stringValue": "> e4 b6"
+                },
+                "description": {
+                  "stringValue": ""
+                },
+                "name": {
+                  "stringValue": "1...b6 - Owen Defense"
+                }
+              }
+            }
+          }
+        ]
+      }
+    },
+    "imageUrl": {
+      "stringValue": "https://firebasestorage.googleapis.com/v0/b/chessnought.appspot.com/o/opening-books%2FSZJaVmdn7hRijCt9BCSkOrumxOy1%2Ffbdadf0d-adac-4d9f-9557-83769b079737-cover?alt=media&token=f4fe6c1b-f5c6-4c71-b1b9-6ed90dc4bdf0"
+    },
+    "requiresTier": {
+      "stringValue": "standard"
+    },
+    "visibility": {
+      "stringValue": "public"
+    },
+    "createdAt": {
+      "timestampValue": "2026-04-21T09:19:46.993Z"
+    },
+    "chapters": {
+      "arrayValue": {}
+    },
+    "id": {
+      "stringValue": "fbdadf0d-adac-4d9f-9557-83769b079737"
+    },
+    "fullDescription": {
+      "stringValue": "Hi, I'm FM Hugo Wernberg from Sweden. This is my beginner-friendly **1.e4 repertoire for White**, built around systems rather than theory, meaning **you'll learn plans and ideas, not endless lines to memorize.**\n\nI've chosen openings like the *Italian Game*, *Closed Sicilian*, and *King's Indian Attack* that give you clear, practical middlegame goals against all of Black's main replies. \n\nGood luck!\n\nHugo"
+    },
+    "description": {
+      "stringValue": "“Best by test: 1.e4” -Bobby Fischer"
+    },
+    "color": {
+      "stringValue": "white"
+    }
+  }
+}

@@ -1,0 +1,96 @@
+{
+  "documents": [
+    {
+      "name": "projects/chessnought/databases/(default)/documents/themes/32380699-ec8a-48b4-9b3f-3e0074d74c38/elements/02409df4-20bc-4395-a8b9-ee613ae7dcfd",
+      "fields": {
+        "index": {
+          "integerValue": "27"
+        },
+        "id": {
+          "stringValue": "02409df4-20bc-4395-a8b9-ee613ae7dcfd"
+        },
+        "name": {
+          "stringValue": "Puzzle #2"
+        },
+        "pgn": {
+          "stringValue": "[Annotator \"https://lichess.org/@/andyfang\"]\n[ChapterName \"Caro-Kann Defense - Puzzle #2\"]\n[ChapterURL \"https://lichess.org/study/TOb6nEN0/SCpEFBFu\"]\n[Date \"2025.10.30\"]\n[ECO \"?\"]\n[Event \"Beginner's Repertoar for White @Hugo Wernberg: Caro-Kann Defense - Puzzle #2\"]\n[FEN \"r1bqkb1r/pp2pppp/2n2n2/3p4/3P4/2PB4/PP3PPP/RNBQK1NR w KQkq - 1 6\"]\n[Opening \"?\"]\n[Perspective \"White\"]\n[Result \"*\"]\n[SetUp \"1\"]\n[StudyName \"Beginner's Repertoar for White @Hugo Wernberg\"]\n[UTCDate \"[object Object]\"]\n[UTCTime \"[object Object]\"]\n[Variant \"Standard\"]\n\n{[%cal Yg8f6] Do you remember our move here? } 6. h3 { Yes! We prevent the annoying **...Bg4 pin**. } (6. Nf3 Bg4 { Also playable, but I'd like to prevent this annoying ...Bg4 pin. }) (6. Bf4 { This is the main line. I recommend preventing any ...Bg4 ideas from Black. }) (6. Bg5? Bg4 { Black gets to develop the bishop with tempo. }) *"
+        },
+        "altPgns": {
+          "arrayValue": {}
+        },
+        "type": {
+          "stringValue": "flashcard"
+        }
+      }
+    },
+    {
+      "name": "projects/chessnought/databases/(default)/documents/themes/32380699-ec8a-48b4-9b3f-3e0074d74c38/elements/07395ec8-2c7a-47bb-b8d3-d57d794b9951",
+      "fields": {
+        "pgn": {
+          "stringValue": "[Annotator \"https://lichess.org/@/andyfang\"]\n[ChapterName \"Italian Game: 4... d5 - Puzzle #3\"]\n[ChapterURL \"https://lichess.org/study/TOb6nEN0/HZtdmTzi\"]\n[Date \"2025.10.30\"]\n[ECO \"?\"]\n[Event \"Beginner's Repertoar for White @Hugo Wernberg: Italian Game: 4... d5 - Puzzle #3\"]\n[FEN \"r2qkb1r/ppp2ppp/2n5/3np2b/2B5/3P1N1P/PPP2PP1/RNBQ1RK1 w kq - 1 8\"]\n[Opening \"?\"]\n[Perspective \"White\"]\n[Result \"*\"]\n[SetUp \"1\"]\n[StudyName \"Beginner's Repertoar for White @Hugo Wernberg\"]\n[UTCDate \"[object Object]\"]\n[UTCTime \"[object Object]\"]\n[Variant \"Standard\"]\n\n{[%cal Yg4h5] How should White continue development? } 8. Re1 { Correct! We now threaten **g4**, winning the **e5-pawn**. } (8. Nc3? Nxc3 { This exchange disrupts our pawn structure. }) (8. Nbd2? { This is also a good developing move, but look for a more forcing one. }) (8. g4? Bg6 { This has weakened our king. }) (8. Bg5? f6 { Black is happy to play ...f6, with the idea of castling queenside. }) *"
+        },
+        "altPgns": {
+          "arrayValue": {}
+        },
+        "type": {
+          "stringValue": "flashcard"
+        },
+        "index": {
+          "integerValue": "13"
+        },
+        "id": {
+          "stringValue": "07395ec8-2c7a-47bb-b8d3-d57d794b9951"
+        },
+        "name": {
+          "stringValue": "Puzzle #3"
+        }
+      }
+    },
+    {
+      "name": "projects/chessnought/databases/(default)/documents/themes/32380699-ec8a-48b4-9b3f-3e0074d74c38/elements/14d94d27-1585-476a-ab15-ccb9e68d9a14",
+      "fields": {
+        "name": {
+          "stringValue": "Sparring Position "
+        },
+        "index": {
+          "integerValue": "9"
+        },
+        "id": {
+          "stringValue": "14d94d27-1585-476a-ab15-ccb9e68d9a14"
+        },
+        "altPgns": {
+          "arrayValue": {}
+        },
+        "type": {
+          "stringValue": "scenario"
+        },
+        "pgn": {
+          "stringValue": "[Annotator \"https://lichess.org/@/andyfang\"]\n[ChapterName \"Italian Game: 7... Be6 - Sparring\"]\n[ChapterURL \"https://lichess.org/study/TOb6nEN0/4efxxwAL\"]\n[Date \"2025.10.30\"]\n[ECO \"?\"]\n[Event \"Beginner's Repertoar for White @Hugo Wernberg: Italian Game: 7... Be6 - Sparring\"]\n[FEN \"r2q1rk1/ppp3pp/1bnppn2/4p3/1P2P3/2PP1N2/P4PPP/RNBQR1K1 w - - 1 10\"]\n[NoctieLevel \"Pawn1\"]\n[Opening \"?\"]\n[Perspective \"White\"]\n[Result \"*\"]\n[SetUp \"1\"]\n[StudyName \"Beginner's Repertoar for White @Hugo Wernberg\"]\n[UTCDate \"[object Object]\"]\n[UTCTime \"[object Object]\"]\n[Variant \"Standard\"]\n\n{[%cal Yc5b6] As we saw in the previous puzzle, my recommended move here is **10. Nbd2.**\n\nAfter that, White can expand on the queenside with a4, complete development, and reach a comfortable middlegame. } *"
+        }
+      }
+    },
+    {
+      "name": "projects/chessnought/databases/(default)/documents/themes/32380699-ec8a-48b4-9b3f-3e0074d74c38/elements/167907e5-7abc-4d48-9b6e-c192b6a81550",
+      "fields": {
+        "altPgns": {
+          "arrayValue": {}
+        },
+        "type": {
+          "stringValue": "instruction"
+        },
+        "pgn": {
+          "stringValue": "[Annotator \"https://lichess.org/@/The-cookie-monster\"]\n[ChapterName \"#9 Pirc Defense\"]\n[ChapterURL \"https://lichess.org/study/TOb6nEN0/QsUIVGlh\"]\n[Date \"2025.10.30\"]\n[ECO \"C41\"]\n[Event \"Beginner Repertoire for White: Other first moves\"]\n[Opening \"Philidor Defense: Lion Variation\"]\n[Perspective \"White\"]\n[Result \"*\"]\n[StudyName \"Beginner's Repertoar for White @Hugo Wernberg\"]\n[Variant \"Standard\"]\n\n{ Now we turn to **1...d6**, the **Pirc Defense**, a close relative of the Modern that often transposes.\n\n**_Tip:_** *This material is also available as an interactive repertoire under *Noctie Repertoires*. Play it out against Noctie and test your knowledge in practice*. } 1. e4 d6 { The Pirc Defense often transposes into the Modern, but if it does not, I have you covered! } 2. d4 Nf6 3. Nc3 e5 { Black tries to strike directly in the center. \n\nWhile **4. dxe5** is a solid option leading to a **_queenless middlegame_**, I prefer the simple **4. Nf3**, which maintains the initiative and develops naturally. } 4. Nf3 Nbd7 5. Bc4 Be7 6. O-O O-O 7. Re1 c6 {[%cal Ga4a5,Gh2h3,Gc1e3,Gd1d2,Ra2a4] It's important to play **8. a4** here, **_preventing Black's queenside expansion_**. \n\nAfter that, we simply continue developing naturally and enjoy a pleasant middlegame with a strong grip on the center. \n\nA common plan is to march the a-pawn forward to gain space on the queenside and limit Black’s counterplay. } *"
+        },
+        "index": {
+          "integerValue": "40"
+        },
+        "id": {
+          "stringValue": "167907e5-7abc-4d48-9b6e-c192b6a81550"
+        },
+        "name": {
+          "stringValue": "#9 Pirc Defense"
+        }
+      }
+    }
+  ]
+}
