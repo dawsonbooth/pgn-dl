@@ -13,5 +13,8 @@ wheels/
 .profile/
 output/
 
+# Working docs, kept out of the repo for now
+docs/
+
 # macOS
 .DS_Store

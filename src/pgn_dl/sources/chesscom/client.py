@@ -1,8 +1,7 @@
 """Connect-RPC client for chess.com's courses service.
 
-Calls go through Playwright's :class:`APIRequestContext`, which inherits cookies
-from the persistent profile. The first call exchanges the ``ACCESS_TOKEN``
-cookie for a Bearer JWT; that JWT is reused for the rest of the run.
+The first call exchanges the ``ACCESS_TOKEN`` cookie for a Bearer JWT; that JWT
+is reused for the rest of the run. The fetcher supplies the cookies.
 """
 
 from __future__ import annotations
@@ -10,39 +9,16 @@ from __future__ import annotations
 import uuid
 from typing import Any
 
-from playwright.async_api import BrowserContext
-
-
-class CloudflareBlocked(RuntimeError):
-    """Raised when chess.com returns a Cloudflare interstitial instead of JSON."""
-
+from ...core.fetch import Fetcher
 
 BASE = "https://www.chess.com/service/courses/rpc"
 _AUTH_SVC = "chesscom.courses.v1.CoursesAuthenticationService"
 _TRAIN_SVC = "chesscom.courses.v1.CoursesTrainingService"
 
-# Cloudflare serves its interstitial/challenge pages under these statuses, with
-# one of these markers in the body. Matching broadly (rather than only a 403
-# "Just a moment" page) lets the scraper back off and resume on a challenge
-# instead of treating it as a fatal error.
-_CF_STATUSES = frozenset({403, 429, 503})
-_CF_MARKERS = (
-    "just a moment",
-    "checking your browser",
-    "attention required",
-    "enable javascript and cookies",
-)
-
-
-def _is_cloudflare_challenge(status: int, headers: dict[str, str], body: str) -> bool:
-    if headers.get("cf-mitigated"):
-        return True
-    return status in _CF_STATUSES and any(m in body.lower() for m in _CF_MARKERS)
-
 
 class CoursesClient:
-    def __init__(self, ctx: BrowserContext) -> None:
-        self._ctx = ctx
+    def __init__(self, fetcher: Fetcher) -> None:
+        self._fetcher = fetcher
         self._jwt: str | None = None
         self.session_id: str = str(uuid.uuid4())
 
@@ -73,19 +49,11 @@ class CoursesClient:
         return await self._call(
             _TRAIN_SVC,
             "GetCourseTrainingForLearning",
-            {
-                "variationId": variation_id,
-                "learningSessionId": self.session_id,
-            },
+            {"variationId": variation_id, "learningSessionId": self.session_id},
         )
 
     async def _call(
-        self,
-        service: str,
-        method: str,
-        body: dict[str, Any],
-        *,
-        authed: bool = True,
+        self, service: str, method: str, body: dict[str, Any], *, authed: bool = True
     ) -> dict[str, Any]:
         headers = {
             "content-type": "application/json",
@@ -98,12 +66,6 @@ class CoursesClient:
             if self._jwt is None:
                 raise RuntimeError("call authenticate() first")
             headers["authorization"] = f"Bearer {self._jwt}"
-
-        url = f"{BASE}/{service}/{method}"
-        resp = await self._ctx.request.post(url, headers=headers, data=body)
-        if not resp.ok:
-            text = await resp.text()
-            if _is_cloudflare_challenge(resp.status, resp.headers, text):
-                raise CloudflareBlocked(f"{service}/{method}: Cloudflare challenge")
-            raise RuntimeError(f"{service}/{method} failed: {resp.status} {text[:500]}")
-        return await resp.json()
+        return await self._fetcher.post_json(
+            f"{BASE}/{service}/{method}", headers=headers, json=body
+        )
