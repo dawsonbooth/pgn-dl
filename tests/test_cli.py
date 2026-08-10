@@ -133,6 +133,7 @@ def test_the_root_app_mounts_the_registered_sources_in_order() -> None:
     # Alphabetical, so `--help` lists them the same way on every build whatever
     # order the source packages happened to be imported in.
     assert [group.name for group in app.registered_groups] == [
+        "chessable",
         "chesscom",
         "chessreps",
         "noctie",

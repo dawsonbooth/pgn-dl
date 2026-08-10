@@ -16,8 +16,19 @@ import chess.pgn
 
 from .models import Arrow, Collection, GameItem, Highlight, MoveNode
 
-# The three drawing levels map to Lichess/ChessBase colours.
-_DRAWING_COLOR = {"primary": "G", "secondary": "Y", "tertiary": "R"}
+# A drawing's ``type`` maps to a Lichess/ChessBase %cal/%csl colour. chess.com
+# names three importance levels; Chessable names colours directly, blue among
+# them, which the levels have no equivalent for - so both vocabularies are
+# accepted here, and anything unknown falls back to green.
+_DRAWING_COLOR = {
+    "primary": "G",
+    "secondary": "Y",
+    "tertiary": "R",
+    "green": "G",
+    "yellow": "Y",
+    "red": "R",
+    "blue": "B",
+}
 
 _DEFAULT_HEADERS = {
     "White": "?",

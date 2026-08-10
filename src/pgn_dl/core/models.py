@@ -11,7 +11,9 @@ import chess
 class Arrow:
     from_square: str  # e.g. "d2"
     to_square: str
-    type: str  # "primary" | "secondary" | "tertiary"
+    # A key ``core.pgn._DRAWING_COLOR`` maps to a %cal/%csl colour: an importance
+    # level ("primary"/"secondary"/"tertiary") or a colour name ("green"/"blue"/...).
+    type: str
 
 
 @dataclass

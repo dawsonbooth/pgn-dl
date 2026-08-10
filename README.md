@@ -5,9 +5,9 @@ into a database, or open in any chess GUI.
 
 pgn-dl is built around sources. Each source knows how to turn one kind of URL
 into a collection of PGN games. chess.com courses, chess.com lessons,
-noctie.ai themes and opening books, and chessreps.com opening courses are
-supported today; the architecture exists so other sites and other kinds of
-collection can be added without disturbing what already works.
+Chessable courses, noctie.ai themes and opening books, and chessreps.com opening
+courses are supported today; the architecture exists so other sites and other
+kinds of collection can be added without disturbing what already works.
 
 > **Use it only for content your own account has access to.** It automates the
 > same requests your browser makes when you study a course; it does not bypass
@@ -17,6 +17,7 @@ collection can be added without disturbing what already works.
 
 | Key | What it downloads | Login | Browser |
 | --- | --- | --- | --- |
+| `chessable:courses` | A Chessable course, one PGN per variation | yes (`pgn-dl login chessable`) | login only |
 | `chesscom:courses` | A chess.com course, one PGN per lesson | yes (`pgn-dl login chesscom`) | yes |
 | `chesscom:lessons` | A chess.com lesson course, one PGN per lesson | yes (`pgn-dl login chesscom`) | yes |
 | `chessreps:openings` | A chessreps.com opening course: the merged repertoire plus one PGN per line | yes (`pgn-dl login chessreps`) | login only |
@@ -75,9 +76,10 @@ uv run playwright install chrome   # skip if Chrome is already installed
 ```
 
 The `browser` extra installs Playwright. It is only needed for sources that
-drive a real browser: chess.com's downloads, and noctie's one-time `login
-noctie`. A plain `uv sync` is enough for anything served over ordinary HTTP,
-which for noctie means every download once you have signed in.
+drive a real browser: chess.com's downloads, and the one-time `login` for
+noctie, chessreps, and Chessable. A plain `uv sync` is enough for anything
+served over ordinary HTTP, which for those three means every download once you
+have signed in.
 
 ## Usage
 
@@ -147,6 +149,27 @@ token. Each later run refreshes it against chessreps's own auth endpoint
 cookie your browser would; every download is plain HTTPS with no browser
 opened at all, and the credential never goes anywhere but chessreps's own two
 hosts.
+
+Chessable is a hybrid of the two shapes above: it opens a browser only for
+sign-in, then downloads over plain HTTPS.
+
+```sh
+uv run pgn-dl login chessable
+```
+
+A browser window opens at Chessable's sign-in page; sign in however you like
+(Chessable signs in through chess.com, so expect a chess.com login and its
+captcha), and the window closes itself as soon as it detects the session.
+Chessable keeps its session as a JSON Web Token in the page's `localStorage`
+rather than a cookie, so what gets read out and stored - at
+`.profile/chessable/credentials.json`, with the same owner-only modes - is that
+token plus your account id. Every later run sends the token as an
+`Authorization: Bearer` header straight to chessable.com; no browser is opened,
+and the credential goes nowhere else.
+
+Chessable has no token-refresh endpoint, so unlike noctie and chessreps the
+stored token is used as-is until it expires. When it does, a download fails with
+a hint to sign in again; just re-run `pgn-dl login chessable`.
 
 ### 2. Download
 
@@ -229,6 +252,20 @@ uv run pgn-dl chessreps openings alapin-sicilian-repertoire-ilg8hms
 uv run pgn-dl https://www.chessreps.com/opening/alapin-sicilian-repertoire-ilg8hms
 ```
 
+Chessable courses take any course URL, or just the numeric id out of it:
+
+```sh
+uv run pgn-dl chessable courses https://www.chessable.com/the-caro-kann-starter-kit/course/25098/
+uv run pgn-dl chessable courses 25098
+
+# bare-URL sugar works here too
+uv run pgn-dl https://www.chessable.com/the-caro-kann-starter-kit/course/25098/
+```
+
+pgn-dl downloads only courses the signed-in account owns; a course the account
+does not hold stops the run with a message saying so, rather than writing a
+fraction of it.
+
 Options, the same for `url` and for every source subcommand:
 
 | Option | Default | Description |
@@ -289,6 +326,41 @@ variations. Beginner drills - marked with a
 `LESSON_CHALLENGE_TYPE "captureTheStar"` header - carry a starting position and
 instructions but no moves at all, because that is all chess.com stores for
 them.
+
+Chessable courses use the same Course -> Chapter -> Variation layout as
+chess.com courses:
+
+```
+output/
+└── chessable/
+    └── courses/
+        └── mastering-time-in-chess-277570/
+            ├── all.pgn                   # every variation concatenated, in course order
+            ├── 01-introduction/
+            │   ├── 001-time-loss-punishment-chess-improvement.pgn
+            │   └── ...
+            └── 02-level-1-1250-1350/
+                ├── 001-game-1-prelude.pgn
+                ├── 002-game-1-exercise.pgn
+                └── ...
+```
+
+Each variation is a single PGN game. The collection directory is the course name
+slugified with the numeric course id appended, because Chessable titles are not
+unique (translations and "Short & Sweet" variants reuse them) and the id keeps
+two courses apart. The course name becomes the `Event` header, `Round` numbers
+the variation within its chapter as `<chapter>.<variation>`, and Chessable's own
+variation id is preserved in a `ChessableVariationId` header; a puzzle's starting
+position (when not the standard one) is emitted as `FEN`/`SetUp`, and the game's
+result as `Result`. The author's commentary rides along as PGN move comments -
+with Chessable's rich-text markup reduced to plain text - evaluation glyphs
+become standard PGN NAGs (`?` -> `$2`, `±` -> `$16`), and board drawings survive
+as `[%cal ...]` / `[%csl ...]`, keeping Chessable's four colours, blue included.
+A sideline the author wrote inside a comment becomes a real PGN variation,
+placed by the move number written into it; one that names no position in the
+variation is kept as the sentence it is. Informational variations - prose with
+no moves, like a chapter's prelude - are written too, as a starting position and
+the author's text.
 
 noctie themes and opening books live under `output/noctie/`:
 

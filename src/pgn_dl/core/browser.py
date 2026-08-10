@@ -23,14 +23,15 @@ _MISSING = (
 )
 
 
-def _is_playwright_error(exc: BaseException) -> bool:
+def is_playwright_error(exc: BaseException) -> bool:
     """Whether ``exc`` is Playwright's own, rather than a bug in this code.
 
     Playwright is an optional extra, so its error type cannot be named at module
     scope. It is imported here instead, inside the handler for a call that has
     just failed through a Playwright context, where the package is installed by
     definition; an import that fails anyway answers "no", which re-raises the
-    exception rather than burying it.
+    exception rather than burying it. Shared with the source login flows, which
+    poll through Playwright's transient navigation errors the same way.
     """
     try:
         from playwright.async_api import Error
@@ -59,7 +60,7 @@ class BrowserFetcher:
             resp = await self._ctx.request.post(url, headers=dict(headers), data=json)
             text = await resp.text()
         except Exception as exc:
-            if not _is_playwright_error(exc):
+            if not is_playwright_error(exc):
                 raise
             raise transport_failure(exc) from None
         # Checked on every response, not only failures: Cloudflare can serve a
@@ -78,7 +79,7 @@ class BrowserFetcher:
             resp = await self._ctx.request.get(url, headers=dict(headers))
             text = await resp.text()
         except Exception as exc:
-            if not _is_playwright_error(exc):
+            if not is_playwright_error(exc):
                 raise
             raise transport_failure(exc) from None
         check_response(url, resp.status, resp.headers, text)
