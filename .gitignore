@@ -15,6 +15,9 @@ output/
 
 # Working docs, kept out of the repo for now
 docs/
+.scratch/
+*.md
+!README.md
 
 # macOS
 .DS_Store
