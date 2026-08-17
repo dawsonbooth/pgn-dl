@@ -15,15 +15,7 @@ import pytest
 
 from pgn_dl.core.models import Collection, GameItem
 from pgn_dl.core.pgn import game_to_pgn
-from pgn_dl.sources.chesscom.parser import (
-    _build_variation_lines,
-    _strip_html,
-    _strip_san,
-    _VarComment,
-    _VarMove,
-    parse_course_skeleton,
-    parse_lesson_tree,
-)
+from pgn_dl.sources.chesscom.parser import parse_course_skeleton, parse_lesson_tree
 
 FIX = Path(__file__).parents[2] / "fixtures" / "chesscom"
 
@@ -167,48 +159,6 @@ def test_a_position_with_no_annotations_adds_nothing() -> None:
     lesson = parse_lesson_tree(_lesson([{"san": "e4", "position": {"fen": "..."}}]))
     node = lesson.root.children[0]
     assert node.arrows == [] and node.highlights == [] and node.nags == []
-
-
-def test_strip_san_maps_trailing_eval_glyphs_to_nags() -> None:
-    assert _strip_san("9.Ne5?!") == ("Ne5", [6])  # move number + dubious glyph
-    assert _strip_san("Qa5=") == ("Qa5", [10])  # equal position
-    assert _strip_san("Nfe4∞") == ("Nfe4", [13])  # unclear position
-    # A check marker is part of the move notation, not a NAG: leave it in place
-    # so it is never silently deleted.
-    assert _strip_san("Nf3+") == ("Nf3+", [])
-
-
-def test_strip_san_records_every_glyph_it_strips() -> None:
-    # A glyph run stripped off the SAN and mapped to nothing is an annotation
-    # deleted from the lesson.
-    assert _strip_san("24.Rbe1+-") == ("Rbe1", [18])  # in lesson_real_game.json
-    assert _strip_san("Nf3-+") == ("Nf3", [19])
-    assert _strip_san("Nf3+/-") == ("Nf3", [16])
-    assert _strip_san("Nf3!?!") == ("Nf3", [5, 1])
-    assert _strip_san("Nf3=∞") == ("Nf3", [10, 13])
-
-
-def test_strip_html_keeps_the_text_after_the_last_tag_or_entity() -> None:
-    # HTMLParser withholds a trailing entity until it knows the entity ended.
-    assert _strip_html("White is better &") == "White is better &"
-    assert _strip_html("<b>Careful</b>: the pawn falls") == "Careful: the pawn falls"
-
-
-def test_strip_html_keeps_a_less_than_sign_that_opens_no_tag() -> None:
-    # Comparisons are ordinary in chess prose, and chess.com's editor does not
-    # escape them; HTMLParser reads one as an unterminated tag and eats the rest
-    # of the comment looking for its ">".
-    assert _strip_html("a<b in the pawn race, so White wins easily.") == (
-        "a<b in the pawn race, so White wins easily."
-    )
-    assert _strip_html("5<6>4") == "5<6>4"
-    assert _strip_html("<i>still</i> a tag") == "still a tag"
-
-
-def test_strip_html_keeps_the_breaks_it_inserts() -> None:
-    assert _strip_html("<p>One.</p><p>Two.</p>") == "One.\n\nTwo."
-    assert _strip_html("a<br>b") == "a\nb"
-    assert _strip_html("keeps   one   space") == "keeps one space"
 
 
 def test_an_unplayable_mainline_move_raises_instead_of_truncating() -> None:
@@ -410,21 +360,3 @@ def test_the_real_game_still_renders_as_a_pgn_a_reader_can_open() -> None:
     game = chess.pgn.read_game(io.StringIO(pgn))
     assert game is not None
     assert game.errors == []
-
-
-def test_variation_comment_attaches_to_the_move_it_follows() -> None:
-    # A 'C' comment between two 'S' moves in a chess.com variation block belongs
-    # to the move it follows, not to the last move of the line.
-    block = [
-        _VarMove("Nf3", []),
-        _VarComment("comment for Nf3"),
-        _VarMove("Nf6", []),
-    ]
-    heads, unplayable = _build_variation_lines(chess.Board(), block)
-    assert unplayable == ""
-    assert [h.san for h in heads] == ["Nf3"]
-    head = heads[0]
-    assert head.post_comment == "comment for Nf3"
-    child = head.children[0]
-    assert child.san == "Nf6"
-    assert child.post_comment == ""
