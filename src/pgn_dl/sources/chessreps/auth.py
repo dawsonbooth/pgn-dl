@@ -5,13 +5,14 @@ is the Supabase session out of the ``sb-api-auth-token`` cookie - access token,
 refresh token and all - refreshed against Supabase's token endpoint on later
 runs, so downloading needs no browser at all.
 
-The stored session is a long-lived credential: it is written owner-only and
-must never be logged, echoed, or included in an error message.
+Storage, the sign-in loop, and the refresh call's error taxonomy are the
+credential store's (see CONTEXT.md); this module supplies chessreps's schema,
+its cookie codec, its browser probe, and its post-refresh choreography
+(merging the refreshed session over the stored one, and the expiry margin).
 """
 
 from __future__ import annotations
 
-import asyncio
 import base64
 import binascii
 import json
@@ -20,12 +21,8 @@ from pathlib import Path
 from typing import Any
 from urllib.parse import unquote
 
-import httpx
-import typer
-
+from ...core.credentials import CredentialStore
 from ...core.fetch import FetchError
-from ...core.io import private_dir, write_text_atomic
-from ...core.paths import profile_dir as _source_profile_dir
 
 #: The one cookie chessreps's SvelteKit server reads the session from,
 #: in @supabase/ssr form. Past ~3180 bytes the browser stores it chunked as
@@ -47,19 +44,8 @@ _TOKEN_URL = "https://api.chessreps.com/auth/v1/token?grant_type=refresh_token"
 #: re-mint to fall back on, and none needed.
 _EXPIRY_MARGIN = 300.0
 
-_LOGIN_HINT = "run: pgn-dl login chessreps"
 
-
-def profile_dir() -> Path:
-    """Directory holding the credential file and chessreps's Chrome profile."""
-    return _source_profile_dir("chessreps")
-
-
-def credentials_path() -> Path:
-    return profile_dir() / "credentials.json"
-
-
-def _require_tokens(session: object) -> dict:
+def _require_tokens(session: object) -> dict[str, Any]:
     """The session as a dict, or a refusal that names the shape, not the value."""
     if not isinstance(session, dict):
         raise FetchError(f"chessreps session is a {type(session).__name__}, not a map")
@@ -69,44 +55,25 @@ def _require_tokens(session: object) -> dict:
     return session
 
 
-def save_session(session: dict) -> None:
-    """Persist the session owner-only, replacing any previous value.
+_store = CredentialStore("chessreps", validate=_require_tokens)
 
-    Written whole or not at all, for the reason noctie's store is: a truncated
-    credentials.json locks the user out until they sign in again.
-    """
-    _require_tokens(session)
-    private_dir(profile_dir())
-    path = credentials_path()
-    # The rename below would replace a link rather than write through it, but
-    # a link here is either an attack or an arrangement we should not silently
-    # destroy, so say so instead.
-    if path.is_symlink():
-        raise FetchError(
-            f"{path} is a symbolic link; refusing to write credentials through it"
-        )
-    try:
-        write_text_atomic(path, json.dumps(session))
-    except OSError as exc:
-        # The message, never the tokens: this reaches the runner and the log.
-        reason = exc.strerror or type(exc).__name__
-        raise FetchError(
-            f"could not save chessreps credentials to {path}: {reason}"
-        ) from None
+
+def profile_dir() -> Path:
+    """Directory holding the credential file and chessreps's Chrome profile."""
+    return _store.profile_dir()
+
+
+def credentials_path() -> Path:
+    return _store.credentials_path()
+
+
+def save_session(session: dict) -> None:
+    """Persist the session owner-only, replacing any previous value."""
+    _store.save(session)
 
 
 def load_session() -> dict:
-    path = credentials_path()
-    try:
-        session = json.loads(path.read_text(encoding="utf-8"))
-    except OSError, ValueError:
-        raise FetchError(
-            f"no saved chessreps credentials at {path}; {_LOGIN_HINT}"
-        ) from None
-    try:
-        return _require_tokens(session)
-    except FetchError as exc:
-        raise FetchError(f"{exc}; {_LOGIN_HINT}") from None
+    return _store.load()
 
 
 def decode_cookie(value: str) -> dict:
@@ -164,32 +131,12 @@ def join_chunks(cookies: list[dict]) -> str | None:
 
 
 async def _refresh(refresh_token: str) -> dict:
-    """Trade a refresh token for a fresh session.
-
-    Every failure leaves here as a :class:`FetchError` so the runner reports it
-    rather than a traceback, and none of them carries the response body: token
-    endpoints echo the request, so the body may contain the token.
-    """
-    try:
-        async with httpx.AsyncClient(timeout=30.0) as client:
-            resp = await client.post(
-                _TOKEN_URL,
-                headers={"apikey": ANON_KEY, "Content-Type": "application/json"},
-                json={"refresh_token": refresh_token},
-            )
-    except httpx.HTTPError as exc:
-        # The exception type only: httpx renders the request in some messages.
-        raise FetchError(
-            f"chessreps token refresh could not reach the server: {type(exc).__name__}"
-        ) from None
-    if resp.status_code != 200:
-        raise FetchError(f"chessreps token refresh failed: {resp.status_code}")
-    try:
-        data: Any = resp.json()
-    except ValueError:
-        raise FetchError(
-            "chessreps token refresh returned a malformed response"
-        ) from None
+    """Trade a refresh token for a fresh session."""
+    data = await _store.refresh(
+        _TOKEN_URL,
+        headers={"apikey": ANON_KEY, "Content-Type": "application/json"},
+        json={"refresh_token": refresh_token},
+    )
     if not isinstance(data, dict):
         raise FetchError("chessreps token refresh returned a non-object response")
     return data
@@ -211,7 +158,7 @@ async def session_cookie() -> str:
         try:
             refreshed = _require_tokens(await _refresh(session["refresh_token"]))
         except FetchError as exc:
-            raise FetchError(f"{exc}; {_LOGIN_HINT}") from None
+            raise FetchError(f"{exc}; {_store.login_hint}") from None
         if "expires_at" not in refreshed:
             # GoTrue always sends expires_in; expires_at only sometimes.
             refreshed = refreshed | {
@@ -228,11 +175,21 @@ async def session_cookie() -> str:
             # Supabase has already rotated the refresh token, so the one on
             # disk is spent whatever happens next: the user signs in again
             # either way.
-            raise FetchError(f"{exc}; {_LOGIN_HINT}") from None
+            raise FetchError(f"{exc}; {_store.login_hint}") from None
     return f"{COOKIE_NAME}={encode_cookie(session)}"
 
 
-_SIGN_IN_POLLS = 300  # every 3 seconds, so 15 minutes
+async def _probe(ctx: Any, page: Any) -> dict[str, Any] | None:
+    """The session decoded from the browser's cookies, or None so far."""
+    value = join_chunks(await ctx.cookies("https://www.chessreps.com"))
+    if not value:
+        return None
+    try:
+        return decode_cookie(value)
+    except FetchError:
+        # A cookie that is not yet a session (or never will be) is not worth
+        # failing the poll over; sign-in may still be in flight.
+        return None
 
 
 async def login() -> None:
@@ -244,36 +201,4 @@ async def login() -> None:
     site signs in on the same page, and the cookie is the one signal that is
     there whichever path the user took.
     """
-    from ...core.browser import browser_context
-
-    typer.echo(
-        "A browser window is open. Sign in to chessreps; this exits automatically."
-    )
-    # Owner-only before the browser writes its own copy of the session into
-    # this directory's cookie store.
-    private_dir(profile_dir())
-    async with browser_context(profile_dir(), headless=False) as ctx:
-        page = await ctx.new_page()
-        await page.goto(
-            "https://www.chessreps.com/signin",
-            wait_until="domcontentloaded",
-            timeout=60000,
-        )
-        for _ in range(_SIGN_IN_POLLS):
-            await asyncio.sleep(3)
-            value = join_chunks(await ctx.cookies("https://www.chessreps.com"))
-            if not value:
-                continue
-            try:
-                session = decode_cookie(value)
-            except FetchError:
-                # A cookie that is not yet a session (or never will be) is not
-                # worth failing the poll over; sign-in may still be in flight.
-                continue
-            save_session(session)
-            typer.echo(f"Signed in. Credentials saved to {credentials_path()}")
-            return
-        raise FetchError(
-            "gave up waiting for chessreps sign-in after 15 minutes; "
-            "nothing was saved. Run: pgn-dl login chessreps to try again"
-        )
+    await _store.sign_in(login_url="https://www.chessreps.com/signin", probe=_probe)

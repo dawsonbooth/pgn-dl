@@ -1,12 +1,17 @@
-"""Credential storage and session-cookie codec. No network, no browser."""
+"""chessreps's own contract: schema, cookie codec, probe, refresh choreography.
+
+Storage invariants (permissions, symlink refusal, atomicity) and the refresh
+call's error taxonomy are the credential store's and are tested once in
+tests/core/test_credentials.py; this suite covers only what chessreps adds.
+"""
 
 from __future__ import annotations
 
 import base64
 import json
-import stat
 import time
 from collections.abc import Callable
+from pathlib import Path
 from typing import Any
 
 import httpx
@@ -31,39 +36,22 @@ def _cookie_value(session: dict) -> str:
     return "base64-" + base64.urlsafe_b64encode(raw).decode().rstrip("=")
 
 
-def test_missing_credentials_tell_the_user_how_to_fix_it(tmp_path, monkeypatch) -> None:
+@pytest.fixture(autouse=True)
+def _profile(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setenv("PGN_DL_PROFILE", str(tmp_path))
+
+
+def test_missing_credentials_tell_the_user_how_to_fix_it() -> None:
     with pytest.raises(FetchError) as exc:
         auth.load_session()
     assert "login chessreps" in str(exc.value)
 
 
-def test_saved_credentials_round_trip_owner_only(tmp_path, monkeypatch) -> None:
-    monkeypatch.setenv("PGN_DL_PROFILE", str(tmp_path))
-    auth.save_session(DUMMY_SESSION)
-    assert auth.load_session() == DUMMY_SESSION
-    mode = stat.S_IMODE(auth.credentials_path().stat().st_mode)
-    assert mode == 0o600, f"credentials must be owner-only, got {mode:o}"
-
-
-def test_a_session_without_both_tokens_is_refused(tmp_path, monkeypatch) -> None:
-    monkeypatch.setenv("PGN_DL_PROFILE", str(tmp_path))
+def test_a_session_without_both_tokens_is_refused() -> None:
     with pytest.raises(FetchError):
         auth.save_session({"access_token": "A"})
     with pytest.raises(FetchError):
         auth.save_session({"refresh_token": "R"})
-
-
-def test_a_symlinked_credentials_file_is_refused(tmp_path, monkeypatch) -> None:
-    monkeypatch.setenv("PGN_DL_PROFILE", str(tmp_path / "profile"))
-    victim = tmp_path / "victim"
-    victim.write_text("not a credential", encoding="utf-8")
-    path = auth.credentials_path()
-    path.parent.mkdir(parents=True, exist_ok=True)
-    path.symlink_to(victim)
-    with pytest.raises(FetchError):
-        auth.save_session(DUMMY_SESSION)
-    assert victim.read_text(encoding="utf-8") == "not a credential"
 
 
 def test_decode_cookie_reads_the_supabase_ssr_form() -> None:
@@ -131,9 +119,8 @@ def _fresh(expires_in: int) -> dict:
 
 
 async def test_a_fresh_session_is_used_without_refreshing(
-    tmp_path, monkeypatch
+    monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    monkeypatch.setenv("PGN_DL_PROFILE", str(tmp_path))
     auth.save_session(_fresh(3600))
 
     async def explode(refresh_token: str) -> dict:
@@ -146,9 +133,8 @@ async def test_a_fresh_session_is_used_without_refreshing(
 
 
 async def test_an_expiring_session_is_refreshed_and_persisted(
-    tmp_path, monkeypatch
+    monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    monkeypatch.setenv("PGN_DL_PROFILE", str(tmp_path))
     auth.save_session(_fresh(60))  # inside the 5-minute margin
     calls: list[str] = []
 
@@ -173,8 +159,9 @@ async def test_an_expiring_session_is_refreshed_and_persisted(
     assert auth.decode_cookie(value.split("=", 1)[1]) == stored
 
 
-async def test_a_session_without_expiry_is_refreshed(tmp_path, monkeypatch) -> None:
-    monkeypatch.setenv("PGN_DL_PROFILE", str(tmp_path))
+async def test_a_session_without_expiry_is_refreshed(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     auth.save_session(
         {"access_token": "DUMMY-A", "refresh_token": "DUMMY-R", "user": {"id": "u-1"}}
     )
@@ -196,14 +183,13 @@ async def test_a_session_without_expiry_is_refreshed(tmp_path, monkeypatch) -> N
 
 
 async def test_a_failure_to_persist_the_rotation_is_actionable(
-    tmp_path, monkeypatch
+    monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     # By this point Supabase has rotated the token, so the one on disk is
     # spent; the message must say sign-in is the fix, and must not carry the
     # rotated token.
-    from pgn_dl.core import io
+    from pgn_dl.core import io as io_module
 
-    monkeypatch.setenv("PGN_DL_PROFILE", str(tmp_path))
     auth.save_session(_fresh(60))
 
     async def fake_refresh(refresh_token: str) -> dict:
@@ -213,30 +199,30 @@ async def test_a_failure_to_persist_the_rotation_is_actionable(
         raise OSError(28, "No space left on device")
 
     monkeypatch.setattr(auth, "_refresh", fake_refresh)
-    monkeypatch.setattr(io.os, "replace", no_space)
+    monkeypatch.setattr(io_module.os, "replace", no_space)
     with pytest.raises(FetchError) as exc:
         await auth.session_cookie()
     assert "login chessreps" in str(exc.value)
     assert "DUMMY-ROTATED-2" not in str(exc.value)
 
 
-Handler = Callable[[httpx.Request], httpx.Response]
+async def test_a_malformed_refresh_response_ends_in_the_login_hint(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    auth.save_session(_fresh(60))
 
+    async def fake_refresh(refresh_token: str) -> dict:
+        raise FetchError("chessreps token refresh returned a malformed response")
 
-def _mock_client(handler: Handler) -> Callable[..., httpx.AsyncClient]:
-    """An ``httpx.AsyncClient`` factory answering from ``handler``, opening no socket."""
-    real = httpx.AsyncClient
-
-    def factory(**kwargs: Any) -> httpx.AsyncClient:
-        return real(transport=httpx.MockTransport(handler), **kwargs)
-
-    return factory
+    monkeypatch.setattr(auth, "_refresh", fake_refresh)
+    with pytest.raises(FetchError) as exc:
+        await auth.session_cookie()
+    assert "login chessreps" in str(exc.value)
 
 
 async def test_a_real_refresh_posts_the_anon_key_and_persists_rotation(
-    tmp_path, monkeypatch
+    monkeypatch: pytest.MonkeyPatch, mock_httpx_client: Callable[..., Any]
 ) -> None:
-    monkeypatch.setenv("PGN_DL_PROFILE", str(tmp_path))
     auth.save_session(_fresh(60))
     seen: list[httpx.Request] = []
 
@@ -251,7 +237,7 @@ async def test_a_real_refresh_posts_the_anon_key_and_persists_rotation(
             },
         )
 
-    monkeypatch.setattr(httpx, "AsyncClient", _mock_client(handler))
+    monkeypatch.setattr(httpx, "AsyncClient", mock_httpx_client(handler))
     await auth.session_cookie()
     req = seen[0]
     assert req.url.host == "api.chessreps.com"
@@ -262,51 +248,33 @@ async def test_a_real_refresh_posts_the_anon_key_and_persists_rotation(
     assert auth.load_session()["refresh_token"] == "DUMMY-ROTATED"
 
 
-async def test_a_rejected_refresh_is_actionable_and_does_not_echo(
-    tmp_path, monkeypatch
+async def test_a_non_object_refresh_response_is_refused(
+    monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    monkeypatch.setenv("PGN_DL_PROFILE", str(tmp_path))
-    auth.save_session(_fresh(60))
+    # A shape check only chessreps needs: its response is merged as a mapping
+    # over the stored session, which a list or scalar cannot be.
+    async def fake_store_refresh(*args: object, **kwargs: object) -> list:
+        return ["not", "a", "map"]
 
-    def handler(request: httpx.Request) -> httpx.Response:
-        return httpx.Response(
-            400, json={"error": "invalid_grant", "echo": request.content.decode()}
-        )
-
-    monkeypatch.setattr(httpx, "AsyncClient", _mock_client(handler))
-    with pytest.raises(FetchError) as exc:
-        await auth.session_cookie()
-    message = str(exc.value)
-    assert "400" in message
-    assert "login chessreps" in message
-    assert "DUMMY-REFRESH-DO-NOT-LEAK" not in message
+    monkeypatch.setattr(auth._store, "refresh", fake_store_refresh)
+    with pytest.raises(FetchError, match="non-object response"):
+        await auth._refresh("DUMMY-REFRESH-DO-NOT-LEAK")
 
 
-async def test_a_connection_failure_does_not_leak_the_token(
-    tmp_path, monkeypatch
-) -> None:
-    monkeypatch.setenv("PGN_DL_PROFILE", str(tmp_path))
-    auth.save_session(_fresh(60))
+class FakeCtx:
+    def __init__(self, cookies: list[dict]) -> None:
+        self._cookies = cookies
 
-    def handler(request: httpx.Request) -> httpx.Response:
-        raise httpx.ConnectError("connection refused")
-
-    monkeypatch.setattr(httpx, "AsyncClient", _mock_client(handler))
-    with pytest.raises(FetchError) as exc:
-        await auth.session_cookie()
-    assert "DUMMY-REFRESH-DO-NOT-LEAK" not in str(exc.value)
+    async def cookies(self, url: str) -> list[dict]:
+        return self._cookies
 
 
-async def test_a_malformed_refresh_response_is_a_fetch_error(
-    tmp_path, monkeypatch
-) -> None:
-    monkeypatch.setenv("PGN_DL_PROFILE", str(tmp_path))
-    auth.save_session(_fresh(60))
+async def test_probe_returns_none_until_the_cookie_is_a_readable_session() -> None:
+    assert await auth._probe(FakeCtx([]), None) is None
+    ctx = FakeCtx([{"name": auth.COOKIE_NAME, "value": "not-a-session"}])
+    assert await auth._probe(ctx, None) is None
 
-    def handler(request: httpx.Request) -> httpx.Response:
-        return httpx.Response(200, text="<html>not json")
 
-    monkeypatch.setattr(httpx, "AsyncClient", _mock_client(handler))
-    with pytest.raises(FetchError) as exc:
-        await auth.session_cookie()
-    assert "login chessreps" in str(exc.value)
+async def test_probe_returns_the_decoded_session_once_the_cookie_appears() -> None:
+    ctx = FakeCtx([{"name": auth.COOKIE_NAME, "value": _cookie_value(DUMMY_SESSION)}])
+    assert await auth._probe(ctx, None) == DUMMY_SESSION

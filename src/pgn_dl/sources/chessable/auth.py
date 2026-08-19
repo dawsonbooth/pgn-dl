@@ -7,22 +7,17 @@ account's user id, read out of the signed-in browser and stored owner-only. From
 then on every download is plain HTTPS carrying ``Authorization: Bearer <jwt>``;
 Chessable has no refresh endpoint, so an expired JWT is fixed by signing in again.
 
-The stored JWT is a long-lived credential: it is written owner-only and must
-never be logged, echoed, or included in an error message.
+Storage and the sign-in loop are the credential store's (see CONTEXT.md); this
+module supplies chessable's schema and its browser probe.
 """
 
 from __future__ import annotations
 
-import asyncio
-import json
 from pathlib import Path
 from typing import Any
 
-import typer
-
+from ...core.credentials import CredentialStore
 from ...core.fetch import FetchError
-from ...core.io import private_dir, write_text_atomic
-from ...core.paths import profile_dir as _source_profile_dir
 
 #: The ``localStorage`` keys Chessable's web app stores the session under, on the
 #: production origin. The login flow reads the JWT (the credential) and the UID
@@ -30,21 +25,12 @@ from ...core.paths import profile_dir as _source_profile_dir
 JWT_KEY = "chessable.web.production.JWT"
 UID_KEY = "chessable.web.production.UID"
 
-_LOGIN_HINT = "run: pgn-dl login chessable"
 
-
-def profile_dir() -> Path:
-    """Directory holding the credential file and chessable's own Chrome profile."""
-    return _source_profile_dir("chessable")
-
-
-def credentials_path() -> Path:
-    return profile_dir() / "credentials.json"
-
-
-def _require(jwt: object, uid: object) -> dict[str, str]:
+def _require(data: object) -> dict[str, str]:
     """The credential as a validated dict, or a refusal that names the missing
     field rather than the value: the value is the token, and refusals are seen."""
+    jwt = data.get("jwt") if isinstance(data, dict) else None
+    uid = data.get("uid") if isinstance(data, dict) else None
     if not isinstance(jwt, str) or not jwt:
         raise FetchError("chessable credentials carry no jwt")
     if not isinstance(uid, str) or not uid:
@@ -52,47 +38,26 @@ def _require(jwt: object, uid: object) -> dict[str, str]:
     return {"jwt": jwt, "uid": uid}
 
 
-def save_credentials(*, jwt: str, uid: str) -> None:
-    """Persist the JWT and uid owner-only, replacing any previous value.
+_store = CredentialStore("chessable", validate=_require)
 
-    Written whole or not at all, for the reason noctie's store is: a truncated
-    credentials.json locks the user out until they sign in again.
-    """
-    payload = _require(jwt, uid)  # validate before any filesystem side effect
-    private_dir(profile_dir())
-    path = credentials_path()
-    # The rename below would replace a link rather than write through it, but a
-    # link here is either an attack or an arrangement we should not silently
-    # destroy, so say so instead.
-    if path.is_symlink():
-        raise FetchError(
-            f"{path} is a symbolic link; refusing to write credentials through it"
-        )
-    try:
-        write_text_atomic(path, json.dumps(payload))
-    except OSError as exc:
-        # The message, never the token: this reaches the runner and the log.
-        reason = exc.strerror or type(exc).__name__
-        raise FetchError(
-            f"could not save chessable credentials to {path}: {reason}"
-        ) from None
+
+def profile_dir() -> Path:
+    """Directory holding the credential file and chessable's own Chrome profile."""
+    return _store.profile_dir()
+
+
+def credentials_path() -> Path:
+    return _store.credentials_path()
+
+
+def save_credentials(*, jwt: str, uid: str) -> None:
+    """Persist the JWT and uid owner-only, replacing any previous value."""
+    _store.save({"jwt": jwt, "uid": uid})
 
 
 def load_credentials() -> dict[str, str]:
     """The stored ``{"jwt", "uid"}``, or a refusal that says how to fix it."""
-    path = credentials_path()
-    try:
-        data = json.loads(path.read_text(encoding="utf-8"))
-    except OSError, ValueError:
-        raise FetchError(
-            f"no saved chessable credentials at {path}; {_LOGIN_HINT}"
-        ) from None
-    if not isinstance(data, dict):
-        raise FetchError(f"chessable credentials are not a map; {_LOGIN_HINT}")
-    try:
-        return _require(data.get("jwt"), data.get("uid"))
-    except FetchError as exc:
-        raise FetchError(f"{exc}; {_LOGIN_HINT}") from None
+    return _store.load()
 
 
 _READ_STORAGE_JS = """(keys) => {
@@ -125,7 +90,8 @@ async def _read_credentials(page: Any) -> dict[str, str] | None:
     return None
 
 
-_SIGN_IN_POLLS = 300  # every 3 seconds, so 15 minutes
+async def _probe(ctx: Any, page: Any) -> dict[str, str] | None:
+    return await _read_credentials(page)
 
 
 async def login() -> None:
@@ -137,29 +103,8 @@ async def login() -> None:
     profile core.browser opens is what gets that through, the same way
     ``login chesscom`` does.
     """
-    from ...core.browser import browser_context
-
-    typer.echo(
-        "A browser window is open. Sign in to Chessable; this exits automatically."
+    await _store.sign_in(
+        login_url="https://www.chessable.com/login/",
+        probe=_probe,
+        display_name="Chessable",
     )
-    # Owner-only before the browser writes its own copy of the session into this
-    # directory's localStorage.
-    private_dir(profile_dir())
-    async with browser_context(profile_dir(), headless=False) as ctx:
-        page = await ctx.new_page()
-        await page.goto(
-            "https://www.chessable.com/login/",
-            wait_until="domcontentloaded",
-            timeout=60000,
-        )
-        for _ in range(_SIGN_IN_POLLS):
-            await asyncio.sleep(3)
-            creds = await _read_credentials(page)
-            if creds is not None:
-                save_credentials(**creds)
-                typer.echo(f"Signed in. Credentials saved to {credentials_path()}")
-                return
-        raise FetchError(
-            "gave up waiting for chessable sign-in after 15 minutes; "
-            "nothing was saved. Run: pgn-dl login chessable to try again"
-        )

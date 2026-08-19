@@ -1,20 +1,20 @@
-"""Credential storage for the chessable source. No network, no browser.
+"""chessable's own contract: schema and probe decoding. No network, no browser.
 
-Chessable's credential is a localStorage JWT (plus the account's user id), read
-out of the browser once at login and stored owner-only. There is no refresh
-flow, so these tests cover only the store: shape, permissions, and the rule that
-no message ever carries the token.
+Storage invariants (permissions, symlink refusal, atomicity) are the credential
+store's and are tested once in tests/core/test_credentials.py; chessable has no
+refresh endpoint, so there is no refresh choreography to add on top.
 """
 
 from __future__ import annotations
 
-import stat
+from contextlib import asynccontextmanager
+from pathlib import Path
 from typing import Any
 
 import pytest
 from playwright.async_api import Error as PlaywrightError
 
-from pgn_dl.core import io
+import pgn_dl.core.browser as browser_module
 from pgn_dl.core.fetch import FetchError
 from pgn_dl.sources.chessable import auth
 
@@ -24,78 +24,41 @@ DUMMY_JWT = "DUMMY-JWT-DO-NOT-LEAK"
 DUMMY_UID = "424242"
 
 
-def test_missing_credentials_tell_the_user_how_to_fix_it(tmp_path, monkeypatch) -> None:
+@pytest.fixture(autouse=True)
+def _profile(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setenv("PGN_DL_PROFILE", str(tmp_path))
+
+
+@pytest.fixture(autouse=True)
+def _no_real_sleep(fast_sign_in_poll: None) -> None:
+    pass
+
+
+def test_missing_credentials_tell_the_user_how_to_fix_it() -> None:
     with pytest.raises(FetchError) as exc:
         auth.load_credentials()
     assert "login chessable" in str(exc.value)
 
 
-def test_saved_credentials_round_trip_owner_only(tmp_path, monkeypatch) -> None:
-    monkeypatch.setenv("PGN_DL_PROFILE", str(tmp_path))
+def test_saved_credentials_round_trip() -> None:
     auth.save_credentials(jwt=DUMMY_JWT, uid=DUMMY_UID)
     assert auth.load_credentials() == {"jwt": DUMMY_JWT, "uid": DUMMY_UID}
-    mode = stat.S_IMODE(auth.credentials_path().stat().st_mode)
-    assert mode == 0o600, f"credentials must be owner-only, got {mode:o}"
 
 
-def test_saving_narrows_a_pre_existing_world_readable_file(
-    tmp_path, monkeypatch
-) -> None:
-    # write_text_atomic replaces via an owner-only temp file, so a file restored
-    # from a backup at 0644 must not keep a long-lived token world-readable.
-    monkeypatch.setenv("PGN_DL_PROFILE", str(tmp_path))
-    path = auth.credentials_path()
-    path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text("{}", encoding="utf-8")
-    path.chmod(0o644)
-    auth.save_credentials(jwt=DUMMY_JWT, uid=DUMMY_UID)
-    mode = stat.S_IMODE(path.stat().st_mode)
-    assert mode == 0o600, f"a pre-existing file must be narrowed, got {mode:o}"
-
-
-def test_credentials_without_a_jwt_are_refused(tmp_path, monkeypatch) -> None:
-    monkeypatch.setenv("PGN_DL_PROFILE", str(tmp_path))
+def test_credentials_without_a_jwt_are_refused() -> None:
     with pytest.raises(FetchError):
         auth.save_credentials(jwt="", uid=DUMMY_UID)
     with pytest.raises(FetchError):
         auth.save_credentials(jwt=DUMMY_UID, uid="")
 
 
-def test_load_refuses_a_credential_file_missing_a_field(tmp_path, monkeypatch) -> None:
-    monkeypatch.setenv("PGN_DL_PROFILE", str(tmp_path))
+def test_load_refuses_a_credential_file_missing_a_field() -> None:
     path = auth.credentials_path()
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text('{"jwt": "only-a-jwt"}', encoding="utf-8")
     with pytest.raises(FetchError) as exc:
         auth.load_credentials()
     assert "login chessable" in str(exc.value)
-
-
-def test_a_symlinked_credentials_file_is_refused(tmp_path, monkeypatch) -> None:
-    monkeypatch.setenv("PGN_DL_PROFILE", str(tmp_path / "profile"))
-    victim = tmp_path / "victim"
-    victim.write_text("not a credential", encoding="utf-8")
-    path = auth.credentials_path()
-    path.parent.mkdir(parents=True, exist_ok=True)
-    path.symlink_to(victim)
-    with pytest.raises(FetchError):
-        auth.save_credentials(jwt=DUMMY_JWT, uid=DUMMY_UID)
-    assert victim.read_text(encoding="utf-8") == "not a credential"
-
-
-def test_a_failure_to_save_does_not_echo_the_token(tmp_path, monkeypatch) -> None:
-    # The save message reaches the terminal and may reach a log; the JWT must
-    # never ride along in it.
-    monkeypatch.setenv("PGN_DL_PROFILE", str(tmp_path))
-
-    def no_space(*args: object, **kwargs: object) -> None:
-        raise OSError(28, "No space left on device")
-
-    monkeypatch.setattr(io.os, "replace", no_space)
-    with pytest.raises(FetchError) as exc:
-        auth.save_credentials(jwt=DUMMY_JWT, uid=DUMMY_UID)
-    assert DUMMY_JWT not in str(exc.value)
 
 
 def test_localstorage_keys_are_the_production_ones() -> None:
@@ -148,3 +111,39 @@ async def test_read_credentials_does_not_swallow_a_bug() -> None:
     page = FakePage(error=TypeError("evaluate expected a string"))
     with pytest.raises(TypeError):
         await auth._read_credentials(page)
+
+
+async def test_probe_delegates_to_read_credentials() -> None:
+    page = FakePage(result={auth.JWT_KEY: DUMMY_JWT, auth.UID_KEY: DUMMY_UID})
+    assert await auth._probe(None, page) == {"jwt": DUMMY_JWT, "uid": DUMMY_UID}
+
+
+class FakeLoginPage:
+    def __init__(self) -> None:
+        self.goto_calls: list[str] = []
+
+    async def goto(self, url: str, **kwargs: object) -> None:
+        self.goto_calls.append(url)
+
+    async def evaluate(self, script: str, arg: Any = None) -> dict[str, str]:
+        return {auth.JWT_KEY: DUMMY_JWT, auth.UID_KEY: DUMMY_UID}
+
+
+async def test_login_greets_with_the_capitalized_brand_name(
+    monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
+    # The registry name is lowercase ("chessable"), but the site's own name is
+    # "Chessable"; the greeting must say what the site is actually called.
+    page = FakeLoginPage()
+
+    @asynccontextmanager
+    async def fake_browser_context(profile: Path, *, headless: bool):
+        class Ctx:
+            async def new_page(self) -> FakeLoginPage:
+                return page
+
+        yield Ctx()
+
+    monkeypatch.setattr(browser_module, "browser_context", fake_browser_context)
+    await auth.login()
+    assert "Sign in to Chessable;" in capsys.readouterr().out
