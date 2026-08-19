@@ -25,7 +25,7 @@ from .io import write_text_atomic
 from .models import GameItem, ItemRef
 from .paths import collection_dir, combine_collection_dir, item_path
 from .pgn import game_to_pgn
-from .registry import logins
+from .registry import has_login
 
 _MAX_ATTEMPTS = 5
 
@@ -107,7 +107,7 @@ def report_discovery_failure(extractor: Extractor, exc: FetchError, echo: Echo) 
     echo(f"! {kind} before any item could be listed: {exc}")
     denied = exc.status == 403 and not isinstance(exc, Blocked)
     source = type(extractor).source
-    if source in logins() and not denied:
+    if has_login(source) and not denied:
         echo(f"  Your session may have expired. Run: pgn-dl login {source}")
     echo("  Nothing was downloaded. Re-run the same command to resume.")
 
@@ -134,7 +134,7 @@ def _report_malformed_discovery(
     if isinstance(exc, json.JSONDecodeError):
         echo(f"! The listing from {source} could not be read as JSON: {exc}")
         echo("  An error page from a proxy or a sign-in page looks like this.")
-        if source in logins():
+        if has_login(source):
             echo(f"  Your session may have expired. Run: pgn-dl login {source}")
         echo("  Nothing was downloaded. Re-run the same command to resume.")
         return

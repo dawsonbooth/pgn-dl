@@ -16,19 +16,9 @@ import typer
 from typer.core import TyperGroup
 
 from . import sources  # noqa: F401  - importing registers the built-in sources
-from .core.cliopts import (
-    DEFAULT_CONCURRENCY,
-    DEFAULT_DELAY,
-    DEFAULT_OUT,
-    ConcurrencyOpt,
-    DelayOpt,
-    LimitOpt,
-    OutOpt,
-)
-from .core.driver import execute
 from .core.fetch import FetchError
-from .core.registry import UnknownSource, apps, iter_extractors, logins, resolve_url
-from .core.runner import Options
+from .core.materialize import build_source_app, build_url_command
+from .core.registry import declarations, iter_extractors
 
 _URL = re.compile(r"^https?://")
 
@@ -50,14 +40,14 @@ class RootGroup(TyperGroup):
 
 
 def mount_sources(root: typer.Typer) -> None:
-    """Mount every registered source's sub-app under its own name.
+    """Materialize and mount every declared source's sub-app under its own name.
 
     Sources announce themselves on import, so this file names none of them.
     Sorted, so ``--help`` lists them the same way however the imports happened
     to run.
     """
-    for name, sub_app in sorted(apps().items()):
-        root.add_typer(sub_app, name=name)
+    for name, declaration in sorted(declarations().items()):
+        root.add_typer(build_source_app(declaration), name=name)
 
 
 # pretty_exceptions_show_locals is Typer's own default, pinned here: a frame
@@ -92,9 +82,11 @@ def login(
     source: Annotated[str, typer.Argument(help="Source name, e.g. chesscom")],
 ) -> None:
     """Sign in to a source once; the session persists for later downloads."""
-    fn = logins().get(source)
+    declaration = declarations().get(source)
+    fn = declaration.login if declaration is not None else None
     if fn is None:
-        known = ", ".join(sorted(logins())) or "none"
+        with_login = [n for n, d in declarations().items() if d.login is not None]
+        known = ", ".join(sorted(with_login)) or "none"
         typer.echo(
             f"{source!r} needs no login, or is unknown. Sources with login: {known}"
         )
@@ -108,24 +100,7 @@ def login(
         raise typer.Exit(code=1) from None
 
 
-@app.command(name="url")
-def url_command(
-    target: Annotated[str, typer.Argument(help="Any supported URL")],
-    out: OutOpt = DEFAULT_OUT,
-    concurrency: ConcurrencyOpt = DEFAULT_CONCURRENCY,
-    delay: DelayOpt = DEFAULT_DELAY,
-    limit: LimitOpt = None,
-) -> None:
-    """Download from any supported URL."""
-    try:
-        extractor = resolve_url(target)
-    except UnknownSource as exc:
-        typer.echo(str(exc))
-        raise typer.Exit(code=1) from None
-    execute(
-        extractor,
-        Options(out=out, concurrency=concurrency, delay=delay, limit=limit),
-    )
+app.command(name="url")(build_url_command())
 
 
 if __name__ == "__main__":

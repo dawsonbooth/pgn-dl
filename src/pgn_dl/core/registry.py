@@ -2,19 +2,13 @@
 
 from __future__ import annotations
 
-from collections.abc import Awaitable, Callable, Iterator, Mapping
-from typing import TYPE_CHECKING
+from collections.abc import Iterator, Mapping
 
+from .declaration import SourceDeclaration
 from .extractor import Extractor
 
-if TYPE_CHECKING:
-    # Only for the annotation: the registry stores sub-apps, it does not build
-    # them, and core has no other reason to reach for typer.
-    import typer
-
 _EXTRACTORS: dict[str, type[Extractor]] = {}
-_LOGINS: dict[str, Callable[[], Awaitable[None]]] = {}
-_APPS: dict[str, typer.Typer] = {}
+_DECLARATIONS: dict[str, SourceDeclaration] = {}
 
 
 class UnknownSource(RuntimeError):
@@ -63,38 +57,31 @@ def resolve_url(url: str) -> Extractor:
     raise UnknownSource(f"no source handles {url!r}; known: {known}")
 
 
-def register_login(source: str, fn: Callable[[], Awaitable[None]]) -> None:
-    """Record a source's login flow, refusing a name already taken.
+def register_declaration(declaration: SourceDeclaration) -> None:
+    """Record a source's declaration, refusing a name already taken.
 
     Refused for the reason :func:`register` refuses a taken key: a copy-pasted
-    source keeping the original's name would silently steal its login.
+    source keeping the original's name would silently take its place on the
+    command line and in ``pgn-dl login``.
     """
-    if source in _LOGINS:
+    name = declaration.source
+    if (owner := _DECLARATIONS.get(name)) is not None:
         raise DuplicateSource(
-            f"two sources claim the login name {source!r}; "
-            "give the new source its own name."
+            f"{declaration.label!r} claims source name {name!r}, already "
+            f"registered by {owner.label!r}; give the new source its own name."
         )
-    _LOGINS[source] = fn
+    _DECLARATIONS[name] = declaration
 
 
-def logins() -> Mapping[str, Callable[[], Awaitable[None]]]:
-    return _LOGINS
+def declarations() -> Mapping[str, SourceDeclaration]:
+    return _DECLARATIONS
 
 
-def register_app(source: str, app: typer.Typer) -> None:
-    """Record a source's Typer sub-app under the name it is typed as.
+def has_login(source: str) -> bool:
+    """Whether ``source`` declares a login flow.
 
-    Duplicates are refused for the reason :func:`register` refuses a taken key:
-    a copy-pasted source keeping the original's name would take its place in
-    ``--help``, and nothing would say so.
+    Used to decide whether a "your session may have expired" hint names a real
+    command, without runner.py needing to know a declaration's shape.
     """
-    if source in _APPS:
-        raise DuplicateSource(
-            f"two sources claim the sub-app name {source!r}; "
-            "give the new source its own name."
-        )
-    _APPS[source] = app
-
-
-def apps() -> Mapping[str, typer.Typer]:
-    return _APPS
+    declaration = _DECLARATIONS.get(source)
+    return declaration is not None and declaration.login is not None

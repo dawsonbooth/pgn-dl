@@ -9,8 +9,23 @@ import pytest
 from typer.testing import CliRunner
 
 from pgn_dl.cli import app
+from pgn_dl.core.extractor import Extractor
+from pgn_dl.core.models import Collection, GameItem, ItemRef
 
 runner = CliRunner()
+
+
+class _StubExtractor(Extractor):
+    """A minimal extractor for tests that need a declaration but never run one."""
+
+    def __init__(self, target: str) -> None:
+        self.target = target
+
+    async def discover(self, fetcher: object) -> tuple[Collection, list[ItemRef]]:
+        return self.collection(slug="s", name="S"), []
+
+    async def fetch(self, fetcher: object, ref: ItemRef) -> GameItem:
+        return GameItem()
 
 
 def test_root_help_lists_sources_and_login() -> None:
@@ -70,12 +85,28 @@ def test_a_login_that_fails_reports_it_instead_of_a_traceback(
 ) -> None:
     # Sign-in can time out or be abandoned; the command has to say so rather
     # than unwinding a FetchError through Typer.
+    from pgn_dl.core.declaration import ExtractorDeclaration, SourceDeclaration
     from pgn_dl.core.fetch import FetchError
+
+    class FakeExtractor(_StubExtractor):
+        key = "faketest:things"
 
     async def times_out() -> None:
         raise FetchError("timed out waiting for noctie sign-in")
 
-    monkeypatch.setattr("pgn_dl.cli.logins", lambda: {"faketest": times_out})
+    fake = SourceDeclaration(
+        label="fake",
+        extractors=(
+            ExtractorDeclaration(
+                extractor=FakeExtractor,
+                help="unused",
+                target_name="target",
+                target_help="unused",
+            ),
+        ),
+        login=times_out,
+    )
+    monkeypatch.setattr("pgn_dl.cli.declarations", lambda: {"faketest": fake})
 
     result = runner.invoke(app, ["login", "faketest"])
     assert result.exit_code == 1
@@ -117,16 +148,16 @@ def test_url_command_is_visible_in_help() -> None:
     assert "url" in result.output
 
 
-def test_every_source_registers_its_sub_app() -> None:
-    # Sources already self-register their extractors and their login; the sub-
-    # app is the third thing core would otherwise have to know each source by
-    # name to wire up.
-    from pgn_dl.core.registry import apps
+def test_every_source_registers_its_declaration() -> None:
+    # Sources already self-register their extractors; the declaration is the
+    # one other thing core would otherwise have to know each source by name
+    # to wire up.
+    from pgn_dl.core.registry import declarations
     from pgn_dl.sources import chesscom, chessreps, noctie
 
-    assert apps()["chesscom"] is chesscom.app
-    assert apps()["chessreps"] is chessreps.app
-    assert apps()["noctie"] is noctie.app
+    assert declarations()["chesscom"] is chesscom.declaration
+    assert declarations()["chessreps"] is chessreps.declaration
+    assert declarations()["noctie"] is noctie.declaration
 
 
 def test_the_root_app_mounts_the_registered_sources_in_order() -> None:
@@ -145,18 +176,30 @@ def test_mounting_is_driven_by_the_registry_not_by_hard_coded_imports(
 ) -> None:
     # A source that core has never heard of must still be mounted. Patching the
     # registry accessor is what proves cli.py reads it rather than importing
-    # two known sub-apps by name.
+    # two known sources by name.
     import typer
 
     from pgn_dl.cli import mount_sources
+    from pgn_dl.core.declaration import ExtractorDeclaration, SourceDeclaration
 
-    fake = typer.Typer(no_args_is_help=True, help="fake source")
+    class PingExtractor(_StubExtractor):
+        key = "fakesource:ping"
 
-    @fake.command(name="ping")
-    def ping() -> None:
-        """Do nothing at all."""
+    fake = SourceDeclaration(
+        label="fake source",
+        extractors=(
+            ExtractorDeclaration(
+                extractor=PingExtractor,
+                help="Do nothing at all.",
+                target_name="target",
+                target_help="unused",
+            ),
+        ),
+    )
 
-    monkeypatch.setattr("pgn_dl.cli.apps", lambda: {"zeta": fake, "alpha": fake})
+    monkeypatch.setattr(
+        "pgn_dl.cli.declarations", lambda: {"zeta": fake, "alpha": fake}
+    )
     root = typer.Typer(add_completion=False)
     mount_sources(root)
 
@@ -180,13 +223,15 @@ def test_the_source_command_names_are_unchanged() -> None:
 
 def test_the_opening_books_help_describes_the_bookmark_files() -> None:
     # A book produces one PGN per bookmark under bookmarks/ as well as the whole
-    # repertoire, and the help has to say so. Asserted on the docstring, not the
-    # rendered page: rich rewraps the prose, so a sentence in the output is not
-    # a contiguous substring of it.
-    from pgn_dl.sources.noctie import opening_books_command
+    # repertoire, and the help has to say so. Asserted on the declared help
+    # text, not the rendered page: rich rewraps the prose, so a sentence in the
+    # output is not a contiguous substring of it.
+    from pgn_dl.sources import noctie
 
-    doc = opening_books_command.__doc__ or ""
-    assert "bookmarks/" in doc
+    entry = next(
+        e for e in noctie.declaration.extractors if e.extractor.kind == "opening-books"
+    )
+    assert "bookmarks/" in entry.help
 
     result = runner.invoke(app, ["noctie", "opening-books", "--help"])
     assert result.exit_code == 0

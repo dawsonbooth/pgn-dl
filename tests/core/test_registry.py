@@ -3,11 +3,12 @@
 from __future__ import annotations
 
 import re
+from collections.abc import Awaitable, Callable
 
 import pytest
-import typer
 
 from pgn_dl.core import registry
+from pgn_dl.core.declaration import ExtractorDeclaration, SourceDeclaration
 from pgn_dl.core.extractor import Extractor
 from pgn_dl.core.models import Collection, GameItem, ItemRef
 from pgn_dl.core.registry import (
@@ -83,32 +84,56 @@ def test_a_duplicate_key_is_rejected_rather_than_shadowing() -> None:
     assert resolve_key("alpha:things") is AlphaExtractor
 
 
-def test_a_duplicate_sub_app_is_rejected_rather_than_shadowing(
+def _declaration(
+    *, label: str, login: Callable[[], Awaitable[None]] | None = None
+) -> SourceDeclaration:
+    return SourceDeclaration(
+        label=label,
+        login=login,
+        extractors=(
+            ExtractorDeclaration(
+                extractor=AlphaExtractor,
+                help="Download alpha things.",
+                target_name="thing",
+                target_help="A thing id.",
+            ),
+        ),
+    )
+
+
+def test_a_declaration_is_recorded_under_its_extractors_source(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    # A copy-pasted source that kept register_app("noctie", ...) would take the
-    # original's place in --help, and nothing would say so.
-    monkeypatch.setattr(registry, "_APPS", {})
-    app = typer.Typer()
-    registry.register_app("alpha", app)
+    monkeypatch.setattr(registry, "_DECLARATIONS", {})
+    declaration = _declaration(label="Alpha")
+    registry.register_declaration(declaration)
+    assert registry.declarations()["alpha"] is declaration
+
+
+def test_a_duplicate_declaration_is_rejected_rather_than_shadowing(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    # A copy-pasted source that kept register_declaration(declaration) with the
+    # original's extractors would take the original's place on the command
+    # line and in `pgn-dl login`, and nothing would say so.
+    monkeypatch.setattr(registry, "_DECLARATIONS", {})
+    first = _declaration(label="Alpha")
+    registry.register_declaration(first)
     with pytest.raises(DuplicateSource):
-        registry.register_app("alpha", typer.Typer())
-    assert registry.apps()["alpha"] is app
+        registry.register_declaration(_declaration(label="Alpha Clone"))
+    assert registry.declarations()["alpha"] is first
 
 
-def test_a_duplicate_login_is_rejected_rather_than_shadowing(
+def test_has_login_reflects_the_registered_declaration(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    # Same failure mode as a duplicate sub-app: a copy-pasted source keeping the
-    # original's login name would silently steal `pgn-dl login <name>`.
     async def sign_in() -> None:  # pragma: no cover - never invoked
         raise AssertionError
 
-    monkeypatch.setattr(registry, "_LOGINS", {})
-    registry.register_login("alpha", sign_in)
-    with pytest.raises(DuplicateSource):
-        registry.register_login("alpha", sign_in)
-    assert registry.logins()["alpha"] is sign_in
+    monkeypatch.setattr(registry, "_DECLARATIONS", {})
+    assert registry.has_login("alpha") is False
+    registry.register_declaration(_declaration(label="Alpha", login=sign_in))
+    assert registry.has_login("alpha") is True
 
 
 def test_a_key_without_a_kind_is_rejected() -> None:

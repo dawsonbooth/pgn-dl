@@ -179,9 +179,7 @@ class BrokenAtDiscoveryExtractor(FakeExtractor):
 
 
 def _pretend_source_has_a_login(monkeypatch: pytest.MonkeyPatch) -> None:
-    async def noop() -> None: ...
-
-    monkeypatch.setattr(runner_module, "logins", lambda: {"fake": noop})
+    monkeypatch.setattr(runner_module, "has_login", lambda source: source == "fake")
 
 
 async def test_a_denied_discovery_does_not_blame_the_session(
