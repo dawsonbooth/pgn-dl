@@ -8,6 +8,7 @@ variation, Course -> Chapter -> Variation, exactly as chess.com courses do.
 from __future__ import annotations
 
 import re
+from dataclasses import dataclass, field
 
 import chess
 
@@ -39,22 +40,29 @@ def course_id_from(target: str) -> str:
     return m.group(1)
 
 
-class CoursesExtractor(Extractor):
+@dataclass
+class _Context:
+    client: GameClient
+    # Keyed by ItemRef.path (unique per item), not by oid: while an oid does
+    # not repeat across chapters today, the path is what the Round belongs to.
+    rounds: dict[tuple[str, ...], str] = field(default_factory=dict)
+
+
+class CoursesExtractor(Extractor[_Context]):
     key = "chessable:courses"
     url_patterns = (re.compile(r"^https?://(www\.)?chessable\.com/"),)
     needs_browser = False
 
     def __init__(self, target: str) -> None:
+        super().__init__()
         self.course_id = course_id_from(target)
-        self._client: GameClient | None = None
-        # Keyed by ItemRef.path (unique per item), not by oid: while an oid does
-        # not repeat across chapters today, the path is what the Round belongs to.
-        self._rounds: dict[tuple[str, ...], str] = {}
 
-    async def discover(self, fetcher: Fetcher) -> tuple[Collection, list[ItemRef]]:
+    async def _discover(
+        self, fetcher: Fetcher
+    ) -> tuple[Collection, list[ItemRef], _Context]:
         creds = auth.load_credentials()
-        self._client = GameClient(fetcher, jwt=creds["jwt"], uid=creds["uid"])
-        outline = parse_course(await self._client.get_course(self.course_id))
+        client = GameClient(fetcher, jwt=creds["jwt"], uid=creds["uid"])
+        outline = parse_course(await client.get_course(self.course_id))
 
         if not outline.owned:
             # getGame would then fail per variation; one clear stop beats a wall
@@ -65,6 +73,7 @@ class CoursesExtractor(Extractor):
                 "add it to your Chessable library, or check the course id"
             )
 
+        context = _Context(client=client)
         refs: list[ItemRef] = []
         for ci, chapter in enumerate(outline.chapters, start=1):
             chap = f"{ci:02d}-{slugify(chapter.title, 'chapter')}"
@@ -72,23 +81,23 @@ class CoursesExtractor(Extractor):
                 name = slugify(var.name, "variation")
                 ref = ItemRef(id=var.oid, path=(chap, f"{vi:03d}-{name}"))
                 refs.append(ref)
-                self._rounds[ref.path] = f"{ci}.{vi}"
+                context.rounds[ref.path] = f"{ci}.{vi}"
 
         collection = self.collection(
             slug=f"{slugify(outline.name, 'course')}-{self.course_id}",
             name=outline.name,
             headers={"Event": outline.name, "Site": SITE},
         )
-        return collection, refs
+        return collection, refs, context
 
-    async def fetch(self, fetcher: Fetcher, ref: ItemRef) -> GameItem:
-        # ``fetcher`` is unused: discover() built a client around the same one,
+    async def _fetch(
+        self, context: _Context, fetcher: Fetcher, ref: ItemRef
+    ) -> GameItem:
+        # ``fetcher`` is unused: discovery built a client around the same one,
         # and the client carries the credential every request needs.
-        if self._client is None:
-            raise FetchError("chessable fetch called before discover")
-        content = parse_game(await self._client.get_game(self.course_id, ref.id))
+        content = parse_game(await context.client.get_game(self.course_id, ref.id))
         headers = {"ChessableVariationId": content.oid or ref.id}
-        if round_ := self._rounds.get(ref.path):
+        if round_ := context.rounds.get(ref.path):
             headers["Round"] = round_
         if content.result != "*":
             headers["Result"] = content.result

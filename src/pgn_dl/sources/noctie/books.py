@@ -35,13 +35,13 @@ missing. Book names are not unique, so the output slug carries a slice of the id
 
 from __future__ import annotations
 
-import asyncio
 import re
 from collections.abc import Sequence
 from copy import deepcopy
-from dataclasses import replace
+from dataclasses import dataclass, field, replace
 from typing import Any
 
+from ...core.extractor import Once
 from ...core.fetch import Fetcher, FetchError
 from ...core.models import Collection, GameItem, ItemRef, MoveNode
 from ...core.paths import COMBINED_NAME, slugify
@@ -247,7 +247,22 @@ def slice_from(root: MoveNode, path: Sequence[str]) -> MoveNode | None:
     return sliced
 
 
-class OpeningBooksExtractor(NoctieExtractor):
+@dataclass
+class _Context:
+    name: str
+    color: str
+    description: str
+    full_description: str
+    # Not list[dict]: an entry upstream stored as something other than a map is
+    # kept, and fails its own item on fetch rather than discovery.
+    bookmarks: list[Any]
+    # The book's move tree, listed and built at most once per run: every item
+    # is a view of this one tree, so listing per item would repeat a paginated
+    # read of hundreds of documents once per bookmark.
+    tree: Once[MoveNode] = field(default_factory=Once)
+
+
+class OpeningBooksExtractor(NoctieExtractor[_Context]):
     """One noctie opening book: the whole tree as one game, plus its bookmarks."""
 
     key = "noctie:opening-books"
@@ -256,104 +271,95 @@ class OpeningBooksExtractor(NoctieExtractor):
     def __init__(self, target: str) -> None:
         super().__init__(target)
         self.book_id = book_id_from(target)
-        self._name = ""
-        self._color = ""
-        self._description = ""
-        self._full_description = ""
-        # Not list[dict]: an entry upstream stored as something other than a map
-        # is kept, and fails its own item in fetch().
-        self._bookmarks: list[Any] = []
-        self._tree: MoveNode | None = None
-        self._tree_lock = asyncio.Lock()
 
-    async def discover(self, fetcher: Fetcher) -> tuple[Collection, list[ItemRef]]:
+    async def _discover(
+        self, fetcher: Fetcher
+    ) -> tuple[Collection, list[ItemRef], _Context]:
         book = await self.read(
             lambda token: get_document(fetcher, f"openingBooks/{self.book_id}", token),
             _NOUN,
         )
-        self._name = book.get("name") or self.book_id
-        self._color = book.get("color") or ""
-        # Prose, not identity: these go in the game comment, never a header. A
-        # `fullDescription` is multi-line markdown and a PGN header is one line,
-        # so a header would either truncate it or produce a file readers reject.
-        self._description = str(book.get("description") or "")
-        self._full_description = str(book.get("fullDescription") or "")
+        name = book.get("name") or self.book_id
         # Nothing here may raise on a malformed bookmark: the whole-book item
-        # needs none of them, and discover() failing loses it too. A `bookmarks`
+        # needs none of them, and discovery failing loses it too. A `bookmarks`
         # that is not an array has no entries to make items from, so it reads as
         # a book with none.
         bookmarks = book.get("bookmarks")
-        self._bookmarks = bookmarks if isinstance(bookmarks, list) else []
+        context = _Context(
+            name=name,
+            color=book.get("color") or "",
+            # Prose, not identity: these go in the game comment, never a
+            # header. A `fullDescription` is multi-line markdown and a PGN
+            # header is one line, so a header would either truncate it or
+            # produce a file readers reject.
+            description=str(book.get("description") or ""),
+            full_description=str(book.get("fullDescription") or ""),
+            bookmarks=bookmarks if isinstance(bookmarks, list) else [],
+        )
         collection = self.collection(
             # Book names are not unique upstream, so two different books would
             # otherwise share an output directory and overwrite each other.
-            slug=f"{slugify(self._name)}-{self.book_id[:8]}",
-            name=self._name,
+            slug=f"{slugify(name)}-{self.book_id[:8]}",
+            name=name,
             # Unlike themes, this source emits a move tree, so the runner
             # renders the PGN itself and these headers do reach the file.
-            headers={"Event": self._name, "Site": SITE},
+            headers={"Event": name, "Site": SITE},
         )
         # The variations are the book's moves, not its items: the whole book is
         # one item, and each bookmark another cut of that same tree. A book
         # without bookmarks stays a single file with no `bookmarks/` beside it.
-        items = [ItemRef(id=self.book_id, path=(_book_file_slug(self._name),))]
+        items = [ItemRef(id=self.book_id, path=(_book_file_slug(name),))]
         items += [
             ItemRef(
                 id=f"{BOOKMARK_ID}{i}",
                 path=("bookmarks", f"{i:02d}-{slugify(_bookmark_name(b))}"),
             )
-            for i, b in enumerate(self._bookmarks, start=1)
+            for i, b in enumerate(context.bookmarks, start=1)
         ]
-        return collection, items
+        return collection, items, context
 
-    async def _book_tree(self, fetcher: Fetcher) -> MoveNode:
-        """The book's move tree, listed and built at most once per run.
+    async def _build_tree(self, fetcher: Fetcher) -> MoveNode:
+        """List and build the book's move tree.
 
-        Every item is a view of this one tree, so listing per item would repeat
-        a paginated read of hundreds of documents once per bookmark. ``fetch``
-        calls run concurrently under the runner's semaphore, so the lock is what
-        stops two of them starting the listing at the same moment.
-
-        A failed listing is deliberately not cached: a bot challenge is retried
-        by the runner, and caching the failure would turn one bad moment into a
-        whole run's worth of failed items.
+        ``fetch`` calls run concurrently under the runner's semaphore, and every
+        one of them wants this tree, so it goes through ``context.tree``
+        (:class:`~pgn_dl.core.extractor.Once`) rather than being listed per
+        item; that is also what keeps two concurrent fetches from starting the
+        listing at the same moment.
         """
-        async with self._tree_lock:
-            if self._tree is None:
-                # No page cap: a capped listing silently drops whole branches.
-                variations = await self.read(
-                    lambda token: list_documents(
-                        fetcher,
-                        f"openingBooks/{self.book_id}/openingBookVariations",
-                        token,
-                    ),
-                    _NOUN,
-                )
-                if not variations:
-                    # An empty tree would have the runner write a moveless file
-                    # and then skip it on every later run.
-                    raise FetchError(
-                        f"noctie opening book {self.book_id} has no variations"
-                    )
-                self._tree = build_tree(variations)
-            return self._tree
+        # No page cap: a capped listing silently drops whole branches.
+        variations = await self.read(
+            lambda token: list_documents(
+                fetcher, f"openingBooks/{self.book_id}/openingBookVariations", token
+            ),
+            _NOUN,
+        )
+        if not variations:
+            # An empty tree would have the runner write a moveless file and
+            # then skip it on every later run.
+            raise FetchError(f"noctie opening book {self.book_id} has no variations")
+        return build_tree(variations)
 
-    async def fetch(self, fetcher: Fetcher, ref: ItemRef) -> GameItem:
-        tree = await self._book_tree(fetcher)
+    async def _fetch(
+        self, context: _Context, fetcher: Fetcher, ref: ItemRef
+    ) -> GameItem:
+        tree = await context.tree.get(lambda: self._build_tree(fetcher))
         headers = {"NoctieBookId": self.book_id}
         # The whole book opens with everything the book says about itself: its
         # blurb, its long description, and the preface on the root document. A
         # bookmark is a cut of the same tree and gets its own description
         # instead, rather than repeating the introduction in every file.
-        comment = _prose(self._description, self._full_description, tree.post_comment)
+        comment = _prose(
+            context.description, context.full_description, tree.post_comment
+        )
         root = tree
 
         if ref.id.startswith(BOOKMARK_ID):
             position = int(ref.id.removeprefix(BOOKMARK_ID))
-            bookmark = self._bookmarks[position - 1]
+            bookmark = context.bookmarks[position - 1]
             if not isinstance(bookmark, dict):
                 # Kept as an item and failed here rather than dropped in
-                # discover(), so the run's tally says a bookmark was not
+                # discovery, so the run's tally says a bookmark was not
                 # written. Dropping it would lose a file silently.
                 raise FetchError(
                     f"noctie bookmark {position} of book {self.book_id} is a "
@@ -375,11 +381,11 @@ class OpeningBooksExtractor(NoctieExtractor):
             # Readers key on Event, so that names the bookmark; the book it was
             # cut from keeps its own headers so the file still says where it
             # came from.
-            headers |= {"Event": name, "NoctieBook": self._name}
+            headers |= {"Event": name, "NoctieBook": context.name}
 
         # A book is written from one side's point of view; naming that side
         # tells a reader whose repertoire this is at a glance.
-        side = _REPERTOIRE_SIDE.get(self._color.lower())
+        side = _REPERTOIRE_SIDE.get(context.color.lower())
         if side is not None:
-            headers |= {"White": "?", "Black": "?", side: self._name}
+            headers |= {"White": "?", "Black": "?", side: context.name}
         return GameItem(headers=headers, comment=comment, root=root)

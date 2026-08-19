@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import re
 from collections import Counter
+from dataclasses import dataclass, field
 
 import chess
 
@@ -27,22 +28,29 @@ def course_id_from(s: str) -> str:
     return m.group(0).lower()
 
 
-class CoursesExtractor(Extractor):
+@dataclass
+class _Context:
+    client: CoursesClient
+    # Keyed by ItemRef.path, which is unique per item; a lesson id can repeat
+    # across chapters, and keying by it would give repeats one Round header.
+    rounds: dict[tuple[str, ...], str] = field(default_factory=dict)
+
+
+class CoursesExtractor(Extractor[_Context]):
     key = "chesscom:courses"
     url_patterns = (re.compile(r"^https?://(www\.)?chess\.com/courses/"),)
     needs_browser = True
 
     def __init__(self, target: str) -> None:
+        super().__init__()
         self.course_id = course_id_from(target)
-        self._client: CoursesClient | None = None
-        # Keyed by ItemRef.path, which is unique per item; a lesson id can repeat
-        # across chapters, and keying by it would give repeats one Round header.
-        self._rounds: dict[tuple[str, ...], str] = {}
 
-    async def discover(self, fetcher: Fetcher) -> tuple[Collection, list[ItemRef]]:
-        self._client = CoursesClient(fetcher)
-        await self._client.authenticate()
-        raw = await self._client.get_learning_session(self.course_id)
+    async def _discover(
+        self, fetcher: Fetcher
+    ) -> tuple[Collection, list[ItemRef], _Context]:
+        client = CoursesClient(fetcher)
+        await client.authenticate()
+        raw = await client.get_learning_session(self.course_id)
         info, headers = parse_course_skeleton(raw)
 
         chapter_idx = {cid: i for i, (cid, _) in enumerate(info.chapters, start=1)}
@@ -53,6 +61,7 @@ class CoursesExtractor(Extractor):
         # chapter's numbering as it was.
         unlisted = len(info.chapters) + 1
 
+        context = _Context(client=client)
         refs: list[ItemRef] = []
         # Keyed by directory rather than chapter id, so the lessons gathered
         # under `unlisted` share one counter and cannot collide.
@@ -67,7 +76,7 @@ class CoursesExtractor(Extractor):
             lesson = slugify(header.get("name", ""), "lesson")
             ref = ItemRef(id=header["id"], path=(chapter, f"{idx:03d}-{lesson}"))
             refs.append(ref)
-            self._rounds[ref.path] = f"{number}.{idx}"
+            context.rounds[ref.path] = f"{number}.{idx}"
 
         collection_headers = {"Event": info.name, "Site": "chess.com"}
         if info.author:
@@ -78,16 +87,16 @@ class CoursesExtractor(Extractor):
             name=info.name,
             headers=collection_headers,
         )
-        return collection, refs
+        return collection, refs, context
 
-    async def fetch(self, fetcher: Fetcher, ref: ItemRef) -> GameItem:
-        # ``fetcher`` is unused: discover() built a client around the same one,
+    async def _fetch(
+        self, context: _Context, fetcher: Fetcher, ref: ItemRef
+    ) -> GameItem:
+        # ``fetcher`` is unused: discovery built a client around the same one,
         # and the client carries the auth token every lesson request needs.
-        if self._client is None:
-            raise RuntimeError("call discover() first")
-        content = parse_lesson_tree(await self._client.get_lesson(ref.id))
+        content = parse_lesson_tree(await context.client.get_lesson(ref.id))
         headers = {"ChessComLessonId": content.id}
-        if round_ := self._rounds.get(ref.path):
+        if round_ := context.rounds.get(ref.path):
             headers["Round"] = round_
         return GameItem(
             headers=headers,

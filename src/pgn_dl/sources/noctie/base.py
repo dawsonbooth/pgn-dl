@@ -53,7 +53,7 @@ def id_from(target: str, pattern: re.Pattern[str], noun: str) -> str:
     return m.group("id").lower()
 
 
-class NoctieExtractor(Extractor):
+class NoctieExtractor[C](Extractor[C]):
     """Base for noctie's sources: no browser, and one ID token at a time.
 
     Downloading needs no browser: `pgn-dl login noctie` stores a refresh token
@@ -69,6 +69,7 @@ class NoctieExtractor(Extractor):
         source. The signature is declared here because :meth:`from_url` builds
         ``cls(url)`` and would not type-check against a constructor taking none.
         """
+        super().__init__()
         # Minted on first use, so constructing an extractor costs nothing.
         self._token = ""
         # How many times it has been minted, so a read that has just been

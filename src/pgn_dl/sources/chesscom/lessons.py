@@ -21,6 +21,7 @@ from __future__ import annotations
 import html
 import json
 import re
+from dataclasses import dataclass
 from urllib.parse import unquote
 
 import chess.pgn
@@ -213,7 +214,23 @@ def parse_target(s: str) -> tuple[str, str | None]:
     return m.group("course").lower(), (m.group("lesson") or "").lower() or None
 
 
-class LessonsExtractor(Extractor):
+@dataclass
+class _Context:
+    """The lesson-course title.
+
+    Filled in by discovery when a listing supplies one, and otherwise left
+    blank for the first (and, in single-lesson mode, only) fetch to fill in
+    from the lesson's own payload - see ``_fetch``.
+    """
+
+    title: str = ""
+
+
+def _pgn_headers(course: str, title: str) -> dict[str, str]:
+    return {"Event": title or course, "Site": "chess.com"}
+
+
+class LessonsExtractor(Extractor[_Context]):
     """One lesson, or every lesson of a lesson course.
 
     A lesson course is chess.com's free ``/lessons/<slug>`` curriculum, not the
@@ -225,20 +242,14 @@ class LessonsExtractor(Extractor):
     needs_browser = True
 
     def __init__(self, target: str) -> None:
+        super().__init__()
         self.course, self.lesson = parse_target(target)
-        # The lesson-course title, once a listing has supplied one. Empty until
-        # then, and in single-lesson mode possibly until fetch() reads the
-        # lesson's own course block, so every reader falls back to the slug.
-        self._title = ""
 
-    def _pgn_headers(self) -> dict[str, str]:
-        return {"Event": self._title or self.course, "Site": "chess.com"}
+    async def _course_slugs(self, fetcher: Fetcher) -> tuple[list[str] | None, str]:
+        """Ordered lesson slugs and the lesson-course title, "" if unknown.
 
-    async def _course_slugs(self, fetcher: Fetcher) -> list[str] | None:
-        """Ordered lesson slugs.
-
-        None when there is no usable lesson-course landing page AND the
-        lesson course is absent from chess.com's guided learn path too.
+        The slugs are None when there is no usable lesson-course landing page
+        AND the lesson course is absent from chess.com's guided learn path too.
         """
         try:
             page = await fetcher.get_text(f"{BASE}/{self.course}", headers={})
@@ -247,9 +258,8 @@ class LessonsExtractor(Extractor):
         if page is not None:
             slugs = course_lesson_slugs(page, self.course)
             if slugs:
-                if m := _OG_TITLE_RE.search(page):
-                    self._title = m.group(1)
-                return slugs
+                title = m.group(1) if (m := _OG_TITLE_RE.search(page)) else ""
+                return slugs, title
         # No landing page, or one that lists no lesson (an expired session's
         # login wall, or a layout change). Both get the same answer, and no
         # title is taken off such a page. Fall back to the learn path: some
@@ -259,22 +269,23 @@ class LessonsExtractor(Extractor):
             learn_page = await fetcher.get_text(LEARN_URL, headers={})
             found = learn_path_course(extract_learn_path(learn_page), self.course)
         except FetchError:
-            return None
+            return None, ""
         if found is None:
-            return None
+            return None, ""
         title, slugs = found
         if not slugs:
             # Present in the learn path but carrying no lesson: same failure as
             # a landing page that lists none, and no title taken from it either.
-            return None
-        self._title = title
-        return slugs
+            return None, ""
+        return slugs, title
 
-    async def discover(self, fetcher: Fetcher) -> tuple[Collection, list[ItemRef]]:
+    async def _discover(
+        self, fetcher: Fetcher
+    ) -> tuple[Collection, list[ItemRef], _Context]:
         # Numbering always comes from the lesson-course page, in both modes, so
         # that downloading one lesson and downloading the whole lesson course
         # agree on paths and resume across each other.
-        slugs = await self._course_slugs(fetcher)
+        slugs, title = await self._course_slugs(fetcher)
 
         if self.lesson is None:
             if slugs is None:
@@ -305,22 +316,25 @@ class LessonsExtractor(Extractor):
 
         collection = self.collection(
             slug=self.course,
-            name=self._title or self.course,
-            headers=self._pgn_headers(),
+            name=title or self.course,
+            headers=_pgn_headers(self.course, title),
         )
         # ``ItemRef.id`` is the lesson slug, not a UUID: the slug is what
         # addresses the page. The lesson's UUID goes into the PGN instead.
         refs = [ItemRef(id=slug, path=(slugify(name),)) for name, slug in chosen]
-        return collection, refs
+        return collection, refs, _Context(title=title)
 
-    async def fetch(self, fetcher: Fetcher, ref: ItemRef) -> GameItem:
+    async def _fetch(
+        self, context: _Context, fetcher: Fetcher, ref: ItemRef
+    ) -> GameItem:
         payload = extract_lesson(
             await fetcher.get_text(f"{BASE}/{self.course}/{ref.id}", headers={})
         )
         # Single-lesson mode reaches no listing that carries the lesson-course
         # title, so the lesson's own course block is where it comes from. Only
-        # that mode leaves ``_title`` empty here, and it fetches one item, so
-        # nothing races for this.
-        if not self._title:
-            self._title = payload.get("course", {}).get("title", "")
-        return GameItem(pgn=lesson_to_pgn(payload, self._pgn_headers()))
+        # that mode leaves the context's title empty here, and it fetches one
+        # item, so nothing races this write.
+        if not context.title:
+            context.title = payload.get("course", {}).get("title", "")
+        headers = _pgn_headers(self.course, context.title)
+        return GameItem(pgn=lesson_to_pgn(payload, headers))

@@ -53,7 +53,7 @@ def element_to_pgn(pgn: str, headers: dict[str, str], element_id: str) -> str:
     )
 
 
-class ThemesExtractor(NoctieExtractor):
+class ThemesExtractor(NoctieExtractor[str]):
     """One noctie theme, as one PGN file per element."""
 
     key = "noctie:themes"
@@ -62,13 +62,14 @@ class ThemesExtractor(NoctieExtractor):
     def __init__(self, target: str) -> None:
         super().__init__(target)
         self.theme_id = theme_id_from(target)
-        self._name = ""
 
-    async def discover(self, fetcher: Fetcher) -> tuple[Collection, list[ItemRef]]:
+    async def _discover(
+        self, fetcher: Fetcher
+    ) -> tuple[Collection, list[ItemRef], str]:
         theme = await self.read(
             lambda token: get_document(fetcher, f"themes/{self.theme_id}", token), _NOUN
         )
-        self._name = theme.get("name") or self.theme_id
+        name = theme.get("name") or self.theme_id
         # The mask is not an optimisation detail: without it every element's
         # whole PGN is transferred here, and then again in fetch().
         elements = await self.read(
@@ -120,13 +121,13 @@ class ThemesExtractor(NoctieExtractor):
         collection = self.collection(
             # Names are not unique upstream, so two different themes would
             # otherwise share an output directory and overwrite each other.
-            slug=f"{slugify(self._name)}-{self.theme_id[:8]}",
-            name=self._name,
+            slug=f"{slugify(name)}-{self.theme_id[:8]}",
+            name=name,
         )
-        return collection, refs
+        return collection, refs, name
 
-    async def fetch(self, fetcher: Fetcher, ref: ItemRef) -> GameItem:
-        # Guarded like the reads in discover(): the theme document can be
+    async def _fetch(self, context: str, fetcher: Fetcher, ref: ItemRef) -> GameItem:
+        # Guarded like the reads in discovery: the theme document can be
         # readable while an element is not, and an unexplained 403 mid-download
         # looks like a broken tool just the same.
         element = await self.read(
@@ -140,7 +141,7 @@ class ThemesExtractor(NoctieExtractor):
             # Returning nothing would have the runner write an empty file and
             # then skip it on every later run.
             raise FetchError(f"noctie element {ref.id} carries no pgn")
-        headers = {"Event": self._name, "Site": SITE}
+        headers = {"Event": context, "Site": SITE}
         headers["ElementName"] = element.get("name", "")
         # instruction / flashcard / scenario are genuinely different artifacts;
         # recording which keeps a downloaded theme filterable by kind.

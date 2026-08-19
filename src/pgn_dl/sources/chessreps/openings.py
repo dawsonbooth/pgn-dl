@@ -156,7 +156,7 @@ def _merged_file_slug(name: str) -> str:
     return f"{slug}-repertoire" if f"{slug}.pgn" == COMBINED_NAME else slug
 
 
-class OpeningsExtractor(Extractor):
+class OpeningsExtractor(Extractor[ParsedPage]):
     """One chessreps opening course: the merged repertoire, plus its lines."""
 
     key = "chessreps:openings"
@@ -168,10 +168,12 @@ class OpeningsExtractor(Extractor):
     )
 
     def __init__(self, target: str) -> None:
+        super().__init__()
         self.slug = slug_from(target)
-        self._page: ParsedPage | None = None
 
-    async def discover(self, fetcher: Fetcher) -> tuple[Collection, list[ItemRef]]:
+    async def _discover(
+        self, fetcher: Fetcher
+    ) -> tuple[Collection, list[ItemRef], ParsedPage]:
         cookie = await auth.session_cookie()
         url = f"https://www.chessreps.com/opening/{self.slug}/__data.json"
         text = await fetcher.get_text(url, headers={"Cookie": cookie})
@@ -184,7 +186,6 @@ class OpeningsExtractor(Extractor):
                 "chessreps answered as signed out rather than as your account; "
                 "the stored session was not accepted"
             )
-        self._page = page
         course = page.course
         collection = self.collection(
             # Trial content is real content the account holds, but it must not
@@ -207,12 +208,12 @@ class OpeningsExtractor(Extractor):
             )
             for n, line in enumerate(course.lines, start=1)
         ]
-        return collection, items
+        return collection, items, page
 
-    async def fetch(self, fetcher: Fetcher, ref: ItemRef) -> GameItem:
-        if self._page is None:
-            raise FetchError("chessreps fetch called before discover cached the course")
-        course = self._page.course
+    async def _fetch(
+        self, context: ParsedPage, fetcher: Fetcher, ref: ItemRef
+    ) -> GameItem:
+        course = context.course
         headers = {"ChessrepsOpeningId": course.id}
         side = _REPERTOIRE_SIDE[course.player_side]
         headers |= {"White": "?", "Black": "?", side: course.name}

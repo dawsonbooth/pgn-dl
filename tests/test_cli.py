@@ -15,16 +15,19 @@ from pgn_dl.core.models import Collection, GameItem, ItemRef
 runner = CliRunner()
 
 
-class _StubExtractor(Extractor):
+class _StubExtractor(Extractor[None]):
     """A minimal extractor for tests that need a declaration but never run one."""
 
     def __init__(self, target: str) -> None:
+        super().__init__()
         self.target = target
 
-    async def discover(self, fetcher: object) -> tuple[Collection, list[ItemRef]]:
-        return self.collection(slug="s", name="S"), []
+    async def _discover(
+        self, fetcher: object
+    ) -> tuple[Collection, list[ItemRef], None]:
+        return self.collection(slug="s", name="S"), [], None
 
-    async def fetch(self, fetcher: object, ref: ItemRef) -> GameItem:
+    async def _fetch(self, context: None, fetcher: object, ref: ItemRef) -> GameItem:
         return GameItem()
 
 

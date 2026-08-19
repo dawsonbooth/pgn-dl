@@ -41,7 +41,7 @@ class FakeFetcher:
 FETCHER = FakeFetcher()
 
 
-class FakeExtractor(Extractor):
+class FakeExtractor(Extractor[None]):
     key = "fake:things"
     url_patterns = (re.compile(r"^https://fake\.test/"),)
     needs_browser = False
@@ -52,16 +52,19 @@ class FakeExtractor(Extractor):
         fail_on: set[int] | None = None,
         block_on: set[int] | None = None,
     ) -> None:
+        super().__init__()
         self.count = count
         self.fail_on = fail_on or set()
         self.block_on = block_on or set()
         self.fetched: list[str] = []
 
-    async def discover(self, fetcher: object) -> tuple[Collection, list[ItemRef]]:
+    async def _discover(
+        self, fetcher: object
+    ) -> tuple[Collection, list[ItemRef], None]:
         refs = [ItemRef(id=str(i), path=(f"{i:03d}-item",)) for i in range(self.count)]
-        return COLLECTION, refs
+        return COLLECTION, refs, None
 
-    async def fetch(self, fetcher: object, ref: ItemRef) -> GameItem:
+    async def _fetch(self, context: None, fetcher: object, ref: ItemRef) -> GameItem:
         i = int(ref.id)
         self.fetched.append(ref.id)
         if i in self.block_on:
@@ -143,7 +146,9 @@ async def test_limit_truncates_the_plan(tmp_path: Path) -> None:
 class BlockedAtDiscoveryExtractor(FakeExtractor):
     key = "fake:blocked-discovery"
 
-    async def discover(self, fetcher: object) -> tuple[Collection, list[ItemRef]]:
+    async def _discover(
+        self, fetcher: object
+    ) -> tuple[Collection, list[ItemRef], None]:
         raise Blocked(
             "https://fake.test/session: bot challenge (status 403)", status=403
         )
@@ -165,7 +170,9 @@ async def test_a_block_during_discovery_stops_cleanly(tmp_path: Path) -> None:
 class DeniedAtDiscoveryExtractor(FakeExtractor):
     key = "fake:denied-discovery"
 
-    async def discover(self, fetcher: object) -> tuple[Collection, list[ItemRef]]:
+    async def _discover(
+        self, fetcher: object
+    ) -> tuple[Collection, list[ItemRef], None]:
         raise FetchError(
             "https://fake.test/doc failed: 403 PERMISSION_DENIED", status=403
         )
@@ -174,7 +181,9 @@ class DeniedAtDiscoveryExtractor(FakeExtractor):
 class BrokenAtDiscoveryExtractor(FakeExtractor):
     key = "fake:broken-discovery"
 
-    async def discover(self, fetcher: object) -> tuple[Collection, list[ItemRef]]:
+    async def _discover(
+        self, fetcher: object
+    ) -> tuple[Collection, list[ItemRef], None]:
         raise FetchError("https://fake.test/doc failed: 500 upstream error", status=500)
 
 
@@ -231,7 +240,9 @@ class MalformedDiscoveryExtractor(FakeExtractor):
         super().__init__()
         self.exc = exc
 
-    async def discover(self, fetcher: object) -> tuple[Collection, list[ItemRef]]:
+    async def _discover(
+        self, fetcher: object
+    ) -> tuple[Collection, list[ItemRef], None]:
         raise self.exc
 
 
@@ -295,7 +306,7 @@ async def test_an_unreadable_body_and_a_changed_schema_are_advised_differently(
 class NoItemExtractor(FakeExtractor):
     key = "fake:no-item"
 
-    async def fetch(self, fetcher: object, ref: ItemRef) -> GameItem:
+    async def _fetch(self, context: None, fetcher: object, ref: ItemRef) -> GameItem:
         # A source that fell through its own guards. Only the runner's own
         # give-up path may mean "blocked".
         return cast(GameItem, None)
@@ -315,9 +326,11 @@ async def test_an_item_that_comes_back_as_nothing_is_failed_not_read_as_a_block(
 class SharedPathExtractor(FakeExtractor):
     key = "fake:shared-path"
 
-    async def discover(self, fetcher: object) -> tuple[Collection, list[ItemRef]]:
+    async def _discover(
+        self, fetcher: object
+    ) -> tuple[Collection, list[ItemRef], None]:
         refs = [ItemRef(id=str(i), path=("001-item",)) for i in range(2)]
-        return COLLECTION, refs
+        return COLLECTION, refs, None
 
 
 async def test_two_items_on_one_path_are_failed_rather_than_read_as_a_resume(
@@ -341,7 +354,7 @@ async def test_two_items_on_one_path_are_failed_rather_than_read_as_a_resume(
 class EmptyPgnExtractor(FakeExtractor):
     key = "fake:empty-pgn"
 
-    async def fetch(self, fetcher: object, ref: ItemRef) -> GameItem:
+    async def _fetch(self, context: None, fetcher: object, ref: ItemRef) -> GameItem:
         return GameItem(pgn="")
 
 
@@ -366,7 +379,7 @@ class InFlightExtractor(FakeExtractor):
         self.in_flight = 0
         self.peak = 0
 
-    async def fetch(self, fetcher: object, ref: ItemRef) -> GameItem:
+    async def _fetch(self, context: None, fetcher: object, ref: ItemRef) -> GameItem:
         self.in_flight += 1
         self.peak = max(self.peak, self.in_flight)
         # A real fetch is a round trip, so it yields; without that every item
@@ -374,7 +387,7 @@ class InFlightExtractor(FakeExtractor):
         # would read as 1 whatever the semaphore allowed.
         await asyncio.sleep(0.01)
         try:
-            return await super().fetch(fetcher, ref)
+            return await super()._fetch(context, fetcher, ref)
         finally:
             self.in_flight -= 1
 

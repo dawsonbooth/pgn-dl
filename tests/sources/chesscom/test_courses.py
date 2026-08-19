@@ -9,9 +9,8 @@ from pathlib import Path
 from typing import Any
 
 import chess.pgn
-import pytest
 
-from pgn_dl.core.models import Collection, GameItem, ItemRef
+from pgn_dl.core.models import Collection, GameItem
 from pgn_dl.core.pgn import game_to_pgn
 from pgn_dl.core.registry import resolve_key, resolve_url
 from pgn_dl.sources.chesscom.courses import CoursesExtractor, course_id_from
@@ -259,16 +258,6 @@ async def test_fetch_keeps_a_lesson_that_starts_from_its_own_position() -> None:
 
     assert item.starting_fen == fen
     assert f'[FEN "{fen}"]' in game_to_pgn(COLLECTION, item)
-
-
-async def test_fetch_before_discover_says_so_rather_than_failing_obscurely() -> None:
-    # discover() is what builds the authenticated client, so without it there
-    # is no token and no round numbering; a None client would otherwise reach
-    # the RPC call and surface as an AttributeError.
-    with pytest.raises(RuntimeError, match="discover"):
-        await CoursesExtractor(COURSE_URL).fetch(
-            _LessonFetcher(), ItemRef(id=REAL_GAME_ID, path=("01-intro", "001-l"))
-        )
 
 
 def test_the_extractor_points_at_the_chesscom_browser_profile() -> None:

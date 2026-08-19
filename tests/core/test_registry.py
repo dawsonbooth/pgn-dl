@@ -19,12 +19,13 @@ from pgn_dl.core.registry import (
 )
 
 
-class AlphaExtractor(Extractor):
+class AlphaExtractor(Extractor[None]):
     key = "alpha:things"
     url_patterns = (re.compile(r"^https://alpha\.test/things/(?P<id>\w+)"),)
     needs_browser = False
 
     def __init__(self, target: str) -> None:
+        super().__init__()
         self.target = target
 
     @classmethod
@@ -34,10 +35,12 @@ class AlphaExtractor(Extractor):
                 return cls(m.group("id"))
         return None
 
-    async def discover(self, fetcher: object) -> tuple[Collection, list[ItemRef]]:
-        return Collection(source="alpha", kind="things", slug="s", name="S"), []
+    async def _discover(
+        self, fetcher: object
+    ) -> tuple[Collection, list[ItemRef], None]:
+        return Collection(source="alpha", kind="things", slug="s", name="S"), [], None
 
-    async def fetch(self, fetcher: object, ref: ItemRef) -> GameItem:
+    async def _fetch(self, context: None, fetcher: object, ref: ItemRef) -> GameItem:
         return GameItem()
 
 

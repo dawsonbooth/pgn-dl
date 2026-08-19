@@ -16,16 +16,18 @@ from pgn_dl.core.models import Collection, GameItem, ItemRef
 from pgn_dl.core.runner import Options, Report
 
 
-class _EmptyExtractor(Extractor):
+class _EmptyExtractor(Extractor[None]):
     """Discovers nothing, so ``run`` completes without any transport traffic.
 
     It defines no ``key``, so subclassing does not register it globally.
     """
 
-    async def discover(self, fetcher: object) -> tuple[Collection, list[ItemRef]]:
-        return Collection(source="fake", kind="things", slug="s", name="S"), []
+    async def _discover(
+        self, fetcher: object
+    ) -> tuple[Collection, list[ItemRef], None]:
+        return Collection(source="fake", kind="things", slug="s", name="S"), [], None
 
-    async def fetch(self, fetcher: object, ref: ItemRef) -> GameItem:
+    async def _fetch(self, context: None, fetcher: object, ref: ItemRef) -> GameItem:
         raise AssertionError("nothing to fetch")
 
 
@@ -33,6 +35,7 @@ class _BrowserExtractor(_EmptyExtractor):
     needs_browser = True
 
     def __init__(self, profile: Path | None) -> None:
+        super().__init__()
         self._profile = profile
 
     def browser_profile(self) -> Path | None:

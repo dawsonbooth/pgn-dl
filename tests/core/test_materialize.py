@@ -19,16 +19,19 @@ from pgn_dl.core.runner import Options
 runner = CliRunner()
 
 
-class WidgetExtractor(Extractor):
+class WidgetExtractor(Extractor[None]):
     key = "widgetsource:widgets"
 
     def __init__(self, target: str) -> None:
+        super().__init__()
         self.target = target
 
-    async def discover(self, fetcher: object) -> tuple[Collection, list[ItemRef]]:
-        return self.collection(slug="s", name="S"), []
+    async def _discover(
+        self, fetcher: object
+    ) -> tuple[Collection, list[ItemRef], None]:
+        return self.collection(slug="s", name="S"), [], None
 
-    async def fetch(self, fetcher: object, ref: ItemRef) -> GameItem:
+    async def _fetch(self, context: None, fetcher: object, ref: ItemRef) -> GameItem:
         return GameItem()
 
 

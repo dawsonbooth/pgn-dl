@@ -18,7 +18,6 @@ than written down.
 
 from __future__ import annotations
 
-import asyncio
 import io
 import json
 from pathlib import Path
@@ -888,25 +887,6 @@ async def test_a_book_with_no_bookmarks_is_still_one_item() -> None:
     # No empty bookmarks/ directory: the path has one segment, so the file
     # lands beside the collection's own.
     assert refs[0].path == ("beginner-s-guide-to-1-e4",)
-
-
-async def test_the_variations_are_listed_once_however_many_items_are_fetched() -> None:
-    # Nine items over one 266-document listing: fetching per item would repeat
-    # a paginated read nine times. fetch() calls run concurrently under the
-    # runner's semaphore, so two items must not both start a listing either.
-    class Slow(FakeFetcher):
-        async def get_text(self, url, *, headers):
-            await asyncio.sleep(0)  # a real read yields; a racing item gets in
-            return await super().get_text(url, headers=headers)
-
-    fetcher = Slow(_fetcher().pages)
-    extractor = OpeningBooksExtractor(BOOK_URL)
-    _, refs = await extractor.discover(fetcher)
-    items = await asyncio.gather(*(extractor.fetch(fetcher, r) for r in refs))
-
-    assert len(items) == 9
-    listings = [u for u in fetcher.gets if VARIATIONS_PATH in u]
-    assert len(listings) == 1
 
 
 async def test_a_book_with_no_variations_fails_the_item() -> None:

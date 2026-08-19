@@ -22,17 +22,18 @@ class FetcherStub:
         raise AssertionError("no network in tests")
 
 
-class PgnExtractor(Extractor):
+class PgnExtractor(Extractor[None]):
     key = "fake:pgntest"
     needs_browser = False
 
     def __init__(self, *, prerendered: bool) -> None:
+        super().__init__()
         self.prerendered = prerendered
 
-    async def discover(self, fetcher):
-        return COLLECTION, [ItemRef(id="1", path=("001-item",))]
+    async def _discover(self, fetcher):
+        return COLLECTION, [ItemRef(id="1", path=("001-item",))], None
 
-    async def fetch(self, fetcher, ref):
+    async def _fetch(self, context, fetcher, ref):
         if self.prerendered:
             return GameItem(pgn=PRERENDERED)
         return GameItem(root=MoveNode(san=None, children=[MoveNode(san="d4")]))

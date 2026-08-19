@@ -3,22 +3,87 @@
 ``discover`` returns every item's output path without fetching it, so the runner
 can skip already-downloaded items with no network traffic. ``fetch`` then
 produces one item.
+
+The runner always calls ``discover`` once and ``fetch`` many times after it, on
+the same instance and with the same transport (see ``core/runner.py``): the
+extractor instance is the run. What discovery produces beyond the listing - a
+session or client it opened, an artifact it parsed, per-item metadata a fetch
+reads - is this run's *fetch context* (see CONTEXT.md). A concrete source
+supplies a discovery step that builds it and a fetch step that receives it;
+``discover``/``fetch`` below are the template that wires the two together and
+the only place the discover-before-fetch invariant is enforced, so a source
+cannot express the bug of skipping it.
 """
 
 from __future__ import annotations
 
+import asyncio
 import re
 from abc import ABC, abstractmethod
-from collections.abc import Sequence
+from collections.abc import Awaitable, Callable, Sequence
 from pathlib import Path
-from typing import ClassVar, Self
+from typing import ClassVar, Self, final
 
 from .fetch import Fetcher
 from .models import Collection, GameItem, ItemRef
 from .paths import profile_dir
 
 
-class Extractor(ABC):
+class NotDiscovered(RuntimeError):
+    """``fetch`` was called on an extractor ``discover`` never ran on.
+
+    The runner always discovers before it fetches, so reaching this means our
+    own code broke that ordering - a source, or a caller bypassing the runner.
+    Per docs/open-issues.md 4.1, a bug of ours should stay debuggable, so this
+    is deliberately left for the caller to leave uncaught rather than folded
+    into a per-item failure the way a source's own errors are.
+    """
+
+
+class _Unset:
+    """Sentinel for "no fetch context yet", distinct from every real one.
+
+    A context type could plausibly be ``None`` itself (a source with nothing to
+    carry between discovery and fetch), so the not-yet-discovered state needs a
+    marker ``None`` cannot be confused with.
+    """
+
+    __slots__ = ()
+
+    def __repr__(self) -> str:
+        return "<undiscovered>"
+
+
+_UNSET = _Unset()
+
+
+class Once[T]:
+    """A value built at most once, the first time something asks for it.
+
+    Concurrent fetches under the runner's semaphore can all reach for the same
+    lazily built artifact at once; without the lock each would build its own
+    copy. Only whichever caller arrives first pays for ``build``, and the rest
+    receive its result.
+
+    A failed build is deliberately not cached: a transient failure (a bot
+    challenge, say) is retried by the runner, and caching it would turn one bad
+    moment into a whole run's worth of failed items.
+    """
+
+    def __init__(self) -> None:
+        self._value: T | _Unset = _UNSET
+        self._lock = asyncio.Lock()
+
+    async def get(self, build: Callable[[], Awaitable[T]]) -> T:
+        async with self._lock:
+            value = self._value
+            if isinstance(value, _Unset):
+                value = await build()
+                self._value = value
+            return value
+
+
+class Extractor[C](ABC):
     key: ClassVar[str] = ""  # "<source>:<kind>", e.g. "chesscom:courses"
     url_patterns: ClassVar[Sequence[re.Pattern[str]]] = ()
     needs_browser: ClassVar[bool] = False
@@ -27,6 +92,11 @@ class Extractor(ABC):
     # a source must never restate them as literals.
     source: ClassVar[str] = ""
     kind: ClassVar[str] = ""
+
+    def __init__(self) -> None:
+        # Set for real by discover(); every subclass constructor must chain
+        # here first so fetch() has this to check before discover() ever runs.
+        self._context: C | _Unset = _UNSET
 
     def __init_subclass__(cls, **kw: object) -> None:
         super().__init_subclass__(**kw)
@@ -79,10 +149,27 @@ class Extractor(ABC):
             return profile_dir(self.source)
         return None
 
-    @abstractmethod
+    @final
     async def discover(self, fetcher: Fetcher) -> tuple[Collection, list[ItemRef]]:
         """Return the collection metadata and every item to download, in order."""
+        collection, refs, context = await self._discover(fetcher)
+        self._context = context
+        return collection, refs
 
-    @abstractmethod
+    @final
     async def fetch(self, fetcher: Fetcher, ref: ItemRef) -> GameItem:
         """Fetch and parse one item."""
+        context = self._context
+        if isinstance(context, _Unset):
+            raise NotDiscovered(
+                f"{type(self).__name__}.fetch() called before discover()"
+            )
+        return await self._fetch(context, fetcher, ref)
+
+    @abstractmethod
+    async def _discover(self, fetcher: Fetcher) -> tuple[Collection, list[ItemRef], C]:
+        """Return the collection, every item to download, and this run's fetch context."""
+
+    @abstractmethod
+    async def _fetch(self, context: C, fetcher: Fetcher, ref: ItemRef) -> GameItem:
+        """Fetch and parse one item, given the context ``_discover`` built."""
