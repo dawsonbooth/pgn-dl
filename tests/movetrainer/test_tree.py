@@ -189,12 +189,15 @@ def test_an_unplayable_mainline_move_raises_the_modules_error() -> None:
     assert "Nf9" in str(exc.value)
 
 
-def test_a_null_move_ply_is_skipped() -> None:
+def test_a_null_move_ply_passes_the_turn() -> None:
+    # A lesson moves one side twice with a null move between, as in showing a plan.
     root = build_tree(
-        chess.Board(), [DecodedPly("e4"), DecodedPly("--"), DecodedPly("e5")]
+        chess.Board(), [DecodedPly("e4"), DecodedPly("--"), DecodedPly("d4")]
     )
-    assert root.children[0].san == "e4"
-    assert root.children[0].children[0].san == "e5"
+    e4 = root.children[0]
+    assert e4.san == "e4"
+    assert e4.children[0].san == "--"
+    assert e4.children[0].children[0].san == "d4"
 
 
 def test_per_ply_annotations_land_on_the_node() -> None:

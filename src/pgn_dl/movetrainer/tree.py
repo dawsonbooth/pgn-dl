@@ -165,7 +165,9 @@ def build_tree(board: chess.Board, plies: Sequence[DecodedPly]) -> MoveNode:
 
     Every annotation block is anchored by the half-move its own SAN names, a
     block that will not replay comes back as prose on the ply it annotates,
-    and an unplayable mainline move raises :class:`UnplayableMoveError`.
+    and an unplayable mainline move raises :class:`UnplayableMoveError`. A null
+    move (``"--"``) is played like any other ply: it passes the turn, and the PGN
+    writes it as ``--``.
     """
     root = MoveNode(san=None)
 
@@ -178,8 +180,6 @@ def build_tree(board: chess.Board, plies: Sequence[DecodedPly]) -> MoveNode:
     continuations: list[MoveNode] = []
 
     for ply in plies:
-        if ply.san == "--":
-            continue
         try:
             move = board.parse_san(ply.san)
         except ValueError as exc:

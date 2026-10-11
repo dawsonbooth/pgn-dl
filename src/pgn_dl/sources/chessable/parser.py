@@ -12,7 +12,8 @@ The getGame schema (see the source's package docstring for the wider picture):
 - ``ann1`` is an evaluation glyph (``?``, ``±``, ...); ``ann2`` its prose.
 - ``draws`` are board drawings: circles (highlights) and arrows.
 - A leading ply with ``san == "--"`` is a null move carrying the variation's
-  prose introduction rather than a real move.
+  prose introduction rather than a real move. A ``--`` anywhere else is a null
+  move that passes the turn.
 
 Annotation blocks are packed into comments as move-number-tagged SAN, the same
 shape chess.com courses use; the format's semantics live in the ``movetrainer``

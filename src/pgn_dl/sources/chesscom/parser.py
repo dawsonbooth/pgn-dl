@@ -2,15 +2,18 @@
 
 The lesson schema, as returned by ``GetCourseTrainingForLearning``:
 
-- ``plies[]`` is a flat array of mainline moves (alternating colors).
+- ``plies[]`` is a flat array of mainline moves, each carrying its ``color`` and
+  the ``position`` after it.
 - A ply may have ``preComment`` and/or ``postComment`` strings. Both are
   JSON-encoded ``{"data":[...]}`` blocks in the MoveTrainer annotation shape:
   ``C`` entries carry prose, ``V`` entries carry annotation blocks whose ``S``
   entries are single SAN moves. The move number written into each SAN is the
   only thing that says where a block belongs.
 - ``position.nags / arrows / highlights`` carry annotation glyphs.
-- A ply with ``san == "--"`` is a null move used to attach a lesson intro;
-  it's the lesson description, not a real move.
+- A leading ply with ``san == "--"`` carries the lesson intro, which becomes the
+  description. When the ply after it is the other side's, it is also a pass, and
+  the lesson starts from the position chess.com gives after it. Anywhere else
+  ``"--"`` is a null move that passes the turn.
 
 The format's semantics - the block item model, the glyph vocabulary, block
 anchoring, and the mainline replay walk - live in the ``movetrainer`` package;
@@ -116,6 +119,11 @@ def parse_lesson_tree(raw: dict) -> LessonContent:
     if plies and plies[0].get("san") == "--":
         intro_text, _ = _parse_comment(plies[0].get("preComment"))
         description = intro_text
+        # Followed by the other side's ply, it is a pass as well, and the lesson
+        # starts from chess.com's own position after it.
+        next_color = plies[1].get("color") if len(plies) > 1 else None
+        if next_color is not None and next_color != plies[0].get("color"):
+            starting_fen = plies[0]["position"]["fen"]
         plies = plies[1:]
 
     decoded: list[DecodedPly] = []

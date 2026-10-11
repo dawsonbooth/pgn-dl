@@ -263,6 +263,64 @@ async def test_fetch_keeps_a_lesson_that_starts_from_its_own_position() -> None:
     assert f'[FEN "{fen}"]' in game_to_pgn(COLLECTION, item)
 
 
+async def test_a_null_move_mid_lesson_is_written_as_a_pass() -> None:
+    # A lesson showing how a piece moves passes the other side's turn with a null move.
+    raw = _load("lesson_real_game.json")
+    raw["lesson"]["variation"]["startingPosition"]["fen"] = "8/8/8/8/8/8/8/R7 w - - 0 1"
+    raw["lesson"]["plies"] = [{"san": "Ra8"}, {"san": "--"}, {"san": "Rh8"}]
+
+    fetcher = _LessonFetcher()
+    extractor = CoursesExtractor(COURSE_URL)
+    _, refs = await extractor.discover(fetcher)
+    fetcher.lessons[refs[0].id] = raw
+
+    item = await extractor.fetch(fetcher, refs[0])
+
+    assert "1. Ra8 -- 2. Rh8" in game_to_pgn(COLLECTION, item)
+
+
+async def test_a_leading_pass_starts_the_lesson_with_the_other_side_to_move() -> None:
+    # A puzzle for Black, stored with White to move, opens with White's null move.
+    raw = _load("lesson_real_game.json")
+    raw["lesson"]["variation"]["startingPosition"]["fen"] = (
+        "6k1/5ppp/8/8/8/8/r4PPP/6K1 w - - 0 40"
+    )
+    after_the_pass = "6k1/5ppp/8/8/8/8/r4PPP/6K1 b - - 0 40"
+    raw["lesson"]["plies"] = [
+        {"san": "--", "color": "COLOR_WHITE", "position": {"fen": after_the_pass}},
+        {"san": "Ra1#", "color": "COLOR_BLACK"},
+    ]
+
+    fetcher = _LessonFetcher()
+    extractor = CoursesExtractor(COURSE_URL)
+    _, refs = await extractor.discover(fetcher)
+    fetcher.lessons[refs[0].id] = raw
+
+    item = await extractor.fetch(fetcher, refs[0])
+
+    assert item.starting_fen == after_the_pass
+    assert "40... Ra1#" in game_to_pgn(COLLECTION, item)
+
+
+async def test_an_intro_followed_by_its_own_sides_move_leaves_the_turn_alone() -> None:
+    raw = _load("lesson_real_game.json")
+    raw["lesson"]["plies"] = [
+        {"san": "--", "color": "COLOR_WHITE", "preComment": "An intro."},
+        {"san": "e4", "color": "COLOR_WHITE"},
+    ]
+
+    fetcher = _LessonFetcher()
+    extractor = CoursesExtractor(COURSE_URL)
+    _, refs = await extractor.discover(fetcher)
+    fetcher.lessons[refs[0].id] = raw
+
+    item = await extractor.fetch(fetcher, refs[0])
+
+    assert item.starting_fen == chess.STARTING_FEN
+    assert item.comment == "An intro."
+    assert [child.san for child in item.root.children] == ["e4"]
+
+
 class _ExpiringService:
     """The courses service with tokens that expire: each exchange gives a new token,
     and a call bearing an expired one is refused 401. Every answer, the exchange's
