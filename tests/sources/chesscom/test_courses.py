@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import asyncio
 import io
 import json
 from collections.abc import Mapping
@@ -9,7 +10,9 @@ from pathlib import Path
 from typing import Any
 
 import chess.pgn
+import pytest
 
+from pgn_dl.core.fetch import FetchError
 from pgn_dl.core.models import Collection, GameItem
 from pgn_dl.core.pgn import game_to_pgn
 from pgn_dl.core.registry import resolve_key, resolve_url
@@ -258,6 +261,97 @@ async def test_fetch_keeps_a_lesson_that_starts_from_its_own_position() -> None:
 
     assert item.starting_fen == fen
     assert f'[FEN "{fen}"]' in game_to_pgn(COLLECTION, item)
+
+
+class _ExpiringService:
+    """The courses service with tokens that expire: each exchange gives a new token,
+    and a call bearing an expired one is refused 401. Every answer, the exchange's
+    included, comes back after other calls have had a turn, as one over the network
+    would."""
+
+    def __init__(self) -> None:
+        self.issued: list[str] = []
+        self.expired: set[str] = set()
+        # A status to refuse every call but the exchange with, whatever its token.
+        self.refusing: int | None = None
+
+    def expire(self) -> None:
+        """Expire every token given so far."""
+        self.expired.update(self.issued)
+
+    async def post_json(
+        self, url: str, *, headers: Mapping[str, str], json: Any
+    ) -> Any:
+        await asyncio.sleep(0)
+        if url.endswith("AuthenticateForCoursesWithCookie"):
+            assert "authorization" not in headers
+            self.issued.append(f"jwt-{len(self.issued) + 1}")
+            return {"accessToken": self.issued[-1]}
+        if self.refusing is not None:
+            raise FetchError(f"{url} failed: {self.refusing}", status=self.refusing)
+        if headers["authorization"].removeprefix("Bearer ") in self.expired:
+            raise FetchError(f"{url} failed: 401 (JSON body)", status=401)
+        if url.endswith("GetCourseLearningSession"):
+            return _load("learning_session.json")
+        if url.endswith("GetCourseTrainingForLearning"):
+            return _load("lesson_real_game.json")
+        raise AssertionError(f"unexpected RPC call: {url}")
+
+    async def get_text(self, url: str, *, headers: Mapping[str, str]) -> str:
+        raise AssertionError("the courses extractor never issues GETs")
+
+
+async def test_a_lesson_after_the_token_expires_is_fetched_with_a_new_one() -> None:
+    # A run that outlasts the token has every later lesson refused 401.
+    service = _ExpiringService()
+    extractor = CoursesExtractor(COURSE_URL)
+    _, refs = await extractor.discover(service)
+    service.expire()
+
+    item = await extractor.fetch(service, refs[2])
+
+    assert item.headers["ChessComLessonId"] == REAL_GAME_ID
+    assert service.issued == ["jwt-1", "jwt-2"]
+
+
+async def test_lessons_refused_together_after_the_token_expires_renew_it_once() -> None:
+    # The runner fetches lessons concurrently, so several can bear the expired token.
+    service = _ExpiringService()
+    extractor = CoursesExtractor(COURSE_URL)
+    _, refs = await extractor.discover(service)
+    service.expire()
+
+    items = await asyncio.gather(
+        extractor.fetch(service, refs[0]), extractor.fetch(service, refs[1])
+    )
+
+    assert [item.headers["Round"] for item in items] == ["1.1", "1.2"]
+    assert service.issued == ["jwt-1", "jwt-2"]
+
+
+async def test_a_lesson_refused_with_the_renewed_token_too_fails() -> None:
+    service = _ExpiringService()
+    extractor = CoursesExtractor(COURSE_URL)
+    _, refs = await extractor.discover(service)
+    service.refusing = 401
+
+    with pytest.raises(FetchError) as exc:
+        await extractor.fetch(service, refs[0])
+
+    assert exc.value.status == 401
+    assert service.issued == ["jwt-1", "jwt-2"]
+
+
+async def test_a_lesson_refused_for_another_reason_keeps_the_token() -> None:
+    service = _ExpiringService()
+    extractor = CoursesExtractor(COURSE_URL)
+    _, refs = await extractor.discover(service)
+    service.refusing = 403
+
+    with pytest.raises(FetchError):
+        await extractor.fetch(service, refs[0])
+
+    assert service.issued == ["jwt-1"]
 
 
 def test_the_extractor_points_at_the_chesscom_browser_profile() -> None:
