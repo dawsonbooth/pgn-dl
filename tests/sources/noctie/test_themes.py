@@ -459,6 +459,22 @@ async def _fetch_with_pgn(pgn: str | None) -> GameItem:
     return await extractor.fetch(fetcher, refs[0])
 
 
+async def test_an_element_whose_tags_stand_on_one_line_starts_from_its_fen() -> None:
+    fen = "2k5/8/8/8/8/8/8/K6Q w - - 0 1"
+    pgn = (
+        rf'[Event "A \"made-up\" chapter"] [Result "*"] [FEN "{fen}"] [SetUp "1"]'
+        "\n\n1. Qh7 Kb8 2. Kb2 *"
+    )
+
+    item = await _fetch_with_pgn(pgn)
+
+    assert item.pgn is not None
+    game = chess.pgn.read_game(io.StringIO(item.pgn))
+    assert game is not None
+    assert game.board().fen() == fen
+    assert [move.uci() for move in game.mainline_moves()] == ["h1h7", "c8b8", "a1b2"]
+
+
 async def test_an_element_with_no_pgn_fails_the_item() -> None:
     # Not a silent empty file: the runner would count it as written and then
     # skip it forever on resume. FetchError has it tallied and retried.

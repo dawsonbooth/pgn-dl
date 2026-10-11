@@ -5,10 +5,12 @@ instruction pages) and each element's ``pgn`` field is already a complete PGN
 string, so this source hands the text to the runner rather than rebuilding a
 move tree.
 
-Two upstream quirks show up in the code. The element listing comes back in no
+Upstream quirks show up in the code. The element listing comes back in no
 particular order (a live listing gave indices 27, 13, 9, 40), so ``index`` has
-to be sorted on before numbering. And theme names are not unique, so the output
-slug carries a slice of the theme id as well.
+to be sorted on before numbering. Theme names are not unique, so the output
+slug carries a slice of the theme id as well. And some elements keep all their
+tags on one line, which python-chess reads as one tag, losing the rest, a ``FEN``
+among them, so the tags are put on lines of their own first.
 
 The only rewriting done to an element's PGN is to its headers: upstream ``Event``
 names the lichess study the material was imported from, which says nothing about
@@ -31,6 +33,9 @@ from .firestore import get_document, list_documents
 
 _TARGET_RE = target_pattern("themes?", THEME_IDS)
 
+# A tag pair, as in [Event "..."], with any quotation mark in its value escaped.
+_TAG = re.compile(r'\[\w+\s+"(?:[^"\\]|\\.)*"\]')
+
 # What this source's material is called, in a rejected target and in the
 # explanation of a denied read.
 _NOUN = "theme"
@@ -49,8 +54,22 @@ def element_to_pgn(pgn: str, headers: dict[str, str], element_id: str) -> str:
     tally both the same way.
     """
     return reexport_pgn(
-        pgn, headers, subject=f"noctie element {element_id}", error=FetchError
+        _tags_on_lines(pgn),
+        headers,
+        subject=f"noctie element {element_id}",
+        error=FetchError,
     )
+
+
+def _tags_on_lines(pgn: str) -> str:
+    """The PGN with each tag it opens with on a line of its own, as python-chess reads
+    tags, then a blank line and the rest."""
+    tags = []
+    rest = pgn.lstrip()
+    while (tag := _TAG.match(rest)) is not None:
+        tags.append(tag.group(0))
+        rest = rest[tag.end() :].lstrip()
+    return "\n".join(tags) + "\n\n" + rest if tags else pgn
 
 
 class ThemesExtractor(NoctieExtractor[str]):
