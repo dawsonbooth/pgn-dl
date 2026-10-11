@@ -26,10 +26,10 @@ from ...core.fetch import Fetcher, FetchError
 from ...core.models import Collection, GameItem, ItemRef
 from ...core.paths import slugify
 from ...core.pgn import reexport_pgn
-from .base import SITE, NoctieExtractor, id_from, target_pattern
+from .base import SITE, THEME_IDS, NoctieExtractor, id_from, target_pattern
 from .firestore import get_document, list_documents
 
-_TARGET_RE = target_pattern("themes?")
+_TARGET_RE = target_pattern("themes?", THEME_IDS)
 
 # What this source's material is called, in a rejected target and in the
 # explanation of a denied read.

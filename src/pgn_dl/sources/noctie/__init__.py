@@ -33,7 +33,7 @@ declaration = SourceDeclaration(
         ExtractorDeclaration(
             extractor=ThemesExtractor,
             target_name="theme",
-            target_help="Theme UUID or noctie.ai theme URL",
+            target_help="Theme id or noctie.ai theme URL",
             help=_THEMES_HELP,
         ),
         ExtractorDeclaration(

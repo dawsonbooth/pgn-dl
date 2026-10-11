@@ -228,10 +228,27 @@ async def test_a_403_is_not_treated_as_an_expiry(
         f"{THEME_URL}?ref=share",
         f"{THEME_URL}#elements",
         THEME_ID,
+        THEME_ID.upper(),
     ],
 )
 def test_theme_id_from_accepts_every_shape_of_target(target: str) -> None:
     assert theme_id_from(target) == THEME_ID
+
+
+@pytest.mark.parametrize(
+    ("target", "expected"),
+    [
+        # Only a UUID is lowercased; these are kept as written.
+        ("2025-W1", "2025-W1"),
+        ("https://app.noctie.ai/themes/2026-W41", "2026-W41"),
+        ("2sD1ewBJTa039iguA2nh", "2sD1ewBJTa039iguA2nh"),
+        ("https://app.noctie.ai/themes/wAeQ6TBjjjzG69iR3qOf/", "wAeQ6TBjjjzG69iR3qOf"),
+    ],
+)
+def test_theme_id_from_keeps_the_case_of_ids_that_are_not_uuids(
+    target: str, expected: str
+) -> None:
+    assert theme_id_from(target) == expected
 
 
 @pytest.mark.parametrize(
@@ -240,6 +257,8 @@ def test_theme_id_from_accepts_every_shape_of_target(target: str) -> None:
         f"https://example.com/themes/{THEME_ID}",
         "https://app.noctie.ai/themes",
         "https://app.noctie.ai/themes/not-a-uuid",
+        # A weekly scenario's id, which is case-sensitive.
+        "2025-w1",
         "https://www.chess.com/lessons/learn-to-play",
         "",
     ],

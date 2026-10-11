@@ -21,9 +21,14 @@ SITE = "noctie.ai"
 
 _UUID = r"[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"
 
+#: The ids a theme can have. Most are UUIDs; a few older themes have Firestore's
+#: own 20-character ids, and the weekly scenarios have ids such as ``2025-W1``.
+#: Unlike a UUID, those two are case-sensitive.
+THEME_IDS = _UUID + r"|(?-i:[A-Za-z0-9]{20}|\d{4}-W\d{1,2})"
 
-def target_pattern(route: str) -> re.Pattern[str]:
-    """Match a noctie URL under ``route``, or a bare id.
+
+def target_pattern(route: str, ids: str = _UUID) -> re.Pattern[str]:
+    """Match a noctie URL under ``route``, or a bare id, its id matching ``ids``.
 
     The prefix is optional so a bare id works, but it is all-or-nothing: with
     the host itself optional, https://example.com/<route>/<uuid> would be
@@ -32,7 +37,7 @@ def target_pattern(route: str) -> re.Pattern[str]:
     route that reads either, like ``themes?``.
     """
     return re.compile(
-        rf"^(?:https?://(?:app\.)?noctie\.ai/{route}/)?(?P<id>{_UUID})/?$",
+        rf"^(?:https?://(?:app\.)?noctie\.ai/{route}/)?(?P<id>{ids})/?$",
         re.IGNORECASE,
     )
 
@@ -50,7 +55,8 @@ def id_from(target: str, pattern: re.Pattern[str], noun: str) -> str:
     m = pattern.match(cleaned)
     if m is None:
         raise ValueError(f"could not read a noctie {noun} id from {target!r}")
-    return m.group("id").lower()
+    found = m.group("id")
+    return found.lower() if re.fullmatch(_UUID, found, re.IGNORECASE) else found
 
 
 class NoctieExtractor[C](Extractor[C]):
