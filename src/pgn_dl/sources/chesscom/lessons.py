@@ -27,7 +27,7 @@ from urllib.parse import unquote
 import chess.pgn
 
 from ...core.extractor import Extractor
-from ...core.fetch import Fetcher, FetchError
+from ...core.fetch import Blocked, Fetcher, FetchError
 from ...core.models import Collection, GameItem, ItemRef
 from ...core.paths import slugify
 from ...core.pgn import reexport_pgn
@@ -253,6 +253,11 @@ class LessonsExtractor(Extractor[_Context]):
         """
         try:
             page = await fetcher.get_text(f"{BASE}/{self.course}", headers={})
+        except Blocked:
+            # Refused, not missing: a challenge or a rate limit says nothing
+            # about the page, and read as its absence the lessons are numbered
+            # from another listing, or not at all.
+            raise
         except FetchError:
             page = None
         if page is not None:
@@ -268,6 +273,8 @@ class LessonsExtractor(Extractor[_Context]):
         try:
             learn_page = await fetcher.get_text(LEARN_URL, headers={})
             found = learn_path_course(extract_learn_path(learn_page), self.course)
+        except Blocked:
+            raise
         except FetchError:
             return None, ""
         if found is None:

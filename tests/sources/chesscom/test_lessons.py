@@ -11,7 +11,7 @@ from typing import Any
 import chess.pgn
 import pytest
 
-from pgn_dl.core.fetch import FetchError
+from pgn_dl.core.fetch import Blocked, FetchError
 from pgn_dl.core.registry import resolve_key, resolve_url
 from pgn_dl.core.runner import Options, run
 from pgn_dl.sources.chesscom.lessons import (
@@ -354,6 +354,20 @@ async def test_single_lesson_falls_back_to_unnumbered_without_a_course_page() ->
     item = await ex.fetch(f, refs[0])
     assert item.pgn is not None
     assert '[Event "Learn To Play"]' in item.pgn
+
+
+async def test_a_refused_landing_page_fails_discovery_rather_than_unnumbering() -> None:
+    # A challenge or a rate limit says nothing about whether the landing page
+    # exists.
+    class Refusing(FakeFetcher):
+        async def get_text(self, url: str, *, headers: Mapping[str, str]) -> str:
+            if url == COURSE_URL:
+                self.gets.append(url)
+                raise Blocked(f"{url}: rate limited (status 429)", status=429)
+            return await super().get_text(url, headers=headers)
+
+    with pytest.raises(Blocked):
+        await LessonsExtractor(LESSON_URL).discover(Refusing(_fetcher().pages))
 
 
 async def test_whole_lesson_course_without_a_course_page_fails_actionably() -> None:
