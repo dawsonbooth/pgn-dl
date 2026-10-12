@@ -335,6 +335,21 @@ async def test_elements_that_would_share_a_path_are_separated_by_their_ids(
     assert all(p[0].endswith(("-00000000", "-00000001")) for p in paths)
 
 
+async def test_a_listed_element_whose_index_or_name_is_null_keeps_the_theme() -> None:
+    # A Firestore field may come as nullValue, which the opening book reads as
+    # absent in fields of the same kind.
+    listing = json.loads(_listing_with_indices([3, 4], "Puzzle #1"))
+    listing["documents"][0]["fields"]["index"] = {"nullValue": None}
+    listing["documents"][1]["fields"]["name"] = {"nullValue": None}
+    fetcher = _fetcher()
+    fetcher.pages[f"{BASE}/themes/{THEME_ID}"] = _theme_doc(None)
+    fetcher.pages[f"{BASE}/themes/{THEME_ID}/elements"] = json.dumps(listing)
+
+    _, refs = await ThemesExtractor(THEME_URL).discover(fetcher)
+
+    assert [r.path for r in refs] == [("000-puzzle-1",), ("004-untitled",)]
+
+
 async def test_an_element_keeps_its_plain_path_when_nothing_clashes_with_it() -> None:
     # Only a clash is disambiguated: the numbering is the resume contract, and
     # suffixing every element would re-download every theme ever downloaded.
@@ -473,6 +488,24 @@ async def test_an_element_whose_tags_stand_on_one_line_starts_from_its_fen() -> 
     assert game is not None
     assert game.board().fen() == fen
     assert [move.uci() for move in game.mainline_moves()] == ["h1h7", "c8b8", "a1b2"]
+
+
+async def test_an_element_whose_name_and_type_are_null_is_still_written() -> None:
+    fetcher = _fetcher()
+    url = f"{BASE}/themes/{THEME_ID}/elements/{SPARRING}"
+    doc = json.loads(fetcher.pages[url])
+    doc["fields"]["name"] = {"nullValue": None}
+    doc["fields"]["type"] = {"nullValue": None}
+    fetcher.pages[url] = json.dumps(doc)
+    extractor = ThemesExtractor(THEME_URL)
+    _, refs = await extractor.discover(fetcher)
+
+    item = await extractor.fetch(fetcher, refs[0])
+
+    assert item.pgn is not None
+    game = chess.pgn.read_game(io.StringIO(item.pgn))
+    assert game is not None
+    assert (game.headers["ElementName"], game.headers["ElementType"]) == ("", "")
 
 
 async def test_an_element_with_no_pgn_fails_the_item() -> None:

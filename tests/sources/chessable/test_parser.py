@@ -26,7 +26,7 @@ def _node(
     col: str,
     san: str,
     mid: int = 0,
-    ann1: str = "",
+    ann1: str | None = "",
     ann2: str = "",
     draws: list[dict] | None = None,
     before: list[dict] | None = None,
@@ -154,6 +154,40 @@ def test_parse_game_carries_the_starting_fen_for_a_puzzle() -> None:
     assert content.root.children[0].san == "a6"
 
 
+def test_a_move_whose_drawings_are_null_has_none() -> None:
+    node = _node(id=0, move=1, col="w", san="e4")
+    node["draws"] = None
+
+    move = parser.parse_game(_game([node])).root.children[0]
+
+    assert (move.san, move.arrows, move.highlights) == ("e4", [], [])
+
+
+def test_null_names_in_a_course_outline_read_as_absent_not_as_none() -> None:
+    # str() of a null is "None", which would become the Event header and the
+    # course's directory, and the chapter's and the variation's file names.
+    raw = _course([_chapter(1, "Level 1", [_var(11, "Game #1", "puzzles")])])
+    raw["course"]["name"] = None
+    raw["course"]["data"][0]["title"] = None
+    raw["course"]["data"][0]["variations"][0]["name"] = None
+
+    outline = parser.parse_course(raw)
+
+    assert outline.name == ""
+    assert outline.chapters[0].title == ""
+    assert outline.chapters[0].variations[0].name == ""
+
+
+def test_a_chapter_whose_variations_are_null_has_none() -> None:
+    empty = _chapter(2, "Level 2", [])
+    empty["variations"] = None
+    raw = _course([_chapter(1, "Level 1", [_var(11, "Game #1", "puzzles")]), empty])
+
+    outline = parser.parse_course(raw)
+
+    assert [len(c.variations) for c in outline.chapters] == [1, 0]
+
+
 def test_a_before_comment_becomes_a_pre_comment_and_after_a_post_comment() -> None:
     game = _game(
         [
@@ -205,6 +239,14 @@ def test_ann1_glyphs_become_nags() -> None:
     root = parser.parse_game(game).root
     assert root.children[0].nags == [2]  # ?
     assert root.children[0].children[0].nags == [16]  # ±
+
+
+def test_a_move_whose_glyph_is_null_has_no_nags() -> None:
+    game = _game([_node(id=0, mid=0, move=1, col="w", san="e4", ann1=None)])
+
+    move = parser.parse_game(game).root.children[0]
+
+    assert (move.san, move.nags) == ("e4", [])
 
 
 def test_draws_become_arrows_and_highlights_with_colours() -> None:

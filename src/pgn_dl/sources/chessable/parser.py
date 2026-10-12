@@ -14,6 +14,8 @@ The getGame schema (see the source's package docstring for the wider picture):
 - A leading ply with ``san == "--"`` is a null move carrying the variation's
   prose introduction rather than a real move. A ``--`` anywhere else is a null
   move that passes the turn.
+- A field with no value may come as null rather than be left out, as ``ann1``
+  does on a move without a glyph.
 
 Annotation blocks are packed into comments as move-number-tagged SAN, the same
 shape chess.com courses use; the format's semantics live in the ``movetrainer``
@@ -140,7 +142,7 @@ def parse_game(raw: dict[str, Any]) -> GameContent:
     for ply in plies:
         pre_text, pre_blocks = _comment(ply.get("before"))
         post_text, post_blocks = _comment(ply.get("after"))
-        arrows, highlights = _parse_draws(ply.get("draws", []))
+        arrows, highlights = _parse_draws(ply.get("draws") or [])
         decoded.append(
             DecodedPly(
                 san=ply.get("san", ""),
@@ -148,7 +150,7 @@ def parse_game(raw: dict[str, Any]) -> GameContent:
                 post_comment=post_text,
                 pre_blocks=pre_blocks,
                 post_blocks=post_blocks,
-                nags=glyph_nags(ply.get("ann1", "")),
+                nags=glyph_nags(ply.get("ann1") or ""),
                 arrows=arrows,
                 highlights=highlights,
             )
@@ -206,14 +208,16 @@ def parse_course(raw: dict[str, Any]) -> CourseOutline:
     chapters: list[Chapter] = []
     for ch in chapters_raw:
         variations = [
-            Variation(oid=str(v["oid"]), name=str(v.get("name", "")))
-            for v in ch.get("variations", [])
+            Variation(oid=str(v["oid"]), name=str(v.get("name") or ""))
+            for v in ch.get("variations") or []
             if "oid" in v
         ]
-        chapters.append(Chapter(title=str(ch.get("title", "")), variations=variations))
+        chapters.append(
+            Chapter(title=str(ch.get("title") or ""), variations=variations)
+        )
 
     return CourseOutline(
-        name=str(course.get("name", "")),
+        name=str(course.get("name") or ""),
         owned=bool(course.get("owned")),
         chapters=chapters,
     )

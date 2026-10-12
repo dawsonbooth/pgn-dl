@@ -115,7 +115,7 @@ class ThemesExtractor(NoctieExtractor[str]):
                 "a truncated listing or a count gone stale upstream, and writing "
                 "the part that arrived would have every later run skip the rest"
             )
-        elements.sort(key=lambda e: e.get("index", 0))
+        elements.sort(key=lambda e: e.get("index") or 0)
         # Nothing upstream makes `index` unique, and an element carrying none
         # falls back to 0 along with every other that does, so two elements can
         # name one file. The runner refuses a shared path, which would cost the
@@ -124,7 +124,8 @@ class ThemesExtractor(NoctieExtractor[str]):
         # group is suffixed, so which one gets the plain name does not depend on
         # the listing order.
         names = [
-            f"{e.get('index', 0):03d}-{slugify(e.get('name', ''))}" for e in elements
+            f"{e.get('index') or 0:03d}-{slugify(e.get('name') or '')}"
+            for e in elements
         ]
         clashing = {name for name, n in Counter(names).items() if n > 1}
         refs = [
@@ -161,9 +162,9 @@ class ThemesExtractor(NoctieExtractor[str]):
             # then skip it on every later run.
             raise FetchError(f"noctie element {ref.id} carries no pgn")
         headers = {"Event": context, "Site": SITE}
-        headers["ElementName"] = element.get("name", "")
+        headers["ElementName"] = element.get("name") or ""
         # instruction / flashcard / scenario are genuinely different artifacts;
         # recording which keeps a downloaded theme filterable by kind.
-        headers["ElementType"] = element.get("type", "")
+        headers["ElementType"] = element.get("type") or ""
         headers["NoctieElementId"] = ref.id
         return GameItem(pgn=element_to_pgn(pgn, headers, ref.id))
