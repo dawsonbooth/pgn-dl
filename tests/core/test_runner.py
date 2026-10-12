@@ -13,7 +13,7 @@ import pytest
 
 from pgn_dl.core import runner as runner_module
 from pgn_dl.core.extractor import Extractor
-from pgn_dl.core.fetch import Blocked, FetchError
+from pgn_dl.core.fetch import Blocked, Fetcher, FetchError
 from pgn_dl.core.models import Collection, GameItem, ItemRef, MoveNode
 from pgn_dl.core.runner import Options, run
 
@@ -23,19 +23,16 @@ COLLECTION = Collection(
 
 
 class FakeFetcher:
-    """Minimal stand-in satisfying the Fetcher protocol.
-
-    FakeExtractor never calls these; the runner only threads the fetcher through
-    to the extractor.
-    """
+    """Minimal stand-in satisfying the Fetcher protocol, answering every request
+    with nothing. FakeExtractor sends one request per item through it."""
 
     async def post_json(
         self, url: str, *, headers: Mapping[str, str], json: Any
     ) -> Any:
-        raise NotImplementedError
+        return {}
 
     async def get_text(self, url: str, *, headers: Mapping[str, str]) -> str:
-        raise NotImplementedError
+        return ""
 
 
 FETCHER = FakeFetcher()
@@ -59,14 +56,15 @@ class FakeExtractor(Extractor[None]):
         self.fetched: list[str] = []
 
     async def _discover(
-        self, fetcher: object
+        self, fetcher: Fetcher
     ) -> tuple[Collection, list[ItemRef], None]:
         refs = [ItemRef(id=str(i), path=(f"{i:03d}-item",)) for i in range(self.count)]
         return COLLECTION, refs, None
 
-    async def _fetch(self, context: None, fetcher: object, ref: ItemRef) -> GameItem:
+    async def _fetch(self, context: None, fetcher: Fetcher, ref: ItemRef) -> GameItem:
         i = int(ref.id)
         self.fetched.append(ref.id)
+        await fetcher.get_text(f"https://fake.test/{ref.id}", headers={})
         if i in self.block_on:
             raise Blocked("challenged")
         if i in self.fail_on:
@@ -233,6 +231,30 @@ async def test_a_block_during_discovery_still_suggests_logging_in(
     assert any("login fake" in line for line in lines)
 
 
+class RateLimitedAtDiscoveryExtractor(FakeExtractor):
+    key = "fake:rate-limited-discovery"
+
+    async def _discover(
+        self, fetcher: object
+    ) -> tuple[Collection, list[ItemRef], None]:
+        raise Blocked("https://fake.test/session failed: 429 (JSON body)", status=429)
+
+
+async def test_a_rate_limit_during_discovery_does_not_blame_the_session(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    # Signing in again does not lift a rate limit.
+    _pretend_source_has_a_login(monkeypatch)
+    lines: list[str] = []
+    report = await run(
+        RateLimitedAtDiscoveryExtractor(), FETCHER, _opts(tmp_path), echo=lines.append
+    )
+
+    assert report.stopped
+    assert any(line.startswith("! Rate limited before any item") for line in lines)
+    assert not any("login" in line for line in lines)
+
+
 class MalformedDiscoveryExtractor(FakeExtractor):
     key = "fake:malformed-discovery"
 
@@ -379,7 +401,7 @@ class InFlightExtractor(FakeExtractor):
         self.in_flight = 0
         self.peak = 0
 
-    async def _fetch(self, context: None, fetcher: object, ref: ItemRef) -> GameItem:
+    async def _fetch(self, context: None, fetcher: Fetcher, ref: ItemRef) -> GameItem:
         self.in_flight += 1
         self.peak = max(self.peak, self.in_flight)
         # A real fetch is a round trip, so it yields; without that every item
@@ -442,6 +464,208 @@ async def test_the_configured_delay_is_paid_after_each_item(
     # Jittered upward, so a fixed cadence never emerges from the traffic.
     assert all(0.5 <= d <= 0.75 for d in slept), slept
     assert len(set(slept)) > 1
+
+
+async def test_the_delay_is_paid_after_an_item_that_fails_too(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    slept = _recorded_sleeps(monkeypatch)
+
+    report = await run(
+        FakeExtractor(3, fail_on={0, 1, 2}),
+        FETCHER,
+        Options(out=tmp_path, concurrency=1, delay=0.5),
+        echo=lambda _: None,
+    )
+
+    assert report.failed == 3
+    assert len(slept) == 3
+    assert all(0.5 <= d <= 0.75 for d in slept), slept
+    assert len(set(slept)) > 1
+
+
+async def test_with_one_slot_no_item_is_fetched_during_a_pause(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    # The pause holds the item's slot. Paid after the slot is given back, it
+    # would space nothing: the next item would be fetched while it ran.
+    ex = FakeExtractor(3, fail_on={1})
+    fetched_during: list[int] = []
+    real_sleep = asyncio.sleep
+
+    async def pause(delay: float, *args: object, **kw: object) -> None:
+        before = len(ex.fetched)
+        await real_sleep(0)
+        fetched_during.append(len(ex.fetched) - before)
+
+    monkeypatch.setattr(runner_module.asyncio, "sleep", pause)
+
+    await run(
+        ex,
+        FETCHER,
+        Options(out=tmp_path, concurrency=1, delay=0.5),
+        echo=lambda _: None,
+    )
+
+    assert fetched_during == [0, 0, 0]
+
+
+async def test_no_delay_is_paid_for_an_item_already_on_disk(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    coll = tmp_path / "fake/things/c"
+    coll.mkdir(parents=True)
+    (coll / "001-item.pgn").write_text('[Event "C"]\n\n*\n', encoding="utf-8")
+    slept = _recorded_sleeps(monkeypatch)
+
+    await run(
+        FakeExtractor(3),
+        FETCHER,
+        Options(out=tmp_path, concurrency=1, delay=0.5),
+        echo=lambda _: None,
+    )
+
+    assert len(slept) == 2
+
+
+async def test_a_block_is_retried_no_sooner_than_the_delay(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    slept = _recorded_sleeps(monkeypatch)
+
+    await run(
+        FakeExtractor(1, block_on={0}),
+        FETCHER,
+        Options(out=tmp_path, concurrency=1, delay=0.5, backoff=0.1),
+        echo=lambda _: None,
+    )
+
+    assert slept
+    assert min(slept) >= 0.5, slept
+
+
+class BlockedOnceExtractor(FakeExtractor):
+    """Item 0 is refused once; every fetch is logged to a shared event list."""
+
+    key = "fake:blocked-once"
+
+    def __init__(self, count: int, events: list[str]) -> None:
+        super().__init__(count)
+        self.events = events
+        self.refused = False
+
+    async def _fetch(self, context: None, fetcher: Fetcher, ref: ItemRef) -> GameItem:
+        self.events.append(f"fetch {ref.id}")
+        if ref.id == "0" and not self.refused:
+            self.refused = True
+            raise Blocked("rate limited (status 429)", status=429)
+        return await super()._fetch(context, fetcher, ref)
+
+
+async def test_a_backoff_holds_back_every_worker_not_only_the_refused_one(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    # A block answers the run, not one item: while one worker backs off, no other
+    # asks either.
+    events: list[str] = []
+    real_sleep = asyncio.sleep
+
+    async def record(delay: float, *args: object, **kw: object) -> None:
+        events.append("wait starts")
+        await real_sleep(0)
+        events.append("wait ends")
+
+    monkeypatch.setattr(runner_module.asyncio, "sleep", record)
+
+    await run(
+        BlockedOnceExtractor(2, events),
+        FETCHER,
+        Options(out=tmp_path, concurrency=2, delay=0.0, backoff=1.0),
+        echo=lambda _: None,
+    )
+
+    assert events.index("fetch 1") > events.index("wait ends"), events
+
+
+class RecordingFetcher(FakeFetcher):
+    """Answers every request with nothing, logging each to a shared event list."""
+
+    def __init__(self, events: list[str]) -> None:
+        self.events = events
+
+    async def post_json(
+        self, url: str, *, headers: Mapping[str, str], json: Any
+    ) -> Any:
+        self.events.append(f"POST {url}")
+        return {}
+
+    async def get_text(self, url: str, *, headers: Mapping[str, str]) -> str:
+        self.events.append(f"GET {url}")
+        return ""
+
+
+class ChattyExtractor(FakeExtractor):
+    """Two requests to discover, as a paged listing makes, and a second one per
+    item, as a call retried on a renewed token makes."""
+
+    key = "fake:chatty"
+
+    async def _discover(
+        self, fetcher: Fetcher
+    ) -> tuple[Collection, list[ItemRef], None]:
+        for page in (1, 2):
+            await fetcher.get_text(f"https://fake.test/list?page={page}", headers={})
+        return await super()._discover(fetcher)
+
+    async def _fetch(self, context: None, fetcher: Fetcher, ref: ItemRef) -> GameItem:
+        await fetcher.post_json("https://fake.test/renew", headers={}, json={})
+        return await super()._fetch(context, fetcher, ref)
+
+
+async def test_the_delay_is_paid_after_every_request_not_once_per_item(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    events: list[str] = []
+
+    async def record(delay: float, *args: object, **kw: object) -> None:
+        events.append("pause")
+
+    monkeypatch.setattr(runner_module.asyncio, "sleep", record)
+
+    await run(
+        ChattyExtractor(2),
+        RecordingFetcher(events),
+        Options(out=tmp_path, concurrency=1, delay=0.5),
+        echo=lambda _: None,
+    )
+
+    requests = [e for e in events if e != "pause"]
+    assert len(requests) == 6
+    assert events == [e for request in requests for e in (request, "pause")]
+
+
+class SilentExtractor(FakeExtractor):
+    """Items built from what discovery already holds, as chessreps lines are."""
+
+    key = "fake:silent"
+
+    async def _fetch(self, context: None, fetcher: Fetcher, ref: ItemRef) -> GameItem:
+        return GameItem(root=MoveNode(san=None, children=[MoveNode(san="e4")]))
+
+
+async def test_an_item_that_sends_no_request_pays_no_pause(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    slept = _recorded_sleeps(monkeypatch)
+
+    await run(
+        SilentExtractor(3),
+        FETCHER,
+        Options(out=tmp_path, concurrency=1, delay=0.5),
+        echo=lambda _: None,
+    )
+
+    assert slept == []
 
 
 async def test_no_delay_is_paid_when_it_is_switched_off(

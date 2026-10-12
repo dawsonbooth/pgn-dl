@@ -92,6 +92,8 @@ def check_response(
     """Raise :class:`Blocked` or :class:`FetchError` for a failed response."""
     if is_challenge(status, headers, body):
         raise Blocked(f"{url}: bot challenge (status {status})", status=status)
+    if status == 429:
+        raise Blocked(f"{url} failed: 429 ({describe_body(body)})", status=status)
     if not 200 <= status < 300:
         raise FetchError(
             f"{url} failed: {status} ({describe_body(body)})", status=status

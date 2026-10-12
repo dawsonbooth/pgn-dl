@@ -15,9 +15,10 @@ import asyncio
 import json
 import random
 from collections import Counter
-from collections.abc import Callable
+from collections.abc import Awaitable, Callable, Mapping
 from dataclasses import dataclass
 from pathlib import Path
+from typing import Any
 
 from .extractor import Extractor
 from .fetch import Blocked, Fetcher, FetchError
@@ -53,21 +54,67 @@ class Report:
 _DEFAULT_OPTIONS = Options()  # frozen, so safe to share as a default
 
 
+async def _pause(opts: Options) -> None:
+    """Wait out ``opts.delay``, jittered upward so requests keep no fixed cadence."""
+    if opts.delay:
+        await asyncio.sleep(opts.delay + random.uniform(0, opts.delay / 2))
+
+
+class _PacedFetcher:
+    """The run's transport, pausing after every request it carries, refused or not.
+
+    ``--delay`` is a pause after each request, so the transport pays it rather than
+    the item: a source may send several requests for one item (a listing's pages,
+    a renewed token and the call retried on it), or none.
+    """
+
+    def __init__(self, inner: Fetcher, opts: Options) -> None:
+        self._inner = inner
+        self._opts = opts
+
+    async def post_json(
+        self, url: str, *, headers: Mapping[str, str], json: Any
+    ) -> Any:
+        return await self._paced(self._inner.post_json(url, headers=headers, json=json))
+
+    async def get_text(self, url: str, *, headers: Mapping[str, str]) -> str:
+        return await self._paced(self._inner.get_text(url, headers=headers))
+
+    async def _paced[T](self, request: Awaitable[T]) -> T:
+        try:
+            result = await request
+        except Exception:
+            # Exception, not BaseException: a cancelled run stops at once
+            # rather than pausing on its way out.
+            await _pause(self._opts)
+            raise
+        await _pause(self._opts)
+        return result
+
+
 async def _fetch_with_retry(
     extractor: Extractor,
     fetcher: Fetcher,
     ref: ItemRef,
     opts: Options,
     echo: Echo,
+    gate: asyncio.Lock,
 ) -> GameItem | None:
     """Fetch one item, backing off on blocks. Returns None if we give up.
 
     None means blocked out and nothing else; the caller reads it as grounds to
     stop the whole run.
+
+    ``gate`` is shared by the run's workers: one holds it while it backs off, and
+    every attempt waits for it first, so a block holds back every worker, not only
+    the one it met.
     """
     label = "/".join(ref.path)
-    backoff = opts.backoff
+    # A source that blocked a request is asked again no sooner than any other.
+    backoff = max(opts.backoff, opts.delay)
     for attempt in range(1, _MAX_ATTEMPTS + 1):
+        async with gate:  # wait out another worker's backoff, if one is on
+            pass
         try:
             item = await extractor.fetch(fetcher, ref)
         except Blocked:
@@ -82,7 +129,8 @@ async def _fetch_with_retry(
                 f"  ~ Blocked on '{label}'; sleeping {wait:.1f}s "
                 f"(attempt {attempt}/{_MAX_ATTEMPTS})"
             )
-            await asyncio.sleep(wait)
+            async with gate:
+                await asyncio.sleep(wait)
             backoff *= 2
         else:
             if item is None:
@@ -98,14 +146,20 @@ def report_discovery_failure(extractor: Extractor, exc: FetchError, echo: Echo) 
 
     The first calls a source makes are its cheapest and least authenticated, so
     a block or an auth failure here is nearly always the session, not the item.
-    The exception is a plain 403: that is the server refusing this account
-    (content behind a paid tier, or not shared with it), and signing in again
-    fixes none of it. A challenge often does clear after a fresh sign-in, even
-    at 403, so it keeps the hint.
+    The exceptions are a plain 403, the server refusing this account (content
+    behind a paid tier, or not shared with it), and a 429, a limit on how fast
+    this account or connection may ask; signing in again fixes neither. A
+    challenge often does clear after a fresh sign-in, even at 403, so it keeps
+    the hint.
     """
-    kind = "Blocked by a bot challenge" if isinstance(exc, Blocked) else "Failed"
+    if exc.status == 429:
+        kind = "Rate limited"
+    elif isinstance(exc, Blocked):
+        kind = "Blocked by a bot challenge"
+    else:
+        kind = "Failed"
     echo(f"! {kind} before any item could be listed: {exc}")
-    denied = exc.status == 403 and not isinstance(exc, Blocked)
+    denied = exc.status == 429 or (exc.status == 403 and not isinstance(exc, Blocked))
     source = type(extractor).source
     if has_login(source) and not denied:
         echo(f"  Your session may have expired. Run: pgn-dl login {source}")
@@ -152,8 +206,9 @@ async def run(
     echo: Echo = print,
 ) -> Report:
     """Download every item the extractor discovers, writing PGN under ``opts.out``."""
+    paced = _PacedFetcher(fetcher, opts)
     try:
-        collection, refs = await extractor.discover(fetcher)
+        collection, refs = await extractor.discover(paced)
     except FetchError as exc:  # Blocked is a FetchError, so this covers both
         report_discovery_failure(extractor, exc, echo)
         return Report(stopped=True)
@@ -182,6 +237,7 @@ async def run(
         refs = [ref for ref in refs if ref.path not in shared]
 
     sem = asyncio.Semaphore(opts.concurrency)
+    gate = asyncio.Lock()
 
     async def process(ref: ItemRef) -> None:
         if report.stopped:
@@ -195,7 +251,7 @@ async def run(
             if report.stopped:
                 return
             try:
-                item = await _fetch_with_retry(extractor, fetcher, ref, opts, echo)
+                item = await _fetch_with_retry(extractor, paced, ref, opts, echo, gate)
             except Exception as exc:  # noqa: BLE001
                 # An unexpected error on one item must not abort the batch;
                 # leave it unwritten so a re-run retries it.
@@ -205,8 +261,6 @@ async def run(
             if item is None:
                 report.stopped = True
                 return
-            if opts.delay:
-                await asyncio.sleep(opts.delay + random.uniform(0, opts.delay / 2))
 
         try:
             text = item.pgn if item.pgn is not None else game_to_pgn(collection, item)

@@ -34,6 +34,13 @@ def test_check_response_raises_blocked_for_challenges() -> None:
         check_response("https://x/y", 403, {}, "Just a moment")
 
 
+def test_check_response_raises_blocked_for_a_rate_limit_whatever_its_body() -> None:
+    with pytest.raises(Blocked) as exc:
+        check_response("https://x/y", 429, {}, '{"error": "too many requests"}')
+    assert str(exc.value) == "https://x/y failed: 429 (JSON body)"
+    assert exc.value.status == 429
+
+
 def test_check_response_raises_fetch_error_for_other_failures() -> None:
     with pytest.raises(FetchError) as exc:
         check_response("https://x/y", 500, {}, "boom")
