@@ -359,7 +359,7 @@ async def test_the_profile_directory_is_made_private_before_the_browser_opens(
 async def test_sign_in_loop_without_a_store_can_decline_to_save(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    # What chess.com uses: it has no credential of its own (see CONTEXT.md), so
+    # What chess.com uses: it has no credential of its own, so
     # the loop's success callback need not persist anything.
     monkeypatch.setattr(browser_module, "browser_context", _fake_browser_context())
     saved: list[Any] = []

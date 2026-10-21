@@ -1,6 +1,6 @@
 """Chess.com session: a persistent Chrome profile signed in once, reused after.
 
-chess.com has no credential file (see CONTEXT.md): its session lives in the
+chess.com has no credential file: its session lives in the
 Chrome profile itself, so it is not a :class:`~...core.credentials.CredentialStore`
 adapter. Its login still rides the credential store's shared sign-in loop -
 detecting the signed-in session and exiting automatically like every other

@@ -1,8 +1,4 @@
-"""Anchor annotation blocks and replay the mainline into the core move tree.
-
-The judgement history behind the anchoring rules lives in docs/open-issues.md
-sections 5.1 and 5.7; read it before changing anything here.
-"""
+"""Anchor annotation blocks and replay the mainline into the core move tree."""
 
 from __future__ import annotations
 

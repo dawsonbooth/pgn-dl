@@ -5,7 +5,7 @@ is a Firebase refresh token, exchanged for a one-hour ID token on each run, so
 downloading needs no browser at all.
 
 Storage, the sign-in loop, and the refresh call's error taxonomy are the
-credential store's (see CONTEXT.md); this module supplies noctie's schema, its
+credential store's; this module supplies noctie's schema, its
 browser probe, and its post-refresh choreography (rotated-token persistence).
 """
 

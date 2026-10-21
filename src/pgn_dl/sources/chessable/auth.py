@@ -7,7 +7,7 @@ account's user id, read out of the signed-in browser and stored owner-only. From
 then on every download is plain HTTPS carrying ``Authorization: Bearer <jwt>``;
 Chessable has no refresh endpoint, so an expired JWT is fixed by signing in again.
 
-Storage and the sign-in loop are the credential store's (see CONTEXT.md); this
+Storage and the sign-in loop are the credential store's; this
 module supplies chessable's schema and its browser probe.
 """
 

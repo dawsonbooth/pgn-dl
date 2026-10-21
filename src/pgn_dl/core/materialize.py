@@ -2,7 +2,7 @@
 
 Every declared extractor gets the same command body - parse the target, build
 Options from the shared flags, execute - implemented once here and reused for
-the `url` command too (ADR-0002). Defaults are read off `runner.Options` when
+the `url` command too. Defaults are read off `runner.Options` when
 a command is built, not at import time, so a rebuild always reflects the
 runner's current values.
 """

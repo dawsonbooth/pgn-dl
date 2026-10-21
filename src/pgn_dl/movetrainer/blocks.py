@@ -1,7 +1,7 @@
 """The annotation-block item model and the block builder.
 
 An annotation block is a flat run of move-number-tagged SAN and prose embedded
-in a MoveTrainer comment (see CONTEXT.md). Both sites encode one as a ``V``
+in a MoveTrainer comment. Both sites encode one as a ``V``
 entry whose ``val`` holds ``S`` (one SAN move each) and ``C`` (prose) entries;
 the comment carrier wrapped around the entry list differs per site and lives in
 the source packages.

@@ -6,7 +6,7 @@ refresh token and all - refreshed against Supabase's token endpoint on later
 runs, so downloading needs no browser at all.
 
 Storage, the sign-in loop, and the refresh call's error taxonomy are the
-credential store's (see CONTEXT.md); this module supplies chessreps's schema,
+credential store's; this module supplies chessreps's schema,
 its cookie codec, its browser probe, and its post-refresh choreography
 (merging the refreshed session over the stored one, and the expiry margin).
 """

@@ -1,12 +1,12 @@
 """The MoveTrainer format: Chessable's training-content format, which chess.com
-courses inherited through the sites' partnership (see CONTEXT.md).
+courses inherited through the sites' partnership.
 
 The format's semantics live here: the annotation-block item model, the NAG
 glyph vocabulary, glyph attachment, the half-move scale, the anchoring rules,
 and the mainline replay walk. Source packages decode their own wire envelopes
 into :class:`DecodedPly` and get the move tree back from :func:`build_tree`.
 
-ADR-0001 places this beside ``core`` and ``sources`` rather than inside
+This lives beside ``core`` and ``sources`` rather than inside
 either: the commonality here is kinship, not universality, and every
 directory under ``sources`` is one registered source.
 """

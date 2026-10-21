@@ -1,6 +1,6 @@
 """chess.com's login: the shared sign-in loop, with no credential to store.
 
-chess.com has no credential file (see CONTEXT.md): its session lives in the
+chess.com has no credential file: its session lives in the
 Chrome profile itself. Its login adopts the credential store's shared sign-in
 loop only to detect that session, exiting automatically like every other
 source instead of waiting for the user to come back and press Enter.

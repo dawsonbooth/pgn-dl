@@ -8,7 +8,7 @@ The runner always calls ``discover`` once and ``fetch`` many times after it, on
 the same instance and with the same transport (see ``core/runner.py``): the
 extractor instance is the run. What discovery produces beyond the listing - a
 session or client it opened, an artifact it parsed, per-item metadata a fetch
-reads - is this run's *fetch context* (see CONTEXT.md). A concrete source
+reads - is this run's *fetch context*. A concrete source
 supplies a discovery step that builds it and a fetch step that receives it;
 ``discover``/``fetch`` below are the template that wires the two together and
 the only place the discover-before-fetch invariant is enforced, so a source
@@ -34,7 +34,7 @@ class NotDiscovered(RuntimeError):
 
     The runner always discovers before it fetches, so reaching this means our
     own code broke that ordering - a source, or a caller bypassing the runner.
-    Per docs/open-issues.md 4.1, a bug of ours should stay debuggable, so this
+    A bug of ours should stay debuggable, so this
     is deliberately left for the caller to leave uncaught rather than folded
     into a per-item failure the way a source's own errors are.
     """

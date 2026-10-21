@@ -1,4 +1,4 @@
-"""The credential store: one source's persisted credential (see CONTEXT.md).
+"""The credential store: one source's persisted credential.
 
 Owns the invariants every credential-bearing source shares: validate before
 any filesystem side effect, an owner-only profile directory and file, a
@@ -14,12 +14,12 @@ its browser probe, its login URL, and its refresh protocol. Post-refresh
 choreography - rotation persistence, session merging, expiry margins, token
 extraction - stays with the source, since that is where its context lives.
 
-chess.com has no credential (see CONTEXT.md) and so is not a
+chess.com has no credential and so is not a
 :class:`CredentialStore` adapter, but its login still rides the shared
 :func:`sign_in_loop`, which is why the loop is a free function rather than a
 store method.
 
-ADR-0001 places this in ``core`` rather than beside a particular source: the
+This lives in ``core`` rather than beside a particular source: the
 three platforms behind noctie, chessreps, and chessable (Firebase, Supabase,
 and a bespoke JWT) are unrelated, so their sharing one credential shape is
 intrinsic to "having a login flow" - exactly the universality ``core`` is for,

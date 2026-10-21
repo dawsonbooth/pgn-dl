@@ -1,5 +1,5 @@
 """Anchoring semantics through the MoveTrainer interface: decoded plies in,
-move tree out. The judgement history is docs/open-issues.md 5.1 and 5.7."""
+move tree out."""
 
 from __future__ import annotations
 
