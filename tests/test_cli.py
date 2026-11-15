@@ -156,8 +156,9 @@ def test_every_source_registers_its_declaration() -> None:
     # one other thing core would otherwise have to know each source by name
     # to wire up.
     from pgn_dl.core.registry import declarations
-    from pgn_dl.sources import chesscom, chessreps, noctie
+    from pgn_dl.sources import aimchess, chesscom, chessreps, noctie
 
+    assert declarations()["aimchess"] is aimchess.declaration
     assert declarations()["chesscom"] is chesscom.declaration
     assert declarations()["chessreps"] is chessreps.declaration
     assert declarations()["noctie"] is noctie.declaration
@@ -167,6 +168,7 @@ def test_the_root_app_mounts_the_registered_sources_in_order() -> None:
     # Alphabetical, so `--help` lists them the same way on every build whatever
     # order the source packages happened to be imported in.
     assert [group.name for group in app.registered_groups] == [
+        "aimchess",
         "chessable",
         "chesscom",
         "chessreps",

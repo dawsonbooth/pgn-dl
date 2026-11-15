@@ -5,7 +5,8 @@ import into any chess GUI.
 
 Supported sources:
 
-- Chessable courses
+- aimchess.com explore, checkmate patterns, tactical motifs, and quiz
+- chessable.com courses
 - chess.com courses and lessons
 - chessreps.com opening courses
 - noctie.ai themes and opening books
@@ -47,6 +48,7 @@ or with the source subcommand, passing a URL or a bare id:
 uv run pgn-dl chesscom courses 6445752b-f404-4d8f-9397-4fb03f690d8e
 uv run pgn-dl chessable courses 25098
 uv run pgn-dl chessreps openings alapin-sicilian-repertoire-ilg8hms
+uv run pgn-dl aimchess explore https://aimchess.com/explore
 ```
 
 `pgn-dl sources` lists every source and the URL patterns it accepts.
