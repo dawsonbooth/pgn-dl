@@ -22,6 +22,8 @@ from pgn_dl.core import io as io_module
 from pgn_dl.core.credentials import CredentialStore, sign_in_loop
 from pgn_dl.core.fetch import FetchError
 
+from ..conftest import posix_only
+
 # Invented throughout: nothing here is a credential, and none of it is ever
 # meant to reach a message.
 DUMMY = "DUMMY-SECRET-DO-NOT-LEAK"
@@ -81,6 +83,7 @@ def test_save_validates_before_any_filesystem_side_effect() -> None:
     assert not store.profile_dir().exists()
 
 
+@posix_only
 def test_saved_credentials_round_trip_owner_only() -> None:
     store = _store()
     store.save({"secret": DUMMY})
@@ -89,6 +92,7 @@ def test_saved_credentials_round_trip_owner_only() -> None:
     assert mode == 0o600, f"credentials must be owner-only, got {mode:o}"
 
 
+@posix_only
 def test_saving_narrows_a_pre_existing_world_readable_file() -> None:
     # os.open's mode applies only on creation, so a file restored from a
     # backup or copied between machines could otherwise keep 0644 and hold a
@@ -103,6 +107,7 @@ def test_saving_narrows_a_pre_existing_world_readable_file() -> None:
     assert mode == 0o600, f"a pre-existing file must be narrowed, got {mode:o}"
 
 
+@posix_only
 def test_the_profile_directory_is_owner_only() -> None:
     store = _store()
     d = store.profile_dir()
@@ -120,6 +125,7 @@ def test_saving_twice_replaces_rather_than_appends() -> None:
     assert store.load() == {"secret": "SECOND"}
 
 
+@posix_only
 def test_a_symlinked_credentials_file_is_refused() -> None:
     store = _store()
     victim = store.profile_dir().parent / "victim"
@@ -137,6 +143,7 @@ def test_a_symlinked_credentials_file_is_refused() -> None:
     assert stat.S_IMODE(victim.stat().st_mode) == 0o644
 
 
+@posix_only
 def test_a_symlinked_profile_directory_is_refused() -> None:
     store = _store()
     outside = store.profile_dir().parent / "outside"

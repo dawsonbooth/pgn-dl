@@ -2,7 +2,9 @@
 
 from __future__ import annotations
 
+import os
 import stat
+from collections.abc import Callable
 from pathlib import Path
 
 import pytest
@@ -10,6 +12,8 @@ import pytest
 import pgn_dl.core.io as io_module
 from pgn_dl.core.fetch import FetchError
 from pgn_dl.core.io import private_dir, write_text_atomic
+
+from ..conftest import posix_only
 
 
 def _interrupt_the_rename(monkeypatch: pytest.MonkeyPatch) -> None:
@@ -55,13 +59,15 @@ def test_an_interrupted_rewrite_leaves_the_previous_content_intact(
     assert [p.name for p in tmp_path.iterdir()] == ["credentials.json"]
 
 
-def test_an_atomic_write_replaces_a_symlink(tmp_path: Path) -> None:
+def test_an_atomic_write_replaces_a_symlink(
+    tmp_path: Path, symlink: Callable[[Path, Path], None]
+) -> None:
     # What save_refresh_token leans on: a planted link must not redirect the
     # content out of the profile directory.
     outside = tmp_path / "outside.json"
     outside.write_text("untouched", encoding="utf-8")
     link = tmp_path / "credentials.json"
-    link.symlink_to(outside)
+    symlink(link, outside)
 
     write_text_atomic(link, "written")
 
@@ -70,6 +76,7 @@ def test_an_atomic_write_replaces_a_symlink(tmp_path: Path) -> None:
     assert outside.read_text(encoding="utf-8") == "untouched"
 
 
+@posix_only
 def test_an_atomic_write_never_widens_the_file_it_creates(tmp_path: Path) -> None:
     # The destination is owner-only from the moment it exists, because the temp
     # file it is renamed from was.
@@ -78,6 +85,7 @@ def test_an_atomic_write_never_widens_the_file_it_creates(tmp_path: Path) -> Non
     assert stat.S_IMODE(path.stat().st_mode) == 0o600
 
 
+@posix_only
 def test_a_profile_directory_and_its_parents_are_owner_only(tmp_path: Path) -> None:
     # A browser profile holds session cookies; noctie's holds a refresh token
     # twice over. mkdir's mode is ignored for parents, so each level is made
@@ -88,6 +96,7 @@ def test_a_profile_directory_and_its_parents_are_owner_only(tmp_path: Path) -> N
         assert mode == 0o700, f"{level} is {mode:o}"
 
 
+@posix_only
 def test_an_existing_world_readable_profile_directory_is_narrowed(
     tmp_path: Path,
 ) -> None:
@@ -98,6 +107,7 @@ def test_an_existing_world_readable_profile_directory_is_narrowed(
     assert stat.S_IMODE(d.stat().st_mode) == 0o700
 
 
+@posix_only
 def test_a_pre_existing_profile_root_that_others_can_reach_is_named(
     tmp_path: Path,
 ) -> None:
@@ -114,6 +124,19 @@ def test_a_pre_existing_profile_root_that_others_can_reach_is_named(
     assert any(str(root) in line and "0755" in line for line in lines)
 
 
+@pytest.mark.skipif(os.name != "nt", reason="Windows only")
+def test_a_pre_existing_profile_root_is_not_named_on_windows(tmp_path: Path) -> None:
+    # stat reports every directory there as 0777, so the warning would come on
+    # every run whatever the ACLs allow.
+    root = tmp_path / "profile"
+    root.mkdir()
+
+    lines: list[str] = []
+    private_dir(root / "chesscom", echo=lines.append)
+
+    assert lines == []
+
+
 def test_a_profile_root_pgn_dl_created_itself_says_nothing(tmp_path: Path) -> None:
     # Every level it creates is 0700 already, and a warning on every run would
     # train the user to ignore the one that matters.
@@ -122,6 +145,7 @@ def test_a_profile_root_pgn_dl_created_itself_says_nothing(tmp_path: Path) -> No
     assert lines == []
 
 
+@posix_only
 def test_a_symlinked_profile_directory_is_refused(tmp_path: Path) -> None:
     outside = tmp_path / "outside"
     outside.mkdir(mode=0o755)

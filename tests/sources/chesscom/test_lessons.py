@@ -37,11 +37,11 @@ LEARN_PATH_ONLY_COURSE_URL = "https://www.chess.com/lessons/chess-tactics"
 
 
 def _payload(name: str) -> dict:
-    return json.loads((FIX / name).read_text())
+    return json.loads((FIX / name).read_text(encoding="utf-8"))
 
 
 def test_course_slugs_keep_curriculum_order_and_dedupe() -> None:
-    html = (FIX / "course_page.html").read_text()
+    html = (FIX / "course_page.html").read_text(encoding="utf-8")
     slugs = course_lesson_slugs(html, "learn-to-play")
     # Document order, not alphabetical; duplicates collapsed; other lesson courses out.
     assert slugs == ["the-king", "the-queen", "the-rook", "castling"]
@@ -60,7 +60,7 @@ def test_extract_lesson_decodes_the_entity_encoded_attribute() -> None:
 
 
 def test_extract_learn_path_decodes_the_uxxxx_escaped_blob() -> None:
-    page = (FIX / "learn_page.html").read_text()
+    page = (FIX / "learn_page.html").read_text(encoding="utf-8")
     payload = extract_learn_path(page)
     assert payload == _payload("learn_path.json")
     # Assert real decoded text survived the \uXXXX round trip (spaces, hyphens,
@@ -308,7 +308,7 @@ class FakeFetcher:
 def _fetcher(*, course_page: bool = True) -> FakeFetcher:
     pages = {LESSON_URL: _page_with(_payload("lesson_page_star.json"))}
     if course_page:
-        pages[COURSE_URL] = (FIX / "course_page.html").read_text()
+        pages[COURSE_URL] = (FIX / "course_page.html").read_text(encoding="utf-8")
     return FakeFetcher(pages)
 
 
@@ -483,7 +483,7 @@ async def test_a_learn_path_lesson_course_listing_no_lessons_fails_actionably() 
 async def test_discover_falls_back_to_the_learn_path_without_a_landing_page() -> None:
     # chess-tactics has no /lessons/chess-tactics landing page (404), but it is
     # present in the /learn path blob.
-    f = FakeFetcher({LEARN_URL: (FIX / "learn_page.html").read_text()})
+    f = FakeFetcher({LEARN_URL: (FIX / "learn_page.html").read_text(encoding="utf-8")})
     collection, refs = await LessonsExtractor(LEARN_PATH_ONLY_COURSE_URL).discover(f)
     assert collection.name == "Tactics"
     assert [r.path for r in refs] == [
@@ -498,7 +498,7 @@ async def test_discover_falls_back_to_the_learn_path_without_a_landing_page() ->
 async def test_advanced_chess_tactics_comes_from_the_learn_path() -> None:
     # advanced-chess-tactics has no landing page at all on chess.com, only a
     # learn-path entry. Pin the resume contract exactly.
-    f = FakeFetcher({LEARN_URL: (FIX / "learn_page.html").read_text()})
+    f = FakeFetcher({LEARN_URL: (FIX / "learn_page.html").read_text(encoding="utf-8")})
     collection, refs = await LessonsExtractor(
         "https://www.chess.com/lessons/advanced-chess-tactics"
     ).discover(f)
@@ -521,7 +521,7 @@ async def test_discover_does_not_fetch_the_learn_path_when_a_landing_page_exists
 
 
 async def test_discover_fails_when_a_course_is_in_neither_listing() -> None:
-    f = FakeFetcher({LEARN_URL: (FIX / "learn_page.html").read_text()})
+    f = FakeFetcher({LEARN_URL: (FIX / "learn_page.html").read_text(encoding="utf-8")})
     with pytest.raises(FetchError) as exc:
         await LessonsExtractor("https://www.chess.com/lessons/no-such-course").discover(
             f
@@ -571,7 +571,7 @@ async def test_a_lesson_missing_from_the_listing_is_unnumbered() -> None:
     # `slugs`, which by definition exclude this one. Both halves are pinned
     # here, the unnumbered fallback and the whole-course enumeration.
     en_passant_url = f"{BASE}/learn-to-play/en-passant"
-    course_page = (FIX / "course_page.html").read_text()
+    course_page = (FIX / "course_page.html").read_text(encoding="utf-8")
     star = _page_with(_payload("lesson_page_star.json"))
 
     single = FakeFetcher({COURSE_URL: course_page, en_passant_url: star})
@@ -595,7 +595,7 @@ async def test_a_lesson_missing_from_the_listing_is_unnumbered() -> None:
 
 async def test_a_whole_lesson_course_requests_each_lesson_page_once() -> None:
     star = _payload("lesson_page_star.json")
-    pages = {COURSE_URL: (FIX / "course_page.html").read_text()}
+    pages = {COURSE_URL: (FIX / "course_page.html").read_text(encoding="utf-8")}
     for slug in ("the-king", "the-queen", "the-rook", "castling"):
         pages[f"{BASE}/learn-to-play/{slug}"] = _page_with(star)
     f = FakeFetcher(pages)

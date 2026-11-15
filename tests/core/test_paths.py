@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from collections.abc import Callable
 from pathlib import Path
 
 from pgn_dl.core.paths import (
@@ -83,14 +84,16 @@ def test_combine_leaves_out_a_file_it_cannot_read(tmp_path: Path) -> None:
     assert any("002-gui.pgn" in line for line in lines)
 
 
-def test_combine_leaves_out_a_symbolic_link(tmp_path: Path) -> None:
+def test_combine_leaves_out_a_symbolic_link(
+    tmp_path: Path, symlink: Callable[[Path, Path], None]
+) -> None:
     # all.pgn is built from the files pgn-dl wrote. Following a link copies
     # content from outside the tree into a file the user goes on to share.
     outside = tmp_path / "outside.pgn"
     outside.write_text('[Event "OUTSIDE"]\n\n*\n', encoding="utf-8")
     coll = tmp_path / "collection"
     _write(coll / "001-a.pgn", "AAA")
-    (coll / "002-link.pgn").symlink_to(outside)
+    symlink(coll / "002-link.pgn", outside)
 
     lines: list[str] = []
     text = combine_collection_dir(coll, echo=lines.append).read_text(encoding="utf-8")

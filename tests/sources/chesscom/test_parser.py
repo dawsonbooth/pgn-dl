@@ -21,7 +21,7 @@ FIX = Path(__file__).parents[2] / "fixtures" / "chesscom"
 
 
 def _load(name: str) -> dict:
-    return json.loads((FIX / name).read_text())
+    return json.loads((FIX / name).read_text(encoding="utf-8"))
 
 
 def _lesson(plies: list[dict]) -> dict:

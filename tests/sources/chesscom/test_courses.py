@@ -34,7 +34,7 @@ COLLECTION = Collection(
 
 
 def _load(fixture: str) -> Any:
-    return json.loads((FIX / fixture).read_text())
+    return json.loads((FIX / fixture).read_text(encoding="utf-8"))
 
 
 def _pgn(fixture: str, round_: str) -> str:

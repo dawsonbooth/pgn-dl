@@ -54,7 +54,7 @@ def test_decode_turns_typed_values_into_plain_python() -> None:
 
 async def test_get_document_decodes_fields() -> None:
     url = f"{BASE}/themes/T1"
-    f = FakeFetcher({url: (FIX / "theme_doc.json").read_text()})
+    f = FakeFetcher({url: (FIX / "theme_doc.json").read_text(encoding="utf-8")})
     doc = await get_document(f, "themes/T1", "tok")
     assert doc["name"] == "Beginner’s Guide to 1. e4"
     assert doc["description"] == "by FM Hugo Wernberg"

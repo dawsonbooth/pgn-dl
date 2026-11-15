@@ -42,7 +42,12 @@ def _report_open_root(root: Path, echo: Callable[[str], None]) -> None:
     The profile inside it is 0700 either way, so what a loose root leaves open is
     which sources have a session here and, if it is writable, the chance for
     someone else to move that profile aside.
+
+    POSIX only. Windows controls access with ACLs, and stat reports every
+    directory there as 0777, so the check would warn on every run.
     """
+    if os.name != "posix":
+        return
     mode = stat.S_IMODE(root.stat().st_mode)
     if not mode & 0o077:
         return

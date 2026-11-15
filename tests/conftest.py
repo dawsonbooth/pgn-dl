@@ -2,13 +2,37 @@
 
 from __future__ import annotations
 
+import os
 from collections.abc import Callable
+from pathlib import Path
 from typing import Any
 
 import httpx
 import pytest
 
 Handler = Callable[[httpx.Request], httpx.Response]
+
+#: For tests that assert POSIX permission bits. Windows has none: chmod only
+#: sets or clears read-only, and stat reports every directory as 0777.
+posix_only = pytest.mark.skipif(os.name != "posix", reason="POSIX permission bits")
+
+
+@pytest.fixture
+def symlink() -> Callable[[Path, Path], None]:
+    """Make a symlink, skipping the test if Windows refuses.
+
+    Windows allows symlinks only with Developer Mode on or as an administrator.
+    """
+
+    def make(link: Path, target: Path) -> None:
+        try:
+            link.symlink_to(target)
+        except OSError as exc:
+            if os.name != "nt":
+                raise
+            pytest.skip(f"cannot create a symlink here: {exc.strerror}")
+
+    return make
 
 
 @pytest.fixture
