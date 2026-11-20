@@ -1,0 +1,566 @@
+{
+  "lesson": {
+    "variation": {
+      "id": "6c6bc637-d62c-4e22-93e5-7c17ee5458f8",
+      "name": "Exchange Variation #1",
+      "startingPosition": {
+        "fen": "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
+      },
+      "moveTrainerId": "1493cca3-e6ba-4ece-9c39-051bbf1867b2",
+      "chapterId": "11db8b14-f730-4438-9076-c3c10ec3b6d9",
+      "type": "COURSE_VARIATION_TYPE_LESSON",
+      "isLearned": true,
+      "accessType": "VARIATION_ACCESS_TYPE_FULL_ACCESS",
+      "learningLevel": 0,
+      "firstLearnedAt": "2026-11-19T23:29:39Z",
+      "nextReviewAt": "2026-11-20T23:29:39Z",
+      "moveCount": 7,
+      "previewPosition": {
+        "fen": "rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1",
+        "highlights": [
+          {
+            "square": "SQUARE_E4",
+            "type": "COURSE_DRAWING_SQUARE_TYPE_SECONDARY"
+          }
+        ],
+        "arrows": [
+          {
+            "squareFrom": "SQUARE_F1",
+            "squareTo": "SQUARE_C4",
+            "type": "COURSE_DRAWING_ARROW_TYPE_SECONDARY"
+          },
+          {
+            "squareFrom": "SQUARE_D1",
+            "squareTo": "SQUARE_H5",
+            "type": "COURSE_DRAWING_ARROW_TYPE_SECONDARY"
+          }
+        ]
+      },
+      "learnerColor": "COLOR_BLACK",
+      "slug": "exchange-variation-1"
+    },
+    "whitePlayer": {
+      "name": "Chess.com",
+      "picture": {
+        "url": "https://assets-courses.chess.com/image/users/2366340_user_medium_opt.jpeg"
+      },
+      "isAuthor": true
+    },
+    "blackPlayer": {
+      "name": "learner",
+      "picture": {
+        "url": "https://chess.com/bundles/web/images/user-image.svg"
+      }
+    },
+    "plies": [
+      {
+        "id": "67a40de8-6e20-4597-8180-5d5dd8125aa0",
+        "moveNumber": 1,
+        "san": "e4",
+        "position": {
+          "fen": "rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1",
+          "highlights": [
+            {
+              "square": "SQUARE_E4",
+              "type": "COURSE_DRAWING_SQUARE_TYPE_SECONDARY"
+            }
+          ],
+          "arrows": [
+            {
+              "squareFrom": "SQUARE_F1",
+              "squareTo": "SQUARE_C4",
+              "type": "COURSE_DRAWING_ARROW_TYPE_SECONDARY"
+            },
+            {
+              "squareFrom": "SQUARE_D1",
+              "squareTo": "SQUARE_H5",
+              "type": "COURSE_DRAWING_ARROW_TYPE_SECONDARY"
+            }
+          ]
+        },
+        "color": "COLOR_WHITE",
+        "preComment": "{\"data\":[{\"key\":\"C\",\"state\":\"V\",\"val\":\"Let's check out the Caro-Kann \\u2013 a reliable, strategically rich defense.\"}]}",
+        "postComment": "{\"data\":[{\"key\":\"C\",\"state\":\"V\",\"val\":\"The most popular way to open the game grabs space in the center and opens up lines for the queen and bishop.\"}]}",
+        "coachSpeech": {
+          "intro": {
+            "textItemId": "courses-openings-60867992-0-intro",
+            "audioUrlHash": "c7db86f8e024ef9904eefd64dcf4b7b88c096f5fe6c66b89c0ab5abd0658d309"
+          },
+          "main": {
+            "textItemId": "courses-openings-60867992-0",
+            "audioUrlHash": "1c5814cf04b705799f63bff1baa6b6dcb7ab0423c1af23daf27a2903484c9ab4"
+          }
+        }
+      },
+      {
+        "id": "c11b2156-527f-4b91-9d11-b580d68b6520",
+        "moveNumber": 1,
+        "san": "c6",
+        "position": {
+          "fen": "rnbqkbnr/pp1ppppp/2p5/8/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 2",
+          "highlights": [
+            {
+              "square": "SQUARE_C6",
+              "type": "COURSE_DRAWING_SQUARE_TYPE_SECONDARY"
+            }
+          ],
+          "arrows": [
+            {
+              "squareFrom": "SQUARE_D7",
+              "squareTo": "SQUARE_D5",
+              "type": "COURSE_DRAWING_ARROW_TYPE_SECONDARY"
+            }
+          ]
+        },
+        "color": "COLOR_BLACK",
+        "isLearnable": true,
+        "alternativeMoves": [
+          {
+            "san": "c5",
+            "fen": "rnbqkbnr/pp1ppppp/8/2p5/4P3/8/PPPP1PPP/RNBQKBNR w KQkq c6 0 2"
+          },
+          {
+            "san": "e5",
+            "fen": "rnbqkbnr/pppp1ppp/8/4p3/4P3/8/PPPP1PPP/RNBQKBNR w KQkq e6 0 2"
+          },
+          {
+            "san": "e6",
+            "fen": "rnbqkbnr/pppp1ppp/4p3/8/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 2"
+          },
+          {
+            "san": "d6",
+            "fen": "rnbqkbnr/ppp1pppp/3p4/8/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 2"
+          },
+          {
+            "san": "g6",
+            "fen": "rnbqkbnr/pppppp1p/6p1/8/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 2"
+          },
+          {
+            "san": "d5",
+            "fen": "rnbqkbnr/ppp1pppp/8/3p4/4P3/8/PPPP1PPP/RNBQKBNR w KQkq d6 0 2"
+          },
+          {
+            "san": "Nf6",
+            "fen": "rnbqkb1r/pppppppp/5n2/8/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 1 2"
+          },
+          {
+            "san": "Nc6",
+            "fen": "r1bqkbnr/pppppppp/2n5/8/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 1 2"
+          },
+          {
+            "san": "b6",
+            "fen": "rnbqkbnr/p1pppppp/1p6/8/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 2"
+          },
+          {
+            "san": "a6",
+            "fen": "rnbqkbnr/1ppppppp/p7/8/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 2"
+          }
+        ],
+        "postComment": "{\"data\":[{\"key\":\"C\",\"state\":\"V\",\"val\":\"This signature Caro-Kann pawn move prepares to support another pawn\\u2019s central strike on the next move.\"}]}",
+        "plyIndex": 1,
+        "coachSpeech": {
+          "main": {
+            "textItemId": "courses-openings-60867992-1",
+            "audioUrlHash": "1f6d84c73f8f1f67a5cc1f75a2e1352fb3d6947042807334e6032cdbf17b388f"
+          }
+        }
+      },
+      {
+        "id": "2d5cc8a8-da16-43ca-be83-fe037c1f467a",
+        "moveNumber": 2,
+        "san": "d4",
+        "position": {
+          "fen": "rnbqkbnr/pp1ppppp/2p5/8/3PP3/8/PPP2PPP/RNBQKBNR b KQkq d3 0 2",
+          "highlights": [
+            {
+              "square": "SQUARE_D4",
+              "type": "COURSE_DRAWING_SQUARE_TYPE_SECONDARY"
+            },
+            {
+              "square": "SQUARE_E4",
+              "type": "COURSE_DRAWING_SQUARE_TYPE_SECONDARY"
+            }
+          ]
+        },
+        "color": "COLOR_WHITE",
+        "postComment": "{\"data\":[{\"key\":\"C\",\"state\":\"V\",\"val\":\"A second pawn claims more central space. It's time to strike in the center!\"}]}",
+        "plyIndex": 2,
+        "coachSpeech": {
+          "main": {
+            "textItemId": "courses-openings-60867992-2",
+            "audioUrlHash": "673e41e032b52e42ac3525ed8487ac6498df316012718c1876a8e3a44f04a768"
+          }
+        }
+      },
+      {
+        "id": "247eb53d-f4bb-4462-9e14-89ca96ca0eab",
+        "moveNumber": 2,
+        "san": "d5",
+        "position": {
+          "fen": "rnbqkbnr/pp2pppp/2p5/3p4/3PP3/8/PPP2PPP/RNBQKBNR w KQkq d6 0 3",
+          "arrows": [
+            {
+              "squareFrom": "SQUARE_D5",
+              "squareTo": "SQUARE_E4",
+              "type": "COURSE_DRAWING_ARROW_TYPE_TERTIARY"
+            }
+          ]
+        },
+        "color": "COLOR_BLACK",
+        "isLearnable": true,
+        "alternativeMoves": [
+          {
+            "san": "g6",
+            "fen": "rnbqkbnr/pp1ppp1p/2p3p1/8/3PP3/8/PPP2PPP/RNBQKBNR w KQkq - 0 3"
+          },
+          {
+            "san": "Na6",
+            "fen": "r1bqkbnr/pp1ppppp/n1p5/8/3PP3/8/PPP2PPP/RNBQKBNR w KQkq - 1 3"
+          }
+        ],
+        "postComment": "{\"data\":[{\"key\":\"C\",\"state\":\"V\",\"val\":\"The pawn joins the battle for central control, threatening to capture a pawn on the next move.\"}]}",
+        "plyIndex": 3,
+        "coachSpeech": {
+          "main": {
+            "textItemId": "courses-openings-60867992-3",
+            "audioUrlHash": "de3884abcf2a7d417e557277aa56aeb6b483f4473bdbbd277f11c4937a1d5c0c"
+          }
+        }
+      },
+      {
+        "id": "46ed9c1d-7556-4085-9e56-52aad20cff6d",
+        "moveNumber": 3,
+        "san": "exd5",
+        "position": {
+          "fen": "rnbqkbnr/pp2pppp/2p5/3P4/3P4/8/PPP2PPP/RNBQKBNR b KQkq - 0 3"
+        },
+        "color": "COLOR_WHITE",
+        "postComment": "{\"data\":[{\"key\":\"C\",\"state\":\"V\",\"val\":\"The threatened pawn captures your pawn \\u2013 a common choice.\"}]}",
+        "plyIndex": 4,
+        "coachSpeech": {
+          "main": {
+            "textItemId": "courses-openings-60867992-4",
+            "audioUrlHash": "bca129953236d90abc31a57fe32fe50bbc2a48bc086a2ca9ca6e636db9a89b45"
+          }
+        }
+      },
+      {
+        "id": "c7b67d2d-2a5d-4eea-8a39-91318c4e0d55",
+        "moveNumber": 3,
+        "san": "cxd5",
+        "position": {
+          "fen": "rnbqkbnr/pp2pppp/8/3p4/3P4/8/PPP2PPP/RNBQKBNR w KQkq - 0 4",
+          "highlights": [
+            {
+              "square": "SQUARE_D5",
+              "type": "COURSE_DRAWING_SQUARE_TYPE_SECONDARY"
+            }
+          ]
+        },
+        "color": "COLOR_BLACK",
+        "isLearnable": true,
+        "postComment": "{\"data\":[{\"key\":\"C\",\"state\":\"V\",\"val\":\"The pawn recaptures into the center.\"}]}",
+        "plyIndex": 5,
+        "coachSpeech": {
+          "main": {
+            "textItemId": "courses-openings-60867992-5",
+            "audioUrlHash": "a33dc4e27a68c805101eac7c0daa12c5dfa6c12371c169eaceaee1ba78060e5d"
+          }
+        }
+      },
+      {
+        "id": "89d19347-76e8-4cec-87f2-55255c413e8f",
+        "moveNumber": 4,
+        "san": "Nc3",
+        "position": {
+          "fen": "rnbqkbnr/pp2pppp/8/3p4/3P4/2N5/PPP2PPP/R1BQKBNR b KQkq - 1 4"
+        },
+        "color": "COLOR_WHITE",
+        "postComment": "{\"data\":[{\"key\":\"C\",\"state\":\"V\",\"val\":\"The knight enters the action, fighting for central control.\"}]}",
+        "plyIndex": 6,
+        "coachSpeech": {
+          "main": {
+            "textItemId": "courses-openings-60867992-6",
+            "audioUrlHash": "435ffb37d24840fd88808e5f811d36eae63876842a12d2ac9e048d8e2e87e28f"
+          }
+        }
+      },
+      {
+        "id": "7a6fbdaa-dd20-4028-acb9-39da9adb12fb",
+        "moveNumber": 4,
+        "san": "Nf6",
+        "position": {
+          "fen": "rnbqkb1r/pp2pppp/5n2/3p4/3P4/2N5/PPP2PPP/R1BQKBNR w KQkq - 2 5",
+          "highlights": [
+            {
+              "square": "SQUARE_D5",
+              "type": "COURSE_DRAWING_SQUARE_TYPE_SECONDARY"
+            },
+            {
+              "square": "SQUARE_E4",
+              "type": "COURSE_DRAWING_SQUARE_TYPE_SECONDARY"
+            }
+          ]
+        },
+        "color": "COLOR_BLACK",
+        "isLearnable": true,
+        "alternativeMoves": [
+          {
+            "san": "Nc6",
+            "fen": "r1bqkbnr/pp2pppp/2n5/3p4/3P4/2N5/PPP2PPP/R1BQKBNR w KQkq - 2 5"
+          },
+          {
+            "san": "Bf5",
+            "fen": "rn1qkbnr/pp2pppp/8/3p1b2/3P4/2N5/PPP2PPP/R1BQKBNR w KQkq - 2 5"
+          },
+          {
+            "san": "a6",
+            "fen": "rnbqkbnr/1p2pppp/p7/3p4/3P4/2N5/PPP2PPP/R1BQKBNR w KQkq - 0 5"
+          }
+        ],
+        "postComment": "{\"data\":[{\"key\":\"C\",\"state\":\"V\",\"val\":\"Your knight hops toward the center, defending important central squares.\"}]}",
+        "plyIndex": 7,
+        "coachSpeech": {
+          "main": {
+            "textItemId": "courses-openings-60867992-7",
+            "audioUrlHash": "e6f19d84b0771f9e1bad9e4de4bfb56b54cb04a4e29f5dead6d6dee290114ac1"
+          }
+        }
+      },
+      {
+        "id": "abf55f61-8bfb-4151-9b1c-0b3d8722c9e4",
+        "moveNumber": 5,
+        "san": "Nf3",
+        "position": {
+          "fen": "rnbqkb1r/pp2pppp/5n2/3p4/3P4/2N2N2/PPP2PPP/R1BQKB1R b KQkq - 3 5"
+        },
+        "color": "COLOR_WHITE",
+        "postComment": "{\"data\":[{\"key\":\"C\",\"state\":\"V\",\"val\":\"Their other knight develops to an active square.\"}]}",
+        "plyIndex": 8,
+        "coachSpeech": {
+          "main": {
+            "textItemId": "courses-openings-60867992-8",
+            "audioUrlHash": "d9dcc65e65c6b4189798937019046f6c4a19c2db5a61f1871f32ed8bee058cae"
+          }
+        }
+      },
+      {
+        "id": "1b094a4e-d104-4e04-896c-4e3b7fed2506",
+        "moveNumber": 5,
+        "san": "Bg4",
+        "position": {
+          "fen": "rn1qkb1r/pp2pppp/5n2/3p4/3P2b1/2N2N2/PPP2PPP/R1BQKB1R w KQkq - 4 6",
+          "highlights": [
+            {
+              "square": "SQUARE_D1",
+              "type": "COURSE_DRAWING_SQUARE_TYPE_TERTIARY"
+            },
+            {
+              "square": "SQUARE_F3",
+              "type": "COURSE_DRAWING_SQUARE_TYPE_TERTIARY"
+            }
+          ],
+          "nags": [
+            {
+              "type": "primary",
+              "nagId": 1
+            }
+          ]
+        },
+        "color": "COLOR_BLACK",
+        "isLearnable": true,
+        "alternativeMoves": [
+          {
+            "san": "Nc6",
+            "fen": "r1bqkb1r/pp2pppp/2n2n2/3p4/3P4/2N2N2/PPP2PPP/R1BQKB1R w KQkq - 4 6"
+          },
+          {
+            "san": "a6",
+            "fen": "rnbqkb1r/1p2pppp/p4n2/3p4/3P4/2N2N2/PPP2PPP/R1BQKB1R w KQkq - 0 6"
+          },
+          {
+            "san": "Bd7",
+            "fen": "rn1qkb1r/pp1bpppp/5n2/3p4/3P4/2N2N2/PPP2PPP/R1BQKB1R w KQkq - 4 6"
+          }
+        ],
+        "postComment": "{\"data\":[{\"key\":\"C\",\"state\":\"V\",\"val\":\"The bishop races into the game, pinning the knight to their queen.\"}]}",
+        "plyIndex": 9,
+        "coachSpeech": {
+          "main": {
+            "textItemId": "courses-openings-60867992-9",
+            "audioUrlHash": "ef525e65b2d8ccb2bb58836d7036b021e268f3f8702695aa37ee004c0f14b160"
+          }
+        }
+      },
+      {
+        "id": "5c5b574e-63fa-407a-9548-f875d31a87a0",
+        "moveNumber": 6,
+        "san": "Be2",
+        "position": {
+          "fen": "rn1qkb1r/pp2pppp/5n2/3p4/3P2b1/2N2N2/PPP1BPPP/R1BQK2R b KQkq - 5 6",
+          "arrows": [
+            {
+              "squareFrom": "SQUARE_E2",
+              "squareTo": "SQUARE_F3",
+              "type": "COURSE_DRAWING_ARROW_TYPE_SECONDARY"
+            },
+            {
+              "squareFrom": "SQUARE_E1",
+              "squareTo": "SQUARE_G1",
+              "type": "COURSE_DRAWING_ARROW_TYPE_SECONDARY"
+            }
+          ]
+        },
+        "color": "COLOR_WHITE",
+        "postComment": "{\"data\":[{\"key\":\"C\",\"state\":\"V\",\"val\":\"The bishop defends the knight and prepares to castle the king.\"}]}",
+        "plyIndex": 10,
+        "coachSpeech": {
+          "main": {
+            "textItemId": "courses-openings-60867992-10",
+            "audioUrlHash": "592f49e7288a7ba6c5d1abd5e94a044a495cbfe39d4c1356911775a4b2bb738c"
+          }
+        }
+      },
+      {
+        "id": "fb13687d-4442-4c6d-85df-9b36b853255d",
+        "moveNumber": 6,
+        "san": "e6",
+        "position": {
+          "fen": "rn1qkb1r/pp3ppp/4pn2/3p4/3P2b1/2N2N2/PPP1BPPP/R1BQK2R w KQkq - 0 7",
+          "arrows": [
+            {
+              "squareFrom": "SQUARE_F8",
+              "squareTo": "SQUARE_E7",
+              "type": "COURSE_DRAWING_ARROW_TYPE_SECONDARY"
+            }
+          ]
+        },
+        "color": "COLOR_BLACK",
+        "isLearnable": true,
+        "alternativeMoves": [
+          {
+            "san": "Nc6",
+            "fen": "r2qkb1r/pp2pppp/2n2n2/3p4/3P2b1/2N2N2/PPP1BPPP/R1BQK2R w KQkq - 6 7"
+          },
+          {
+            "san": "Qb6",
+            "fen": "rn2kb1r/pp2pppp/1q3n2/3p4/3P2b1/2N2N2/PPP1BPPP/R1BQK2R w KQkq - 6 7"
+          },
+          {
+            "san": "a6",
+            "fen": "rn1qkb1r/1p2pppp/p4n2/3p4/3P2b1/2N2N2/PPP1BPPP/R1BQK2R w KQkq - 0 7"
+          },
+          {
+            "san": "Nbd7",
+            "fen": "r2qkb1r/pp1npppp/5n2/3p4/3P2b1/2N2N2/PPP1BPPP/R1BQK2R w KQkq - 6 7"
+          },
+          {
+            "san": "Bxf3",
+            "fen": "rn1qkb1r/pp2pppp/5n2/3p4/3P4/2N2b2/PPP1BPPP/R1BQK2R w KQkq - 0 7"
+          }
+        ],
+        "postComment": "{\"data\":[{\"key\":\"C\",\"state\":\"V\",\"val\":\"This pawn supports the central pawn while also clearing a diagonal for your dark-squared bishop.\"}]}",
+        "plyIndex": 11,
+        "coachSpeech": {
+          "main": {
+            "textItemId": "courses-openings-60867992-11",
+            "audioUrlHash": "7218e661f5e3d5b6eb622a0bdc9121daad9261dcce0cfd99a538ed0ada53b338"
+          }
+        }
+      },
+      {
+        "id": "f2ba1b34-d27c-451c-af32-c9df311986fa",
+        "moveNumber": 7,
+        "san": "O-O",
+        "position": {
+          "fen": "rn1qkb1r/pp3ppp/4pn2/3p4/3P2b1/2N2N2/PPP1BPPP/R1BQ1RK1 b kq - 1 7"
+        },
+        "color": "COLOR_WHITE",
+        "postComment": "{\"data\":[{\"key\":\"C\",\"state\":\"V\",\"val\":\"The king castles to safety.\"}]}",
+        "plyIndex": 12,
+        "coachSpeech": {
+          "main": {
+            "textItemId": "courses-openings-60867992-12",
+            "audioUrlHash": "8fa1e42eee6f0c88151ea7260cf8222c67947232445add3d5ee460c3846b071f"
+          }
+        }
+      },
+      {
+        "id": "a6b0f0f8-9853-4887-8a20-994ce080d7ed",
+        "moveNumber": 7,
+        "san": "Be7",
+        "position": {
+          "fen": "rn1qk2r/pp2bppp/4pn2/3p4/3P2b1/2N2N2/PPP1BPPP/R1BQ1RK1 w kq - 2 8",
+          "arrows": [
+            {
+              "squareFrom": "SQUARE_E8",
+              "squareTo": "SQUARE_G8",
+              "type": "COURSE_DRAWING_ARROW_TYPE_SECONDARY"
+            },
+            {
+              "squareFrom": "SQUARE_B8",
+              "squareTo": "SQUARE_C6",
+              "type": "COURSE_DRAWING_ARROW_TYPE_SECONDARY"
+            }
+          ]
+        },
+        "color": "COLOR_BLACK",
+        "isLearnable": true,
+        "alternativeMoves": [
+          {
+            "san": "Nc6",
+            "fen": "r2qkb1r/pp3ppp/2n1pn2/3p4/3P2b1/2N2N2/PPP1BPPP/R1BQ1RK1 w kq - 2 8"
+          },
+          {
+            "san": "h6",
+            "fen": "rn1qkb1r/pp3pp1/4pn1p/3p4/3P2b1/2N2N2/PPP1BPPP/R1BQ1RK1 w kq - 0 8"
+          },
+          {
+            "san": "Bh5",
+            "fen": "rn1qkb1r/pp3ppp/4pn2/3p3b/3P4/2N2N2/PPP1BPPP/R1BQ1RK1 w kq - 2 8"
+          },
+          {
+            "san": "a6",
+            "fen": "rn1qkb1r/1p3ppp/p3pn2/3p4/3P2b1/2N2N2/PPP1BPPP/R1BQ1RK1 w kq - 0 8"
+          }
+        ],
+        "postComment": "{\"data\":[{\"key\":\"C\",\"state\":\"V\",\"val\":\"The bishop supports the knight and clears the path for castling. Next, you can focus on developing your other pieces.\"}]}",
+        "plyIndex": 13,
+        "coachSpeech": {
+          "main": {
+            "textItemId": "courses-openings-60867992-13",
+            "audioUrlHash": "2abcb7966b3f503facf3742528e9cbbfaa084bff100fd2a82be89d87cdf004a6"
+          }
+        }
+      }
+    ],
+    "settings": {
+      "showVideo": true,
+      "language": "en-US",
+      "learnType": "COURSE_LEARN_TYPE_ALL",
+      "reviewType": "COURSE_REVIEW_TYPE_LEARNED_ORDER",
+      "repetitionAmount": 1,
+      "scheduleType": "COURSE_SCHEDULE_TYPE_SPACED_REPETITION",
+      "schedule": {
+        "secondsAmount": [
+          86400,
+          259200,
+          604800,
+          1209600,
+          2592000,
+          5184000,
+          7776000
+        ]
+      },
+      "autoNext": false,
+      "quizTimeLimit": true,
+      "timer": 60,
+      "assistedQuiz": true,
+      "reviewFailedBehavior": "COURSE_REVIEW_FAILED_BEHAVIOR_MOVE_TO_NEXT_CYCLE",
+      "assistedQuizPauseToRead": true,
+      "learnMode": "COURSE_CONSUMPTION_MODE_LEARN"
+    },
+    "firstLearnableMoveColor": "COLOR_BLACK"
+  },
+  "trainingId": "c5a9fcfb-8631-4fb3-8c3d-3ff0e18c5dd4"
+}

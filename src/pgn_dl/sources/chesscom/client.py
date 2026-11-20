@@ -1,5 +1,11 @@
 """Connect-RPC client for chess.com's courses service.
 
+chess.com serves the same API from two deployments: one for Courses and one for
+the opening courses under Openings. They share course ids, but an opening course
+requested from the Courses deployment comes back as a preview, each lesson cut
+to its first move or two, with no error. So a client is bound to one
+:class:`Service`.
+
 The first call exchanges the ``ACCESS_TOKEN`` cookie for a Bearer JWT. The JWT
 expires before a long course is through, and chess.com refuses a call bearing an
 expired one with a 401, so a call refused with a 401 exchanges the cookie again and
@@ -10,18 +16,38 @@ from __future__ import annotations
 
 import asyncio
 import uuid
+from dataclasses import dataclass
 from typing import Any
 
 from ...core.fetch import Fetcher, FetchError
 
-BASE = "https://www.chess.com/service/courses/rpc"
 _AUTH_SVC = "chesscom.courses.v1.CoursesAuthenticationService"
 _TRAIN_SVC = "chesscom.courses.v1.CoursesTrainingService"
+_PRODUCT_SVC = "chesscom.courses.v1.CourseProductDetailsService"
+
+
+@dataclass(frozen=True)
+class Service:
+    """One deployment of the courses service."""
+
+    rpc: str  # where its methods are, as ``<rpc>/<service>/<method>``
+    page: str  # the web app it serves, sent as the referer
+
+
+COURSES = Service(
+    rpc="https://www.chess.com/service/courses/rpc",
+    page="https://www.chess.com/courses",
+)
+OPENING_COURSES = Service(
+    rpc="https://www.chess.com/service/opening-courses/rpc",
+    page="https://www.chess.com/openings/courses",
+)
 
 
 class CoursesClient:
-    def __init__(self, fetcher: Fetcher) -> None:
+    def __init__(self, fetcher: Fetcher, service: Service = COURSES) -> None:
         self._fetcher = fetcher
+        self._service = service
         self._jwt: str | None = None
         self._renewing = asyncio.Lock()
         self.session_id: str = str(uuid.uuid4())
@@ -35,6 +61,10 @@ class CoursesClient:
             None,
         )
         self._jwt = data["accessToken"]
+
+    async def get_product(self, slug: str) -> dict[str, Any]:
+        """Return the product details for a course page's slug, course id included."""
+        return await self._call(_PRODUCT_SVC, "GetCourseProductBySlug", {"slug": slug})
 
     async def get_learning_session(self, course_id: str) -> dict[str, Any]:
         """Return the course outline (chapters + every lesson header)."""
@@ -83,10 +113,10 @@ class CoursesClient:
             "accept": "application/json",
             "connect-protocol-version": "1",
             "origin": "https://www.chess.com",
-            "referer": "https://www.chess.com/courses",
+            "referer": self._service.page,
         }
         if jwt is not None:
             headers["authorization"] = f"Bearer {jwt}"
         return await self._fetcher.post_json(
-            f"{BASE}/{service}/{method}", headers=headers, json=body
+            f"{self._service.rpc}/{service}/{method}", headers=headers, json=body
         )

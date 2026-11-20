@@ -1,0 +1,116 @@
+{
+  "details": {
+    "product": {
+      "id": "6eb29512-5509-4c5e-a7ed-cd4df93492b1",
+      "name": "Caro-Kann Defense",
+      "description": "Caro-Kann for Black",
+      "shortDescription": "Positional defense to 1.e4, fighting for light square control without blocking in the light-squared bishop.",
+      "squarePicture": {
+        "url": "https://assets-courses.chess.com/image/courses/default_course_square_opt.png"
+      },
+      "rectangularPicture": {
+        "url": "https://assets-courses.chess.com/image/courses/default_course_rectangular_v2.png",
+        "previewUrl": "https://assets-courses.chess.com/image/courses/default_course_rectangular_preview_v2.png"
+      },
+      "rating": {},
+      "recommendedLevelRange": {
+        "to": 800
+      },
+      "gameAspect": {
+        "mainGameAspect": "COURSE_GAME_ASPECT_TYPE_OPENING"
+      },
+      "color": [
+        "COLOR_BLACK"
+      ],
+      "releaseDate": "2026-02-26T10:15:33Z",
+      "authors": [
+        {
+          "name": "Chess.com",
+          "chessTitle": "",
+          "picture": {
+            "url": "https://assets-courses.chess.com/image/users/2366340_user_medium_opt.jpeg"
+          }
+        }
+      ],
+      "video": {},
+      "slug": "caro-kann-defense-396427",
+      "moveTrainerSku": "mt_396427",
+      "videoSku": "",
+      "moveTrainerPurchaseDate": "2026-11-19T23:28:46Z",
+      "variationCount": 8,
+      "language": [
+        {
+          "locale": "en-US"
+        },
+        {
+          "locale": "ar-SA"
+        },
+        {
+          "locale": "de-DE"
+        },
+        {
+          "locale": "es-ES"
+        },
+        {
+          "locale": "fr-FR"
+        },
+        {
+          "locale": "hi-IN"
+        },
+        {
+          "locale": "id-ID"
+        },
+        {
+          "locale": "it-IT"
+        },
+        {
+          "locale": "ko-KR"
+        },
+        {
+          "locale": "pl-PL"
+        },
+        {
+          "locale": "pt-BR"
+        },
+        {
+          "locale": "ru-RU"
+        },
+        {
+          "locale": "tr-TR"
+        }
+      ],
+      "freeVideoMinutes": 0,
+      "courseSource": {
+        "id": "396427",
+        "type": "SOURCE_TYPE_CHESSABLE"
+      },
+      "userAccessGrant": "USER_ACCESS_GRANT_FULL",
+      "canonicalLine": {
+        "moves": [
+          "e4",
+          "c6"
+        ]
+      },
+      "isRecommended": true,
+      "firstCoachComment": {
+        "text": "Let's check out the Caro-Kann – a reliable, strategically rich defense.",
+        "speech": {
+          "textItemId": "courses-openings-60867992-0-intro",
+          "audioUrlHash": "c7db86f8e024ef9904eefd64dcf4b7b88c096f5fe6c66b89c0ab5abd0658d309"
+        },
+        "locale": "en-US"
+      }
+    },
+    "chapters": [
+      {
+        "id": "11db8b14-f730-4438-9076-c3c10ec3b6d9",
+        "name": "Caro-Kann Defense",
+        "stats": {
+          "trainableVariations": 8,
+          "averageTrainingDepth": 8.375
+        }
+      }
+    ],
+    "defaultMoveTrainerId": "1493cca3-e6ba-4ece-9c39-051bbf1867b2"
+  }
+}

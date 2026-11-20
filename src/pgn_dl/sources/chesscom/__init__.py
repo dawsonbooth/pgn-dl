@@ -5,10 +5,20 @@ from ...core.registry import register_declaration
 from .auth import login
 from .courses import CoursesExtractor
 from .lessons import LessonsExtractor
+from .opening_courses import OpeningCoursesExtractor
 
 _COURSES_HELP = """
 Download a course into PGN files (requires `pgn-dl login chesscom`).
 
+Re-running with the same out dir resumes, skipping PGNs that already exist.
+For an opening course (chess.com/openings/courses), use
+`pgn-dl chesscom opening-courses`.
+"""
+
+_OPENING_COURSES_HELP = """
+Download an opening course into PGN files (requires `pgn-dl login chesscom`).
+
+Give a chess.com/openings/courses/<slug> URL, or just the slug.
 Re-running with the same out dir resumes, skipping PGNs that already exist.
 """
 
@@ -31,6 +41,12 @@ declaration = SourceDeclaration(
             help=_COURSES_HELP,
         ),
         ExtractorDeclaration(
+            extractor=OpeningCoursesExtractor,
+            target_name="course",
+            target_help="Opening course slug or chess.com/openings/courses URL",
+            help=_OPENING_COURSES_HELP,
+        ),
+        ExtractorDeclaration(
             extractor=LessonsExtractor,
             target_name="target",
             target_help="Lesson-course or lesson URL, or 'lesson-course/lesson'",
@@ -40,4 +56,9 @@ declaration = SourceDeclaration(
 )
 register_declaration(declaration)
 
-__all__ = ["CoursesExtractor", "LessonsExtractor", "declaration"]
+__all__ = [
+    "CoursesExtractor",
+    "LessonsExtractor",
+    "OpeningCoursesExtractor",
+    "declaration",
+]

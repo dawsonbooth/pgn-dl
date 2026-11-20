@@ -1,0 +1,323 @@
+{
+  "learningSession": {
+    "lessonsHeaders": [
+      {
+        "id": "6c6bc637-d62c-4e22-93e5-7c17ee5458f8",
+        "name": "Exchange Variation #1",
+        "startingPosition": {
+          "fen": "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
+        },
+        "moveTrainerId": "1493cca3-e6ba-4ece-9c39-051bbf1867b2",
+        "chapterId": "11db8b14-f730-4438-9076-c3c10ec3b6d9",
+        "type": "COURSE_VARIATION_TYPE_LESSON",
+        "isLearned": true,
+        "accessType": "VARIATION_ACCESS_TYPE_FULL_ACCESS",
+        "learningLevel": 0,
+        "firstLearnedAt": "2026-11-19T23:29:39Z",
+        "nextReviewAt": "2026-11-20T23:29:39Z",
+        "moveCount": 7,
+        "previewPosition": {
+          "fen": "rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1",
+          "highlights": [
+            {
+              "square": "SQUARE_E4",
+              "type": "COURSE_DRAWING_SQUARE_TYPE_SECONDARY"
+            }
+          ],
+          "arrows": [
+            {
+              "squareFrom": "SQUARE_F1",
+              "squareTo": "SQUARE_C4",
+              "type": "COURSE_DRAWING_ARROW_TYPE_SECONDARY"
+            },
+            {
+              "squareFrom": "SQUARE_D1",
+              "squareTo": "SQUARE_H5",
+              "type": "COURSE_DRAWING_ARROW_TYPE_SECONDARY"
+            }
+          ]
+        },
+        "learnerColor": "COLOR_BLACK",
+        "slug": "exchange-variation-1"
+      },
+      {
+        "id": "51ef9796-063b-464b-9394-54d0332e9a21",
+        "name": "Exchange Variation #2",
+        "startingPosition": {
+          "fen": "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
+        },
+        "moveTrainerId": "1493cca3-e6ba-4ece-9c39-051bbf1867b2",
+        "chapterId": "11db8b14-f730-4438-9076-c3c10ec3b6d9",
+        "type": "COURSE_VARIATION_TYPE_LESSON",
+        "isLearned": true,
+        "accessType": "VARIATION_ACCESS_TYPE_FULL_ACCESS",
+        "learningLevel": 0,
+        "firstLearnedAt": "2026-11-19T23:30:37Z",
+        "nextReviewAt": "2026-11-20T23:30:37Z",
+        "moveCount": 9,
+        "previewPosition": {
+          "fen": "rnbqkbnr/pp2pppp/8/3p4/3P4/5N2/PPP2PPP/RNBQKB1R b KQkq - 1 4"
+        },
+        "learnerColor": "COLOR_BLACK",
+        "slug": "exchange-variation-2"
+      },
+      {
+        "id": "ed3c899e-42d3-4fee-a8d0-606690269542",
+        "name": "Advance Variation: Bishop Swap",
+        "startingPosition": {
+          "fen": "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
+        },
+        "moveTrainerId": "1493cca3-e6ba-4ece-9c39-051bbf1867b2",
+        "chapterId": "11db8b14-f730-4438-9076-c3c10ec3b6d9",
+        "type": "COURSE_VARIATION_TYPE_LESSON",
+        "isLearned": true,
+        "accessType": "VARIATION_ACCESS_TYPE_FULL_ACCESS",
+        "learningLevel": 0,
+        "firstLearnedAt": "2026-11-19T23:32:01Z",
+        "nextReviewAt": "2026-11-20T23:32:01Z",
+        "moveCount": 9,
+        "previewPosition": {
+          "fen": "rnbqkbnr/pp2pppp/2p5/3pP3/3P4/8/PPP2PPP/RNBQKBNR b KQkq - 0 3",
+          "highlights": [
+            {
+              "square": "SQUARE_E5",
+              "type": "COURSE_DRAWING_SQUARE_TYPE_TERTIARY"
+            }
+          ],
+          "arrows": [
+            {
+              "squareFrom": "SQUARE_E5",
+              "squareTo": "SQUARE_D6",
+              "type": "COURSE_DRAWING_ARROW_TYPE_SECONDARY"
+            },
+            {
+              "squareFrom": "SQUARE_E5",
+              "squareTo": "SQUARE_F6",
+              "type": "COURSE_DRAWING_ARROW_TYPE_SECONDARY"
+            }
+          ]
+        },
+        "learnerColor": "COLOR_BLACK",
+        "slug": "advance-variation-bishop-swap"
+      },
+      {
+        "id": "f2e595c3-c48f-42e5-b4e8-fba3db1c8b6d",
+        "name": "Advance Variation: Pawn Chain Attack #1",
+        "startingPosition": {
+          "fen": "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
+        },
+        "moveTrainerId": "1493cca3-e6ba-4ece-9c39-051bbf1867b2",
+        "chapterId": "11db8b14-f730-4438-9076-c3c10ec3b6d9",
+        "type": "COURSE_VARIATION_TYPE_LESSON",
+        "isLearned": true,
+        "accessType": "VARIATION_ACCESS_TYPE_FULL_ACCESS",
+        "learningLevel": 0,
+        "firstLearnedAt": "2026-11-19T23:32:57Z",
+        "nextReviewAt": "2026-11-20T23:32:57Z",
+        "moveCount": 8,
+        "previewPosition": {
+          "fen": "rn1qkbnr/pp2pppp/2p5/3pPb2/3P4/5N2/PPP2PPP/RNBQKB1R b KQkq - 2 4",
+          "highlights": [
+            {
+              "square": "SQUARE_D4",
+              "type": "COURSE_DRAWING_SQUARE_TYPE_SECONDARY"
+            },
+            {
+              "square": "SQUARE_E5",
+              "type": "COURSE_DRAWING_SQUARE_TYPE_SECONDARY"
+            }
+          ]
+        },
+        "learnerColor": "COLOR_BLACK",
+        "slug": "advance-variation-pawn-chain-attack-1"
+      },
+      {
+        "id": "dde69009-7a40-4d5b-87ec-5c45f44c0de9",
+        "name": "Advance Variation: Pawn Chain Attack #2",
+        "startingPosition": {
+          "fen": "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
+        },
+        "moveTrainerId": "1493cca3-e6ba-4ece-9c39-051bbf1867b2",
+        "chapterId": "11db8b14-f730-4438-9076-c3c10ec3b6d9",
+        "type": "COURSE_VARIATION_TYPE_LESSON",
+        "isLearned": true,
+        "accessType": "VARIATION_ACCESS_TYPE_FULL_ACCESS",
+        "learningLevel": 0,
+        "firstLearnedAt": "2026-11-19T23:33:47Z",
+        "nextReviewAt": "2026-11-20T23:33:47Z",
+        "moveCount": 8,
+        "previewPosition": {
+          "fen": "rn1qkb1r/pp2nppp/4p3/2ppPb2/3P4/2P2N2/PP2BPPP/RNBQ1RK1 b kq - 0 7",
+          "highlights": [
+            {
+              "square": "SQUARE_D4",
+              "type": "COURSE_DRAWING_SQUARE_TYPE_TERTIARY"
+            }
+          ],
+          "arrows": [
+            {
+              "squareFrom": "SQUARE_C3",
+              "squareTo": "SQUARE_D4",
+              "type": "COURSE_DRAWING_ARROW_TYPE_SECONDARY"
+            },
+            {
+              "squareFrom": "SQUARE_C5",
+              "squareTo": "SQUARE_D4",
+              "type": "COURSE_DRAWING_ARROW_TYPE_SECONDARY"
+            }
+          ]
+        },
+        "learnerColor": "COLOR_BLACK",
+        "slug": "advance-variation-pawn-chain-attack-2"
+      },
+      {
+        "id": "45dab381-e610-4abd-8e2f-3fedc86d7148",
+        "name": "Classical Variation: Central Pawn Grab",
+        "startingPosition": {
+          "fen": "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
+        },
+        "moveTrainerId": "1493cca3-e6ba-4ece-9c39-051bbf1867b2",
+        "chapterId": "11db8b14-f730-4438-9076-c3c10ec3b6d9",
+        "type": "COURSE_VARIATION_TYPE_LESSON",
+        "isLearned": true,
+        "accessType": "VARIATION_ACCESS_TYPE_FULL_ACCESS",
+        "learningLevel": 0,
+        "firstLearnedAt": "2026-11-19T23:35:15Z",
+        "nextReviewAt": "2026-11-20T23:35:15Z",
+        "moveCount": 9,
+        "previewPosition": {
+          "fen": "rnbqkbnr/pp2pppp/2p5/3p4/3PP3/2N5/PPP2PPP/R1BQKBNR b KQkq - 1 3",
+          "highlights": [
+            {
+              "square": "SQUARE_D5",
+              "type": "COURSE_DRAWING_SQUARE_TYPE_TERTIARY"
+            },
+            {
+              "square": "SQUARE_E4",
+              "type": "COURSE_DRAWING_SQUARE_TYPE_SECONDARY"
+            }
+          ]
+        },
+        "learnerColor": "COLOR_BLACK",
+        "slug": "classical-variation-central-pawn-grab"
+      },
+      {
+        "id": "edee34b5-7c45-475c-97d9-2a4879fa8d15",
+        "name": "Classical Variation: Bishop Face-Off",
+        "startingPosition": {
+          "fen": "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
+        },
+        "moveTrainerId": "1493cca3-e6ba-4ece-9c39-051bbf1867b2",
+        "chapterId": "11db8b14-f730-4438-9076-c3c10ec3b6d9",
+        "type": "COURSE_VARIATION_TYPE_LESSON",
+        "isLearned": true,
+        "accessType": "VARIATION_ACCESS_TYPE_FULL_ACCESS",
+        "learningLevel": 0,
+        "firstLearnedAt": "2026-11-19T23:36:23Z",
+        "nextReviewAt": "2026-11-20T23:36:23Z",
+        "moveCount": 8,
+        "previewPosition": {
+          "fen": "rn1qkbnr/pp2pppp/2p5/5b2/3P4/6N1/PPP2PPP/R1BQKBNR b KQkq - 2 5",
+          "arrows": [
+            {
+              "squareFrom": "SQUARE_G3",
+              "squareTo": "SQUARE_F5",
+              "type": "COURSE_DRAWING_ARROW_TYPE_TERTIARY"
+            }
+          ]
+        },
+        "learnerColor": "COLOR_BLACK",
+        "slug": "classical-variation-bishop-face-off"
+      },
+      {
+        "id": "26824559-7e26-4f55-bd8a-e85144818786",
+        "name": "Classical Variation: Rook Pawn Attack",
+        "startingPosition": {
+          "fen": "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
+        },
+        "moveTrainerId": "1493cca3-e6ba-4ece-9c39-051bbf1867b2",
+        "chapterId": "11db8b14-f730-4438-9076-c3c10ec3b6d9",
+        "type": "COURSE_VARIATION_TYPE_LESSON",
+        "isLearned": true,
+        "accessType": "VARIATION_ACCESS_TYPE_FULL_ACCESS",
+        "learningLevel": 0,
+        "firstLearnedAt": "2026-11-19T23:37:29Z",
+        "nextReviewAt": "2026-11-20T23:37:29Z",
+        "moveCount": 9,
+        "previewPosition": {
+          "fen": "rn1qkbnr/pp2pppp/2p3b1/8/3P3P/6N1/PPP2PP1/R1BQKBNR b KQkq h3 0 6",
+          "highlights": [
+            {
+              "square": "SQUARE_G6",
+              "type": "COURSE_DRAWING_SQUARE_TYPE_TERTIARY"
+            }
+          ],
+          "arrows": [
+            {
+              "squareFrom": "SQUARE_H4",
+              "squareTo": "SQUARE_H5",
+              "type": "COURSE_DRAWING_ARROW_TYPE_TERTIARY"
+            }
+          ]
+        },
+        "learnerColor": "COLOR_BLACK",
+        "slug": "classical-variation-rook-pawn-attack"
+      }
+    ],
+    "moveTrainers": [
+      {
+        "id": "1493cca3-e6ba-4ece-9c39-051bbf1867b2",
+        "name": "Caro-Kann Defense",
+        "picture": {
+          "url": "https://assets-courses.chess.com/image/courses/default_course_square_opt.png"
+        },
+        "chapters": [
+          {
+            "id": "11db8b14-f730-4438-9076-c3c10ec3b6d9",
+            "name": "Caro-Kann Defense"
+          }
+        ],
+        "authors": [
+          {
+            "name": "Chess.com",
+            "chessTitle": "",
+            "picture": {
+              "url": "https://assets-courses.chess.com/image/users/2366340_user_medium_opt.jpeg"
+            },
+            "type": "COURSE_AUTHOR_TYPE_MAIN"
+          }
+        ],
+        "slug": "caro-kann-defense-396427",
+        "accessRightMode": "ACCESS_RIGHT_MODE_FULL",
+        "courseType": "COURSE_TYPE_FREE",
+        "courseSource": {
+          "id": "396427",
+          "type": "SOURCE_TYPE_CHESSABLE"
+        },
+        "courseGameAspect": {
+          "mainGameAspect": "COURSE_GAME_ASPECT_TYPE_OPENING"
+        },
+        "coach": {
+          "avatar": "COURSE_COACH_AVATAR_DANTE"
+        },
+        "authorPlayer": {
+          "name": "Chess.com",
+          "picture": {
+            "url": "https://assets-courses.chess.com/image/users/2366340_user_medium_opt.jpeg"
+          },
+          "isAuthor": true
+        },
+        "learnerPlayer": {
+          "name": "learner",
+          "picture": {
+            "url": "https://chess.com/bundles/web/images/user-image.svg"
+          }
+        },
+        "locale": "en-US"
+      }
+    ],
+    "lastLearnedVariationId": "26824559-7e26-4f55-bd8a-e85144818786"
+  },
+  "learningSessionId": "fbc7e719-fc96-43ac-b9de-54f31dd8b045",
+  "progress": {}
+}

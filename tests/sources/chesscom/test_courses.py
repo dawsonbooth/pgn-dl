@@ -129,6 +129,19 @@ async def test_discover_builds_the_collection_from_the_course_outline() -> None:
     assert len(fetcher.calls) == 2
 
 
+async def test_every_call_goes_to_the_courses_service() -> None:
+    # The opening-courses deployment answers the same methods, so only the URL
+    # says which of the two a call reached.
+    fetcher = _LessonFetcher()
+    extractor = CoursesExtractor(COURSE_URL)
+    _, refs = await extractor.discover(fetcher)
+    await extractor.fetch(fetcher, refs[0])
+
+    assert len(fetcher.calls) == 3
+    for url in fetcher.calls:
+        assert url.startswith("https://www.chess.com/service/courses/rpc/")
+
+
 async def test_discover_numbers_item_paths_for_resume() -> None:
     # These paths are the resume contract: a re-run skips an item when its file
     # already exists, so any drift here silently re-downloads or skips the wrong
