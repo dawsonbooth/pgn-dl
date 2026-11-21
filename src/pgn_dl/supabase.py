@@ -78,6 +78,15 @@ class SupabaseAuth:
     def credentials_path(self) -> Path:
         return self._store.credentials_path()
 
+    def has_saved_session(self) -> bool:
+        """Whether ``login`` has saved a session, readable or not.
+
+        For a source with public content: with no file there is no account to
+        download as, while a file that fails to load still means the user meant
+        to sign in, and :meth:`load` says how to fix it.
+        """
+        return self.credentials_path().exists()
+
     def save(self, session: dict[str, Any]) -> None:
         """Persist the session owner-only, replacing any previous value."""
         self._store.save(session)
@@ -148,17 +157,21 @@ class SupabaseAuth:
 
         Polling the cookie rather than waiting for a navigation: sites sign in on
         the same page, and the cookie is the one signal that is there whichever
-        path the user took.
+        path the user took. A guest's anonymous session does not end the wait.
         """
         value = self.join_chunks(await ctx.cookies(self._site))
         if not value:
             return None
         try:
-            return self.decode_cookie(value)
+            session = self.decode_cookie(value)
         except FetchError:
             # A cookie that is not yet a session (or never will be) is not worth
             # failing the poll over; sign-in may still be in flight.
             return None
+        user = session.get("user")
+        if isinstance(user, dict) and user.get("is_anonymous") is True:
+            return None
+        return session
 
     async def sign_in(self, *, login_url: str, display_name: str | None = None) -> None:
         """Open a browser so the user can sign in, then store the session."""

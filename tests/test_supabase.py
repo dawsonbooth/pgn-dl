@@ -48,6 +48,13 @@ def test_missing_credentials_tell_the_user_how_to_fix_it() -> None:
     assert "login widget" in str(exc.value)
 
 
+def test_has_saved_session_reports_whether_login_saved_anything() -> None:
+    auth = _auth()
+    assert auth.has_saved_session() is False
+    auth.save(SUPABASE_SESSION)
+    assert auth.has_saved_session() is True
+
+
 def test_a_session_without_both_tokens_is_refused() -> None:
     with pytest.raises(FetchError):
         _auth().save({"access_token": "A"})
@@ -292,3 +299,14 @@ async def test_probe_returns_the_decoded_session_once_the_cookie_appears() -> No
     ctx = FakeCtx([{"name": COOKIE, "value": supabase_cookie(SUPABASE_SESSION)}])
     assert await _auth().probe(ctx, None) == SUPABASE_SESSION
     assert ctx.asked == ["https://widget.example"]
+
+
+async def test_probe_keeps_waiting_through_an_anonymous_session() -> None:
+    # A site that hands guests an anonymous session would otherwise be read as
+    # signed in before the user has done anything.
+    guest = SUPABASE_SESSION | {"user": {"id": "u-2", "is_anonymous": True}}
+    ctx = FakeCtx([{"name": COOKIE, "value": supabase_cookie(guest)}])
+    assert await _auth().probe(ctx, None) is None
+    member = SUPABASE_SESSION | {"user": {"id": "u-3", "is_anonymous": False}}
+    ctx = FakeCtx([{"name": COOKIE, "value": supabase_cookie(member)}])
+    assert await _auth().probe(ctx, None) == member

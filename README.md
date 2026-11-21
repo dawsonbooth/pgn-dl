@@ -8,6 +8,7 @@ Supported sources:
 - aimchess.com explore, checkmate patterns, tactical motifs, and quiz
 - chessable.com courses
 - chess.com courses, opening courses, and lessons
+- chessendings.com theory, strategy, challenges, and guides
 - chessreps.com opening courses
 - noctie.ai themes and opening books
 
@@ -50,6 +51,7 @@ uv run pgn-dl chesscom opening-courses caro-kann-defense-396427
 uv run pgn-dl chessable courses 25098
 uv run pgn-dl chessreps openings alapin-sicilian-repertoire-ilg8hms
 uv run pgn-dl aimchess explore https://aimchess.com/explore
+uv run pgn-dl chessendings theory lucena-position
 ```
 
 `pgn-dl sources` lists every source and the URL patterns it accepts.
