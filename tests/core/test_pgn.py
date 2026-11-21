@@ -98,6 +98,30 @@ def test_drawings_and_comments_become_cal_csl_commands() -> None:
     assert "$1" in pgn
 
 
+def test_drawings_on_the_starting_position_join_the_game_comment() -> None:
+    # PGN annotates the starting position through the game comment.
+    root = MoveNode(
+        san=None,
+        arrows=[Arrow(from_square="g2", to_square="c6", type="blue")],
+        highlights=[Highlight(square="c7", type="yellow")],
+        children=[MoveNode(san="e4")],
+    )
+    pgn = game_to_pgn(COLLECTION, _item(root, comment="Look at c7."))
+    game = chess.pgn.read_game(io.StringIO(pgn))
+    assert game is not None
+    assert game.comment == "Look at c7. [%cal Bg2c6] [%csl Yc7]"
+    # python-chess reads a marked square as an arrow from it to itself.
+    assert [(a.tail, a.head) for a in game.arrows()] == [
+        (chess.G2, chess.C6),
+        (chess.C7, chess.C7),
+    ]
+
+
+def test_a_root_with_drawings_and_no_comment_still_gets_them() -> None:
+    root = MoveNode(san=None, highlights=[Highlight(square="d5", type="green")])
+    assert "{ [%csl Gd5] }" in game_to_pgn(COLLECTION, _item(root))
+
+
 def test_braces_in_a_comment_become_parentheses_rather_than_vanishing() -> None:
     # PGN delimits a comment with braces and gives no way to escape one inside,
     # so python-chess's exporter deletes a `}` and keeps a `{`: the file stays

@@ -112,10 +112,11 @@ def _highlights_pgn(highlights: list[Highlight]) -> str:
     return f"[%csl {items}]"
 
 
-def _build_move_comment(node: MoveNode) -> str:
+def _with_drawings(text: str, node: MoveNode) -> str:
+    """``text`` made comment-safe, followed by ``node``'s drawing commands."""
     parts: list[str] = []
-    if node.post_comment:
-        parts.append(_comment_text(node.post_comment))
+    if text:
+        parts.append(_comment_text(text))
     if node.arrows:
         parts.append(_arrows_pgn(node.arrows))
     if node.highlights:
@@ -146,7 +147,7 @@ def _attach_children(
         pgn_child = pgn_parent.add_variation(move)
         if child.pre_comment:
             pgn_child.starting_comment = _comment_text(child.pre_comment)
-        comment = _build_move_comment(child)
+        comment = _with_drawings(child.post_comment, child)
         if comment:
             pgn_child.comment = comment
         for nag in child.nags:
@@ -168,8 +169,9 @@ def game_to_pgn(collection: Collection, item: GameItem) -> str:
         game.headers["FEN"] = item.starting_fen
         game.headers["SetUp"] = "1"
 
-    if item.comment:
-        game.comment = _comment_text(item.comment)
+    # PGN annotates the starting position through the game comment.
+    if comment := _with_drawings(item.comment, item.root):
+        game.comment = comment
 
     board = chess.Board(fen=item.starting_fen)
     _attach_children(game, board, item.root.children)
