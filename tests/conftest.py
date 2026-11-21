@@ -2,8 +2,11 @@
 
 from __future__ import annotations
 
+import base64
+import json
 import os
 from collections.abc import Callable
+from contextlib import asynccontextmanager
 from pathlib import Path
 from typing import Any
 
@@ -68,3 +71,58 @@ def fast_sign_in_poll(monkeypatch: pytest.MonkeyPatch) -> None:
         return None
 
     monkeypatch.setattr(credentials_module.asyncio, "sleep", fast_sleep)
+
+
+#: A Supabase session as a site's auth cookie carries it. Invented: nothing here
+#: is a credential, and none of it may reach a message.
+SUPABASE_SESSION = {
+    "access_token": "DUMMY-ACCESS-DO-NOT-LEAK",
+    "refresh_token": "DUMMY-REFRESH-DO-NOT-LEAK",
+    "expires_at": 4102444800,  # 2100-01-01, far future
+    "token_type": "bearer",
+    "user": {"id": "u-1"},
+}
+
+
+def supabase_cookie(session: dict) -> str:
+    """``session`` as @supabase/ssr writes it into its cookie."""
+    raw = json.dumps(session).encode()
+    return "base64-" + base64.urlsafe_b64encode(raw).decode().rstrip("=")
+
+
+class SignInBrowser:
+    """A browser for the sign-in loop: it opens pages and serves cookies."""
+
+    def __init__(self) -> None:
+        self.cookies: list[dict] = []
+        self.visited: list[str] = []
+        self.asked: list[str] = []
+
+
+@pytest.fixture
+def sign_in_browser(
+    monkeypatch: pytest.MonkeyPatch, fast_sign_in_poll: None
+) -> SignInBrowser:
+    """Stand a fake browser in for the real one during ``login``."""
+    import pgn_dl.core.browser as browser_module
+
+    browser = SignInBrowser()
+
+    class Page:
+        async def goto(self, url: str, **kwargs: object) -> None:
+            browser.visited.append(url)
+
+    class Context:
+        async def new_page(self) -> Page:
+            return Page()
+
+        async def cookies(self, url: str) -> list[dict]:
+            browser.asked.append(url)
+            return browser.cookies
+
+    @asynccontextmanager
+    async def fake_browser_context(profile: Path, *, headless: bool):
+        yield Context()
+
+    monkeypatch.setattr(browser_module, "browser_context", fake_browser_context)
+    return browser

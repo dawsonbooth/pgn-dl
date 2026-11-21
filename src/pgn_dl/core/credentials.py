@@ -12,7 +12,8 @@ A source supplies only what differs: its name (which drives its profile
 directory, its login hint, and its message wording), its credential schema,
 its browser probe, its login URL, and its refresh protocol. Post-refresh
 choreography - rotation persistence, session merging, expiry margins, token
-extraction - stays with the source, since that is where its context lives.
+extraction - stays with the source, since that is where its context lives; the
+sources signing in through Supabase share theirs in ``pgn_dl.supabase``.
 
 chess.com has no credential and so is not a
 :class:`CredentialStore` adapter, but its login still rides the shared
