@@ -156,12 +156,20 @@ def test_every_source_registers_its_declaration() -> None:
     # one other thing core would otherwise have to know each source by name
     # to wire up.
     from pgn_dl.core.registry import declarations
-    from pgn_dl.sources import aimchess, chesscom, chessendings, chessreps, noctie
+    from pgn_dl.sources import (
+        aimchess,
+        chesscom,
+        chessendings,
+        chessreps,
+        lichess,
+        noctie,
+    )
 
     assert declarations()["aimchess"] is aimchess.declaration
     assert declarations()["chesscom"] is chesscom.declaration
     assert declarations()["chessendings"] is chessendings.declaration
     assert declarations()["chessreps"] is chessreps.declaration
+    assert declarations()["lichess"] is lichess.declaration
     assert declarations()["noctie"] is noctie.declaration
 
 
@@ -174,6 +182,7 @@ def test_the_root_app_mounts_the_registered_sources_in_order() -> None:
         "chesscom",
         "chessendings",
         "chessreps",
+        "lichess",
         "noctie",
     ]
 

@@ -10,6 +10,7 @@ Supported sources:
 - chess.com courses, opening courses, and lessons
 - chessendings.com theory, strategy, challenges, and guides
 - chessreps.com opening courses
+- lichess.org learn, practice, studies, and opening pages
 - noctie.ai themes and opening books
 
 pgn-dl only downloads content your account already has access to. It does not
@@ -32,10 +33,14 @@ Sign in once per source:
 uv run pgn-dl login chesscom
 ```
 
-A browser window opens; sign in on the site and the session is saved. Sessions
-and credentials live under `.profile/` in the current directory, so run `login`
-and downloads from the same place, or set `PGN_DL_PROFILE` to a fixed path. If
-a session expires, run `login` again.
+A browser window opens; sign in on the site and the session is saved. Lichess
+is the exception: `login lichess` opens Lichess's authorization page in your
+own browser, you click Authorize, and pgn-dl receives a token that lasts a
+year. Only its opening pages and private studies need one.
+
+Sessions and credentials live under `.profile/` in the current directory, so
+run `login` and downloads from the same place, or set `PGN_DL_PROFILE` to a
+fixed path. If a session expires, run `login` again.
 
 Then download by URL:
 
@@ -52,6 +57,10 @@ uv run pgn-dl chessable courses 25098
 uv run pgn-dl chessreps openings alapin-sicilian-repertoire-ilg8hms
 uv run pgn-dl aimchess explore https://aimchess.com/explore
 uv run pgn-dl chessendings theory lucena-position
+uv run pgn-dl lichess practice https://lichess.org/practice
+uv run pgn-dl lichess study https://lichess.org/study/fE4k21MW
+uv run pgn-dl lichess user-studies https://lichess.org/study/by/thibault
+uv run pgn-dl lichess openings https://lichess.org/opening/London_System
 ```
 
 `pgn-dl sources` lists every source and the URL patterns it accepts.
@@ -65,8 +74,13 @@ Options:
 | `--delay SECONDS`     | `0.4`    | Jittered pause between requests   |
 | `--limit N`           | none     | Only fetch the first N items      |
 
-Only chess.com needs a browser for downloads (it sits behind Cloudflare). The
-other sources use one just for `login` and download over plain HTTPS.
+Only chess.com and Lichess's opening pages need a browser for downloads (their
+pages are served only to one). chess.com's runs headless on the saved session.
+Lichess's opens a Chrome window, signed out, that stays open until the run
+ends; Lichess allows a signed-out visitor 30 opening pages per 10 minutes, so
+all of its openings take about 18 hours, and a run that stops picks up where
+it left off. The other sources use a browser just for `login` and download
+over plain HTTPS.
 
 ## Output
 
