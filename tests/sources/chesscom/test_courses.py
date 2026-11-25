@@ -94,6 +94,9 @@ class _FakeFetcher:
     def __init__(self) -> None:
         self.calls: list[str] = []
 
+    async def post_text(self, url, *, headers, body):  # pragma: no cover
+        raise AssertionError("no text POSTs in these tests")
+
     async def post_json(
         self, url: str, *, headers: Mapping[str, str], json: Any
     ) -> Any:
@@ -349,6 +352,9 @@ class _ExpiringService:
     def expire(self) -> None:
         """Expire every token given so far."""
         self.expired.update(self.issued)
+
+    async def post_text(self, url, *, headers, body):  # pragma: no cover
+        raise AssertionError("no text POSTs in these tests")
 
     async def post_json(
         self, url: str, *, headers: Mapping[str, str], json: Any

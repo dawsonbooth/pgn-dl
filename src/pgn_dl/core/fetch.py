@@ -107,6 +107,10 @@ class Fetcher(Protocol):
 
     async def get_text(self, url: str, *, headers: Mapping[str, str]) -> str: ...
 
+    async def post_text(
+        self, url: str, *, headers: Mapping[str, str], body: str
+    ) -> str: ...
+
 
 def transport_failure(exc: Exception) -> FetchError:
     """A failure with no response at all, as something the runner can catch.
@@ -152,6 +156,18 @@ class HttpxFetcher:
     async def get_text(self, url: str, *, headers: Mapping[str, str]) -> str:
         try:
             resp = await self._client.get(url, headers=dict(headers))
+        except httpx.HTTPError as exc:
+            raise transport_failure(exc) from None
+        check_response(url, resp.status_code, resp.headers, resp.text)
+        return resp.text
+
+    async def post_text(
+        self, url: str, *, headers: Mapping[str, str], body: str
+    ) -> str:
+        try:
+            resp = await self._client.post(
+                url, headers=dict(headers), content=body.encode()
+            )
         except httpx.HTTPError as exc:
             raise transport_failure(exc) from None
         check_response(url, resp.status_code, resp.headers, resp.text)

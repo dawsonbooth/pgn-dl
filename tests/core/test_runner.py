@@ -26,6 +26,9 @@ class FakeFetcher:
     """Minimal stand-in satisfying the Fetcher protocol, answering every request
     with nothing. FakeExtractor sends one request per item through it."""
 
+    async def post_text(self, url, *, headers, body):  # pragma: no cover
+        raise AssertionError("no text POSTs in these tests")
+
     async def post_json(
         self, url: str, *, headers: Mapping[str, str], json: Any
     ) -> Any:
@@ -593,6 +596,12 @@ class RecordingFetcher(FakeFetcher):
     def __init__(self, events: list[str]) -> None:
         self.events = events
 
+    async def post_text(
+        self, url: str, *, headers: Mapping[str, str], body: str
+    ) -> str:
+        self.events.append(f"POST-TEXT {url}")
+        return ""
+
     async def post_json(
         self, url: str, *, headers: Mapping[str, str], json: Any
     ) -> Any:
@@ -641,6 +650,38 @@ async def test_the_delay_is_paid_after_every_request_not_once_per_item(
 
     requests = [e for e in events if e != "pause"]
     assert len(requests) == 6
+    assert events == [e for request in requests for e in (request, "pause")]
+
+
+class TextPostingExtractor(FakeExtractor):
+    """A text POST per item, as an export of several games by id is."""
+
+    key = "fake:textpost"
+
+    async def _fetch(self, context: None, fetcher: Fetcher, ref: ItemRef) -> GameItem:
+        await fetcher.post_text("https://fake.test/export", headers={}, body="a,b")
+        return await super()._fetch(context, fetcher, ref)
+
+
+async def test_a_text_post_pays_the_delay_like_any_request(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    events: list[str] = []
+
+    async def record(delay: float, *args: object, **kw: object) -> None:
+        events.append("pause")
+
+    monkeypatch.setattr(runner_module.asyncio, "sleep", record)
+
+    await run(
+        TextPostingExtractor(2),
+        RecordingFetcher(events),
+        Options(out=tmp_path, concurrency=1, delay=0.5),
+        echo=lambda _: None,
+    )
+
+    assert events.count("POST-TEXT https://fake.test/export") == 2
+    requests = [e for e in events if e != "pause"]
     assert events == [e for request in requests for e in (request, "pause")]
 
 

@@ -81,6 +81,9 @@ class FakeFetcher:
         self.pages = pages
         self.gets: list[str] = []
 
+    async def post_text(self, url, *, headers, body):  # pragma: no cover
+        raise AssertionError("no text POSTs in these tests")
+
     async def post_json(self, url, *, headers, json):  # pragma: no cover
         raise AssertionError("chessreps reads must be GETs")
 

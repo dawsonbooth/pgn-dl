@@ -127,6 +127,40 @@ async def test_httpx_fetcher_posts_and_returns_json() -> None:
     assert b'"a"' in body
 
 
+async def test_httpx_fetcher_posts_a_text_body_and_returns_text() -> None:
+    seen: dict[str, object] = {}
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        seen["method"] = request.method
+        seen["body"] = request.content
+        seen["type"] = request.headers.get("content-type")
+        return httpx.Response(200, text='[Event "x"]\n\n*')
+
+    transport = httpx.MockTransport(handler)
+    async with httpx.AsyncClient(transport=transport) as client:
+        text = await HttpxFetcher(client).post_text(
+            "https://x/y", headers={"Content-Type": "text/plain"}, body="a,b"
+        )
+
+    assert text == '[Event "x"]\n\n*'
+    assert seen == {"method": "POST", "body": b"a,b", "type": "text/plain"}
+
+
+async def test_a_text_post_that_fails_is_a_fetch_error() -> None:
+    transport = httpx.MockTransport(lambda r: httpx.Response(404, text="Not found"))
+    async with httpx.AsyncClient(transport=transport) as client:
+        with pytest.raises(FetchError) as exc:
+            await HttpxFetcher(client).post_text("https://x/y", headers={}, body="")
+    assert exc.value.status == 404
+
+
+async def test_a_dropped_connection_on_a_text_post_is_a_fetch_error() -> None:
+    async with httpx.AsyncClient(transport=_dropping_transport()) as client:
+        with pytest.raises(FetchError) as exc:
+            await HttpxFetcher(client).post_text("https://x/y", headers={}, body="")
+    assert "ConnectError" in str(exc.value)
+
+
 async def test_httpx_fetcher_maps_challenge_to_blocked() -> None:
     transport = httpx.MockTransport(
         lambda r: httpx.Response(403, text="Just a moment...")

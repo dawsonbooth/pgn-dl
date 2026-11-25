@@ -19,6 +19,9 @@ class FakeFetcher:
         self.pages = pages  # keyed by URL without its query string
         self.gets: list[str] = []
 
+    async def post_text(self, url, *, headers, body):  # pragma: no cover
+        raise AssertionError("no text POSTs in these tests")
+
     async def post_json(self, url, *, headers, json):  # pragma: no cover
         raise AssertionError("firestore reads must be GETs")
 

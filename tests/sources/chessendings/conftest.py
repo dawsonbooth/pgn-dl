@@ -326,6 +326,9 @@ class FakeFetcher:
             raise FetchError(f"{url} failed: 404 (HTML page)", status=404)
         return self.pages[url]
 
+    async def post_text(self, url, *, headers, body):  # pragma: no cover
+        raise AssertionError("no text POSTs in these tests")
+
     async def post_json(self, url, *, headers, json):  # pragma: no cover
         raise AssertionError("chessendings pages are only read")
 

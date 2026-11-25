@@ -25,6 +25,9 @@ REF = ItemRef(id="1", path=("001-item",))
 class FakeFetcher:
     """Satisfies the Fetcher protocol; nothing here ever calls it."""
 
+    async def post_text(self, url, *, headers, body):  # pragma: no cover
+        raise AssertionError("no text POSTs in these tests")
+
     async def post_json(
         self, url: str, *, headers: Mapping[str, str], json: Any
     ) -> Any:

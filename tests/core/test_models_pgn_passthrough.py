@@ -15,6 +15,9 @@ PRERENDERED = '[Event "Given"]\n[Result "*"]\n\n1. e4 e5 *'
 
 
 class FetcherStub:
+    async def post_text(self, url, *, headers, body):  # pragma: no cover
+        raise AssertionError("no text POSTs in these tests")
+
     async def post_json(self, url, *, headers, json):  # pragma: no cover
         raise AssertionError("no network in tests")
 

@@ -80,6 +80,11 @@ class _PacedFetcher:
     async def get_text(self, url: str, *, headers: Mapping[str, str]) -> str:
         return await self._paced(self._inner.get_text(url, headers=headers))
 
+    async def post_text(
+        self, url: str, *, headers: Mapping[str, str], body: str
+    ) -> str:
+        return await self._paced(self._inner.post_text(url, headers=headers, body=body))
+
     async def _paced[T](self, request: Awaitable[T]) -> T:
         try:
             result = await request

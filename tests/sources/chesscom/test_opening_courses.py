@@ -81,6 +81,9 @@ class _OpeningCoursesService:
         self.issued: list[str] = []
         self.expired: set[str] = set()
 
+    async def post_text(self, url, *, headers, body):  # pragma: no cover
+        raise AssertionError("no text POSTs in these tests")
+
     async def post_json(
         self, url: str, *, headers: Mapping[str, str], json: Any
     ) -> Any:

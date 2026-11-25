@@ -167,6 +167,9 @@ class FakeFetcher:
             raise FetchError(f"{url} failed: 404 (JSON body)", status=404)
         return dumps(self.gets_by_url[url])
 
+    async def post_text(self, url, *, headers, body):  # pragma: no cover
+        raise AssertionError("no text POSTs in these tests")
+
     async def post_json(
         self, url: str, *, headers: Mapping[str, str], json: Any
     ) -> Any:
@@ -259,6 +262,9 @@ class SiteFetcher:
         if url not in self.pages:
             raise FetchError(f"{url} failed: 404 (HTML page)", status=404)
         return self.pages[url]
+
+    async def post_text(self, url, *, headers, body):  # pragma: no cover
+        raise AssertionError("no text POSTs in these tests")
 
     async def post_json(self, url, *, headers, json):  # pragma: no cover
         raise AssertionError("the site's scripts are only read")

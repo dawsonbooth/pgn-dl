@@ -62,6 +62,18 @@ async def test_get_text_detects_a_challenge_served_with_status_200() -> None:
         await _fetcher(resp).get_text("https://x/y", headers={})
 
 
+async def test_post_text_detects_a_challenge_served_with_status_200() -> None:
+    resp = FakeResponse(200, {"cf-mitigated": "challenge"}, "<html>Just a moment")
+    with pytest.raises(Blocked):
+        await _fetcher(resp).post_text("https://x/y", headers={}, body="")
+
+
+async def test_post_text_returns_the_body() -> None:
+    resp = FakeResponse(200, {}, '[Event "x"]\n\n*')
+    text = await _fetcher(resp).post_text("https://x/y", headers={}, body="a,b")
+    assert text == '[Event "x"]\n\n*'
+
+
 async def test_a_plain_failure_is_a_fetch_error_not_a_block() -> None:
     resp = FakeResponse(500, {}, "boom")
     with pytest.raises(FetchError) as exc:

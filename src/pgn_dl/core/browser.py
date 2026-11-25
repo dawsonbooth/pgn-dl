@@ -85,6 +85,21 @@ class BrowserFetcher:
         check_response(url, resp.status, resp.headers, text)
         return text
 
+    async def post_text(
+        self, url: str, *, headers: Mapping[str, str], body: str
+    ) -> str:
+        try:
+            resp = await self._ctx.request.post(
+                url, headers=dict(headers), data=body.encode()
+            )
+            text = await resp.text()
+        except Exception as exc:
+            if not is_playwright_error(exc):
+                raise
+            raise transport_failure(exc) from None
+        check_response(url, resp.status, resp.headers, text)
+        return text
+
 
 @asynccontextmanager
 async def browser_context(profile: Path, *, headless: bool) -> AsyncIterator[Any]:
