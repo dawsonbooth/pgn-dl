@@ -21,7 +21,7 @@ from pathlib import Path
 from typing import Any
 
 from .extractor import Extractor
-from .fetch import Blocked, Fetcher, FetchError
+from .fetch import Blocked, Fatal, Fetcher, FetchError, PageFetcher
 from .io import write_text_atomic
 from .models import GameItem, ItemRef
 from .paths import collection_dir, combine_collection_dir, item_path
@@ -95,6 +95,28 @@ class _PacedFetcher:
             raise
         await _pause(self._opts)
         return result
+
+
+class _PacedPageFetcher(_PacedFetcher):
+    """The same, for a transport that also reads pages (a ``PageFetcher``).
+
+    Its own class rather than a ``get_page`` on every paced fetcher: whether a
+    fetcher reads pages is told by whether it has the method, and a plain
+    transport must not seem to.
+    """
+
+    def __init__(self, inner: PageFetcher, opts: Options) -> None:
+        super().__init__(inner, opts)
+        self._pages = inner
+
+    async def get_page(self, url: str) -> str:
+        return await self._paced(self._pages.get_page(url))
+
+
+def _paced(fetcher: Fetcher, opts: Options) -> _PacedFetcher:
+    if isinstance(fetcher, PageFetcher):
+        return _PacedPageFetcher(fetcher, opts)
+    return _PacedFetcher(fetcher, opts)
 
 
 async def _fetch_with_retry(
@@ -211,7 +233,7 @@ async def run(
     echo: Echo = print,
 ) -> Report:
     """Download every item the extractor discovers, writing PGN under ``opts.out``."""
-    paced = _PacedFetcher(fetcher, opts)
+    paced = _paced(fetcher, opts)
     try:
         collection, refs = await extractor.discover(paced)
     except FetchError as exc:  # Blocked is a FetchError, so this covers both
@@ -257,6 +279,11 @@ async def run(
                 return
             try:
                 item = await _fetch_with_retry(extractor, paced, ref, opts, echo, gate)
+            except Fatal as exc:
+                report.failed += 1
+                report.stopped = True
+                echo(f"  ! Stopping at {label!r}: {exc}")
+                return
             except Exception as exc:  # noqa: BLE001
                 # An unexpected error on one item must not abort the batch;
                 # leave it unwritten so a re-run retries it.

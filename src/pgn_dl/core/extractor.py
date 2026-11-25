@@ -87,6 +87,11 @@ class Extractor[C](ABC):
     key: ClassVar[str] = ""  # "<source>:<kind>", e.g. "chesscom:courses"
     url_patterns: ClassVar[Sequence[re.Pattern[str]]] = ()
     needs_browser: ClassVar[bool] = False
+    #: Reads some of the site's own pages through a visible browser window
+    #: (``core/browser.py``'s ``PageWindow``), and the rest over plain HTTP. The
+    #: fetcher it is handed is then a ``PageFetcher``. Not with
+    #: ``needs_browser``: the two would open the same profile twice.
+    reads_pages: ClassVar[bool] = False
 
     # Both halves of ``key``, split out once. They name the output directory, so
     # a source must never restate them as literals.
@@ -141,11 +146,11 @@ class Extractor[C](ABC):
     def browser_profile(self) -> Path | None:
         """Persistent browser profile this source's session lives in.
 
-        Only meaningful when ``needs_browser`` is set. Every source's session
-        lives in the same place, so a source overrides this only to live
-        somewhere else.
+        Only meaningful when ``needs_browser`` or ``reads_pages`` is set.
+        Every source's session lives in the same place, so a source overrides
+        this only to live somewhere else.
         """
-        if self.needs_browser and self.source:
+        if (self.needs_browser or self.reads_pages) and self.source:
             return profile_dir(self.source)
         return None
 

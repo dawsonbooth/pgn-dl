@@ -10,7 +10,7 @@ from __future__ import annotations
 import re
 from collections.abc import AsyncIterator, Mapping
 from contextlib import asynccontextmanager
-from typing import Any, Protocol
+from typing import Any, Protocol, runtime_checkable
 
 import httpx
 
@@ -30,7 +30,23 @@ class FetchError(RuntimeError):
 
 
 class Blocked(FetchError):
-    """A bot challenge or rate limit. Retryable: the runner backs off."""
+    """A bot challenge or rate limit. Retryable: the runner backs off.
+
+    ``challenge`` tells the two apart where the status cannot: Cloudflare
+    serves a challenge under 429 too. A rate limit may be waited out; a
+    challenge never is.
+    """
+
+    def __init__(
+        self, *args: object, status: int | None = None, challenge: bool = False
+    ) -> None:
+        super().__init__(*args, status=status)
+        self.challenge = challenge
+
+
+class Fatal(FetchError):
+    """A failure every later item would meet too, such as a browser that will
+    not start: the runner stops rather than fail each item in turn."""
 
 
 # Cloudflare serves interstitial/challenge pages under these statuses with one
@@ -91,7 +107,9 @@ def check_response(
 ) -> None:
     """Raise :class:`Blocked` or :class:`FetchError` for a failed response."""
     if is_challenge(status, headers, body):
-        raise Blocked(f"{url}: bot challenge (status {status})", status=status)
+        raise Blocked(
+            f"{url}: bot challenge (status {status})", status=status, challenge=True
+        )
     if status == 429:
         raise Blocked(f"{url} failed: 429 ({describe_body(body)})", status=status)
     if not 200 <= status < 300:
@@ -110,6 +128,20 @@ class Fetcher(Protocol):
     async def post_text(
         self, url: str, *, headers: Mapping[str, str], body: str
     ) -> str: ...
+
+
+@runtime_checkable
+class PageFetcher(Fetcher, Protocol):
+    """A fetcher that can also read a site's own pages as a browser does.
+
+    For a site that serves its pages only to a real browser while its API stays
+    open (see ``core/browser.py``'s ``PageWindow``): ``get_page`` goes through
+    the browser, everything else through the plain transport. An extractor asks
+    for one by setting ``reads_pages``. Separate from :class:`Fetcher` so the
+    sources that never read a page, and their test fakes, need nothing new.
+    """
+
+    async def get_page(self, url: str) -> str: ...
 
 
 def transport_failure(exc: Exception) -> FetchError:

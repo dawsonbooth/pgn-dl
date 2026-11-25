@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from collections.abc import AsyncIterator
+from collections.abc import AsyncGenerator, AsyncIterator
 from contextlib import asynccontextmanager
 from pathlib import Path
 
@@ -11,7 +11,7 @@ import typer
 
 from pgn_dl.core import driver
 from pgn_dl.core.extractor import Extractor
-from pgn_dl.core.fetch import FetchError
+from pgn_dl.core.fetch import FetchError, PageFetcher
 from pgn_dl.core.models import Collection, GameItem, ItemRef
 from pgn_dl.core.runner import Options, Report
 
@@ -109,8 +109,80 @@ def test_a_plain_extractor_never_launches_a_browser(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     monkeypatch.setattr(driver, "browser_fetcher", _no_browser)
+    monkeypatch.setattr(driver, "page_window", _no_browser)
 
     driver.execute(_EmptyExtractor(), Options(out=tmp_path / "out"))
+
+
+class _PageExtractor(_EmptyExtractor):
+    reads_pages = True
+
+    def __init__(self, profile: Path | None) -> None:
+        super().__init__()
+        self._profile = profile
+
+    def browser_profile(self) -> Path | None:
+        return self._profile
+
+
+class _Window:
+    async def get_page(self, url: str) -> str:
+        return "page"
+
+
+def _capture_run(seen: list[object]):
+    async def fake_run(
+        extractor: object, fetcher: object, opts: Options, **kw: object
+    ) -> Report:
+        seen.append(fetcher)
+        return Report()
+
+    return fake_run
+
+
+async def test_an_extractor_that_reads_pages_gets_a_page_fetcher(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    # Its other requests keep plain HTTP; no headless browser is involved.
+    profiles: list[Path] = []
+    fetchers: list[object] = []
+
+    @asynccontextmanager
+    async def fake_window(profile: Path, **kw: object) -> AsyncGenerator[object]:
+        profiles.append(profile)
+        yield _Window()
+
+    monkeypatch.setattr(driver, "page_window", fake_window)
+    monkeypatch.setattr(driver, "browser_fetcher", _no_browser)
+    monkeypatch.setattr(driver, "run", _capture_run(fetchers))
+    profile = tmp_path / "profiles" / "fake"
+
+    await driver._run(_PageExtractor(profile), Options(out=tmp_path / "out"))
+
+    assert profiles == [profile]
+    [fetcher] = fetchers
+    assert isinstance(fetcher, PageFetcher)
+    assert await fetcher.get_page("https://site.test/") == "page"
+
+
+def test_a_page_reading_extractor_without_a_profile_is_an_error(
+    tmp_path: Path,
+) -> None:
+    with pytest.raises(RuntimeError, match="browser_profile"):
+        driver.execute(_PageExtractor(None), Options(out=tmp_path / "out"))
+
+
+def test_reading_pages_and_a_headless_browser_together_is_an_error(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    class Both(_BrowserExtractor):
+        reads_pages = True
+
+    monkeypatch.setattr(driver, "browser_fetcher", _no_browser)
+    monkeypatch.setattr(driver, "page_window", _no_browser)
+
+    with pytest.raises(RuntimeError, match="both"):
+        driver.execute(Both(tmp_path / "profile"), Options(out=tmp_path / "out"))
 
 
 def test_a_stopped_run_exits_with_code_2(

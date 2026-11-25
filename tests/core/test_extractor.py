@@ -127,3 +127,14 @@ async def test_once_does_not_cache_a_failed_build() -> None:
 
     assert await once.get(flaky) == 7
     assert attempts == 2
+
+
+def test_a_page_reading_extractor_lives_in_its_source_s_profile(
+    tmp_path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setenv("PGN_DL_PROFILE", str(tmp_path))
+    reader = ContextExtractor()
+    monkeypatch.setattr(reader, "reads_pages", True)
+
+    assert reader.browser_profile() == tmp_path / "fake"
+    assert ContextExtractor().browser_profile() is None

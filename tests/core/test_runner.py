@@ -13,7 +13,7 @@ import pytest
 
 from pgn_dl.core import runner as runner_module
 from pgn_dl.core.extractor import Extractor
-from pgn_dl.core.fetch import Blocked, Fetcher, FetchError
+from pgn_dl.core.fetch import Blocked, Fatal, Fetcher, FetchError, PageFetcher
 from pgn_dl.core.models import Collection, GameItem, ItemRef, MoveNode
 from pgn_dl.core.runner import Options, run
 
@@ -51,11 +51,13 @@ class FakeExtractor(Extractor[None]):
         count: int = 3,
         fail_on: set[int] | None = None,
         block_on: set[int] | None = None,
+        fatal_on: set[int] | None = None,
     ) -> None:
         super().__init__()
         self.count = count
         self.fail_on = fail_on or set()
         self.block_on = block_on or set()
+        self.fatal_on = fatal_on or set()
         self.fetched: list[str] = []
 
     async def _discover(
@@ -72,6 +74,8 @@ class FakeExtractor(Extractor[None]):
             raise Blocked("challenged")
         if i in self.fail_on:
             raise ValueError("bad item")
+        if i in self.fatal_on:
+            raise Fatal("the Chrome window was closed")
         return GameItem(root=MoveNode(san=None, children=[MoveNode(san="e4")]))
 
 
@@ -134,6 +138,23 @@ async def test_persistent_block_stops_cleanly_and_keeps_what_it_has(
     assert report.written == 0
     # Five attempts on the first item before giving up.
     assert ex.fetched.count("0") == 5
+
+
+async def test_a_fatal_failure_stops_the_run_and_says_why(tmp_path: Path) -> None:
+    # Every later item would meet it too, so none is tried.
+    said: list[str] = []
+    ex = FakeExtractor(4, fatal_on={1})
+    report = await run(
+        ex,
+        FETCHER,
+        Options(out=tmp_path, concurrency=1, delay=0.0),
+        echo=said.append,
+    )
+
+    assert report.stopped
+    assert (report.written, report.failed) == (1, 1)
+    assert ex.fetched == ["0", "1"]
+    assert "  ! Stopping at '001-item': the Chrome window was closed" in said
 
 
 async def test_limit_truncates_the_plan(tmp_path: Path) -> None:
@@ -723,3 +744,75 @@ async def test_all_pgn_is_written_at_the_collection_root(tmp_path: Path) -> None
     await run(FakeExtractor(2), FETCHER, _opts(tmp_path), echo=lambda _: None)
     combined = (tmp_path / "fake/things/c/all.pgn").read_text(encoding="utf-8")
     assert combined.count("[Event ") == 2
+
+
+class PageRecordingFetcher(RecordingFetcher):
+    """A transport that reads pages too, as a run's window makes it."""
+
+    async def get_page(self, url: str) -> str:
+        self.events.append(f"PAGE {url}")
+        return "<html>page</html>"
+
+
+class PageReadingExtractor(FakeExtractor):
+    """A page per item, as an opening's description is read."""
+
+    key = "fake:pages"
+    reads_pages = True
+
+    def __init__(self, count: int) -> None:
+        super().__init__(count)
+        self.page_fetchers: list[bool] = []
+
+    async def _fetch(self, context: None, fetcher: Fetcher, ref: ItemRef) -> GameItem:
+        self.page_fetchers.append(isinstance(fetcher, PageFetcher))
+        assert isinstance(fetcher, PageFetcher)
+        await fetcher.get_page(f"https://fake.test/page/{ref.id}")
+        return await super()._fetch(context, fetcher, ref)
+
+
+async def test_a_transport_that_reads_pages_still_does_through_the_run(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    # The run wraps its transport to pace it; wrapping must not hide get_page,
+    # or every page read fails as though the extractor had asked for no window.
+    events: list[str] = []
+
+    async def record(delay: float, *args: object, **kw: object) -> None:
+        events.append("pause")
+
+    monkeypatch.setattr(runner_module.asyncio, "sleep", record)
+    extractor = PageReadingExtractor(2)
+
+    report = await run(
+        extractor,
+        PageRecordingFetcher(events),
+        Options(out=tmp_path, concurrency=1, delay=0.5),
+        echo=lambda _: None,
+    )
+
+    assert report.written == 2
+    assert extractor.page_fetchers == [True, True]
+    assert events.count("PAGE https://fake.test/page/0") == 1
+    # A page read is a request like any other, and pays the delay.
+    requests = [e for e in events if e != "pause"]
+    assert events == [e for request in requests for e in (request, "pause")]
+
+
+async def test_a_plain_transport_does_not_seem_to_read_pages_through_the_run(
+    tmp_path: Path,
+) -> None:
+    seen: list[bool] = []
+
+    class Looking(FakeExtractor):
+        key = "fake:looking"
+
+        async def _fetch(
+            self, context: None, fetcher: Fetcher, ref: ItemRef
+        ) -> GameItem:
+            seen.append(isinstance(fetcher, PageFetcher))
+            return await super()._fetch(context, fetcher, ref)
+
+    await run(Looking(1), FETCHER, _opts(tmp_path), echo=lambda _: None)
+
+    assert seen == [False]

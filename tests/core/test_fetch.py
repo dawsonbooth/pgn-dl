@@ -66,6 +66,16 @@ def test_a_challenge_carries_its_status_code_too() -> None:
     assert exc.value.status == 429
 
 
+def test_a_challenge_under_429_is_told_from_a_rate_limit() -> None:
+    # Both are a Blocked 429; only the rate limit may be waited out.
+    with pytest.raises(Blocked) as challenge:
+        check_response("https://x/y", 429, {"cf-mitigated": "challenge"}, "")
+    with pytest.raises(Blocked) as limit:
+        check_response("https://x/y", 429, {}, "Too many requests")
+    assert (challenge.value.status, challenge.value.challenge) == (429, True)
+    assert (limit.value.status, limit.value.challenge) == (429, False)
+
+
 def test_a_failure_names_what_the_body_was_instead_of_quoting_it() -> None:
     # No response body reaches an error message, because the runner echoes one
     # to the terminal and a log may keep it. Today no transport that carries a
