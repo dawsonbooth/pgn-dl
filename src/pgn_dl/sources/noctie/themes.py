@@ -162,9 +162,9 @@ class ThemesExtractor(NoctieExtractor[str]):
             # then skip it on every later run.
             raise FetchError(f"noctie element {ref.id} carries no pgn")
         headers = {"Event": context, "Site": SITE}
-        headers["ElementName"] = element.get("name") or ""
+        headers["NoctieElementName"] = element.get("name") or ""
         # instruction / flashcard / scenario are genuinely different artifacts;
         # recording which keeps a downloaded theme filterable by kind.
-        headers["ElementType"] = element.get("type") or ""
+        headers["NoctieElementType"] = element.get("type") or ""
         headers["NoctieElementId"] = ref.id
         return GameItem(pgn=element_to_pgn(pgn, headers, ref.id))

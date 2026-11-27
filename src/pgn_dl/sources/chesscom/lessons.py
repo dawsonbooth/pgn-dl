@@ -179,7 +179,7 @@ def lesson_to_pgn(payload: dict, headers: dict[str, str]) -> str:
     """Every question of a lesson, as one PGN file of N games."""
     base = dict(headers)
     base["ChessComLessonId"] = payload.get("id", "")
-    base["LessonName"] = payload.get("name", "")
+    base["ChessComLessonName"] = payload.get("name", "")
     games = []
     for i, question in enumerate(payload.get("questions", []), start=1):
         games.append(question_to_pgn(question, {**base, "Round": str(i)}))

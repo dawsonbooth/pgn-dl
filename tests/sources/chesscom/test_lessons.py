@@ -223,8 +223,10 @@ def test_lesson_to_pgn_emits_one_game_per_question() -> None:
 def test_lesson_to_pgn_records_the_lesson_identity() -> None:
     payload = _payload("lesson_page.json")
     text = lesson_to_pgn(payload, {})
-    assert payload["id"] in text
-    assert "In Between Moves" in text
+    game = chess.pgn.read_game(io.StringIO(text))
+    assert game is not None
+    assert game.headers["ChessComLessonId"] == payload["id"]
+    assert game.headers["ChessComLessonName"] == "In Between Moves"
 
 
 def test_a_question_with_an_unplayable_move_raises_instead_of_truncating() -> None:

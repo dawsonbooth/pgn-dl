@@ -443,11 +443,11 @@ async def test_fetch_rewrites_provenance_but_keeps_lichess_attribution() -> None
     assert game.headers["Annotator"] == "https://lichess.org/@/andyfang"
     assert game.headers["ChapterURL"] == "https://lichess.org/study/TOb6nEN0/HZtdmTzi"
     # The element itself is identified in the file.
-    assert game.headers["ElementName"] == "Puzzle #3"
+    assert game.headers["NoctieElementName"] == "Puzzle #3"
     assert game.headers["NoctieElementId"] == PUZZLE_3
     # instruction / flashcard / scenario are genuinely different artifacts, so
     # a downloaded theme stays filterable by kind.
-    assert game.headers["ElementType"] == "flashcard"
+    assert game.headers["NoctieElementType"] == "flashcard"
 
 
 async def test_fetch_reads_only_the_requested_element() -> None:
@@ -505,7 +505,10 @@ async def test_an_element_whose_name_and_type_are_null_is_still_written() -> Non
     assert item.pgn is not None
     game = chess.pgn.read_game(io.StringIO(item.pgn))
     assert game is not None
-    assert (game.headers["ElementName"], game.headers["ElementType"]) == ("", "")
+    assert (game.headers["NoctieElementName"], game.headers["NoctieElementType"]) == (
+        "",
+        "",
+    )
 
 
 async def test_an_element_with_no_pgn_fails_the_item() -> None:
