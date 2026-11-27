@@ -48,7 +48,7 @@ import chess
 import chess.pgn
 
 from ...core.extractor import Extractor, WholeSection
-from ...core.fetch import Blocked, Fetcher, FetchError
+from ...core.fetch import Blocked, Fetcher, FetchError, UnknownTarget
 from ...core.models import Collection, GameItem, ItemRef, MoveNode
 from ...core.paths import slugify
 from ...core.pgn import game_to_pgn
@@ -457,9 +457,9 @@ class OpeningsExtractor(Extractor[_Context]):
         if wanted.key is None:
             ref = ItemRef(id=INDEX, path=(INDEX,))
         elif (found := find_page(table.pages, wanted.key)) is None:
-            raise FetchError(f"lichess has no opening page {wanted.key!r}")
+            raise UnknownTarget(f"lichess has no opening page {wanted.key!r}")
         elif wanted.line and not _reaches(found, wanted.line):
-            raise FetchError(
+            raise UnknownTarget(
                 f"{'_'.join(wanted.line)} does not reach {found.name}; only the "
                 "named openings' own pages are downloaded"
             )

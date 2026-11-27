@@ -33,7 +33,7 @@ from typing import Any
 import chess
 
 from ...core.extractor import Extractor, WholeSection
-from ...core.fetch import Fetcher, FetchError
+from ...core.fetch import Fetcher, FetchError, UnknownTarget
 from ...core.models import Arrow, Collection, GameItem, Highlight, ItemRef, MoveNode
 from ...core.paths import slugify
 from ...core.pgn import game_to_pgn
@@ -527,7 +527,7 @@ class LearnExtractor(Extractor[_Context]):
         categories = await fetch_learn(Client(fetcher))
         placed = [(s, path) for s, path in layout(categories) if s.id == self.stage]
         if not placed:
-            raise FetchError(f"lichess Learn has no stage {self.stage}")
+            raise UnknownTarget(f"lichess Learn has no stage {self.stage}")
         collection = self.collection(
             slug=slugify(COLLECTION_NAME), name=COLLECTION_NAME
         )

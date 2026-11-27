@@ -10,7 +10,7 @@ import pytest
 
 from pgn_dl.core import registry
 from pgn_dl.core.extractor import WholeSection
-from pgn_dl.core.fetch import FetchError
+from pgn_dl.core.fetch import FetchError, UnknownTarget
 from pgn_dl.sources.lichess.practice import (
     SECTIONS,
     PracticeExtractor,
@@ -209,7 +209,9 @@ async def test_a_study_gets_the_path_the_layout_gives_it(target: str) -> None:
 
 async def test_a_study_under_another_section_s_url_is_refused() -> None:
     target = f"{PRACTICE}/checkmates/greek-gift/{GREEK_GIFT}"
-    with pytest.raises(FetchError, match=f"{GREEK_GIFT} is not in section checkmates"):
+    with pytest.raises(
+        UnknownTarget, match=f"{GREEK_GIFT} is not in section checkmates"
+    ):
         await PracticeExtractor(target).discover(FakeFetcher({}))
 
 

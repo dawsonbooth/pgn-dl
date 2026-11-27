@@ -10,7 +10,7 @@ import pytest
 
 from pgn_dl.core import registry
 from pgn_dl.core.extractor import WholeSection
-from pgn_dl.core.fetch import FetchError
+from pgn_dl.core.fetch import FetchError, UnknownTarget
 from pgn_dl.core.pgn import game_to_pgn
 from pgn_dl.sources.chessendings import auth, flight
 from pgn_dl.sources.chessendings.client import Client
@@ -224,7 +224,7 @@ async def test_a_session_answered_as_a_guest_is_refused() -> None:
 @pytest.mark.usefixtures("guest")
 async def test_an_unlisted_lesson_is_refused() -> None:
     fetcher = FakeFetcher({LISTING: theory_listing()}, signed_in=False)
-    with pytest.raises(FetchError, match="no Theory lesson 'nope'"):
+    with pytest.raises(UnknownTarget, match="no Theory lesson 'nope'"):
         await TheoryExtractor("nope").discover(fetcher)
 
 

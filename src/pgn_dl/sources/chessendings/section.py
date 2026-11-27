@@ -24,7 +24,7 @@ from dataclasses import dataclass, field
 from typing import Any, ClassVar
 
 from ...core.extractor import Extractor
-from ...core.fetch import Fetcher, FetchError
+from ...core.fetch import Fetcher, FetchError, UnknownTarget
 from ...core.models import Collection, GameItem, ItemRef
 from ...core.paths import slugify
 from . import auth
@@ -155,7 +155,7 @@ class SectionExtractor(Extractor[_Context]):
         listed = self.parse_listing(tree)
         placed = [(x, path) for x, path in layout(listed) if x.slug == self.slug]
         if not placed:
-            raise FetchError(
+            raise UnknownTarget(
                 f"chessendings has no {self.title} {self.noun} {self.slug!r}"
             )
         refs = [ItemRef(id=x.slug, path=path) for x, path in placed]

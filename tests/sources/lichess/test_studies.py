@@ -12,7 +12,7 @@ import chess
 import pytest
 
 from pgn_dl.core import registry
-from pgn_dl.core.fetch import Blocked, FetchError
+from pgn_dl.core.fetch import Blocked, FetchError, UnknownTarget
 from pgn_dl.sources.lichess.client import Client
 from pgn_dl.sources.lichess.studies import (
     StudiesExtractor,
@@ -237,6 +237,7 @@ async def test_lichess_refusals_are_put_in_words(
         await export(Client(fetcher, token=token), STUDY)
     assert str(exc.value) == message
     assert exc.value.status == status
+    assert not isinstance(exc.value, UnknownTarget)
 
 
 async def test_a_private_study_asked_for_without_the_token_does_not_blame_it() -> None:
@@ -326,6 +327,7 @@ async def test_json_refusals_are_put_in_words(
         await study_json(Client(fetcher, token=token), STUDY, MATE_ID)
     assert str(exc.value) == message
     assert exc.value.status == status
+    assert not isinstance(exc.value, UnknownTarget)
 
 
 @pytest.mark.parametrize(
@@ -442,10 +444,16 @@ async def test_each_chapter_is_written_as_exported_after_asking_its_json() -> No
     ]
 
 
+async def test_a_study_lichess_does_not_have_is_an_unknown_target() -> None:
+    fetcher = FakeFetcher({study_url(STUDY): failure(study_url(STUDY), 404)})
+    with pytest.raises(UnknownTarget, match=f"lichess has no study {STUDY}"):
+        await StudiesExtractor(STUDY).discover(fetcher)
+
+
 async def test_a_chapter_the_study_does_not_have_is_refused() -> None:
     fetcher = exported()
     with pytest.raises(
-        FetchError, match=f"lichess has no chapter ZZZZ9999 in study {STUDY}"
+        UnknownTarget, match=f"lichess has no chapter ZZZZ9999 in study {STUDY}"
     ):
         await StudiesExtractor(f"{ROOT}/study/{STUDY}/ZZZZ9999").discover(fetcher)
 
@@ -748,8 +756,10 @@ async def test_a_chapter_that_does_not_come_back_as_itself_fails_alone(
     extractor = StudiesExtractor(STUDY)
     _, refs = await extractor.discover(fetcher)
     assert (await extractor.fetch(fetcher, refs[0])).pgn == as_written(SACRIFICE)
-    with pytest.raises(FetchError, match=message):
+    with pytest.raises(FetchError, match=message) as failed:
         await extractor.fetch(fetcher, refs[1])
+    # A chapter Lichess listed itself, so its 404 is no fault of the target.
+    assert not isinstance(failed.value, UnknownTarget)
 
 
 # A gamebook chapter: its hints and replies to wrong moves, from its JSON.

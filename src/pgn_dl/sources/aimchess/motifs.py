@@ -14,7 +14,7 @@ import re
 from dataclasses import dataclass
 
 from ...core.extractor import Extractor
-from ...core.fetch import Fetcher, FetchError
+from ...core.fetch import Fetcher, FetchError, UnknownTarget
 from ...core.models import Collection, GameItem, ItemRef
 from ...core.paths import slugify
 from .bundle import STRING, find_script, string_value
@@ -89,7 +89,7 @@ class MotifsExtractor(Extractor[dict[str, Motif]]):
             if motif.key.lower() == self.motif.lower()
         ]
         if not refs:
-            raise FetchError(f"aimchess has no motif {self.motif!r}")
+            raise UnknownTarget(f"aimchess has no motif {self.motif!r}")
         collection = self.collection(
             slug=slugify(COLLECTION_NAME), name=COLLECTION_NAME
         )

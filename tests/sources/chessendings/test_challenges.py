@@ -6,7 +6,7 @@ import pytest
 
 from pgn_dl.core import registry
 from pgn_dl.core.extractor import WholeSection
-from pgn_dl.core.fetch import FetchError
+from pgn_dl.core.fetch import FetchError, UnknownTarget
 from pgn_dl.sources.chessendings import flight
 from pgn_dl.sources.chessendings.challenges import (
     ChallengesExtractor,
@@ -25,6 +25,7 @@ from .conftest import (
     games,
     page,
     stream,
+    theme_page,
 )
 
 INDEX = f"{ROOT}/challenges"
@@ -96,8 +97,17 @@ async def test_themes_and_categories_are_numbered_in_the_site_order(
     assert fetcher.gets == [INDEX, f"{INDEX}/t/checkmates", f"{INDEX}/t/rook"]
 
 
+async def test_a_theme_page_that_lists_no_category_means_the_site_changed() -> None:
+    pages = challenge_pages() | {f"{INDEX}/t/rook": theme_page([])}
+    with pytest.raises(FetchError, match="theme 'rook' lists no category") as refused:
+        await ChallengesExtractor("rook-win").discover(
+            FakeFetcher(pages, signed_in=False)
+        )
+    assert not isinstance(refused.value, UnknownTarget)
+
+
 async def test_an_unknown_category_is_refused() -> None:
-    with pytest.raises(FetchError, match="no challenge 'pawn-win'"):
+    with pytest.raises(UnknownTarget, match="no challenge 'pawn-win'"):
         await ChallengesExtractor("pawn-win").discover(
             FakeFetcher(challenge_pages(), signed_in=False)
         )

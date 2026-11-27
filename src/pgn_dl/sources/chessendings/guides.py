@@ -23,7 +23,7 @@ from typing import Any
 import chess
 
 from ...core.extractor import Extractor
-from ...core.fetch import Fetcher, FetchError
+from ...core.fetch import Fetcher, FetchError, UnknownTarget
 from ...core.models import Collection, GameItem, ItemRef, MoveNode
 from ...core.paths import slugify
 from ...core.pgn import game_to_pgn
@@ -202,7 +202,7 @@ class GuidesExtractor(Extractor[_Context]):
             (x, path) for x, path in layout(index, width=2) if x.slug == self.slug
         ]
         if not placed:
-            raise FetchError(f"chessendings has no guide {self.slug!r}")
+            raise UnknownTarget(f"chessendings has no guide {self.slug!r}")
         refs = [ItemRef(id=x.slug, path=path) for x, path in placed]
         collection = self.collection(
             slug=slugify(COLLECTION_NAME), name=COLLECTION_NAME

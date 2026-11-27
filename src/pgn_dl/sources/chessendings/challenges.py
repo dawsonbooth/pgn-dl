@@ -20,7 +20,7 @@ from typing import Any
 import chess
 
 from ...core.extractor import Extractor, WholeSection
-from ...core.fetch import Fetcher, FetchError
+from ...core.fetch import Fetcher, FetchError, UnknownTarget
 from ...core.models import Collection, GameItem, ItemRef
 from ...core.paths import slugify
 from ...core.pgn import game_to_pgn
@@ -192,8 +192,14 @@ class ChallengesExtractor(Extractor[_Context]):
             )
         categories = []
         for theme in themes:
-            page = await client.page(f"/challenges/t/{theme}")
-            for category in _hrefs(page, _CATEGORY_HREF):
+            found = _hrefs(await client.page(f"/challenges/t/{theme}"), _CATEGORY_HREF)
+            if not found:
+                # Every later theme's number would shift.
+                raise FetchError(
+                    f"chessendings challenge theme {theme!r} lists no category; "
+                    "the site has changed"
+                )
+            for category in found:
                 categories.append(
                     Listed(slug=category, group=theme, order=len(categories))
                 )
@@ -203,7 +209,7 @@ class ChallengesExtractor(Extractor[_Context]):
             if x.slug == self.category
         ]
         if not placed:
-            raise FetchError(f"chessendings has no challenge {self.category!r}")
+            raise UnknownTarget(f"chessendings has no challenge {self.category!r}")
         refs = [ItemRef(id=x.slug, path=path) for x, path in placed]
         collection = self.collection(
             slug=slugify(COLLECTION_NAME), name=COLLECTION_NAME

@@ -18,7 +18,7 @@ import pytest
 
 from pgn_dl.core import registry
 from pgn_dl.core.extractor import WholeSection
-from pgn_dl.core.fetch import FetchError
+from pgn_dl.core.fetch import FetchError, UnknownTarget
 from pgn_dl.core.models import Collection
 from pgn_dl.sources.lichess.client import Client
 from pgn_dl.sources.lichess.learn import (
@@ -636,5 +636,5 @@ async def test_a_stage_s_url_downloads_that_stage_at_its_place() -> None:
 
 
 async def test_a_stage_learn_does_not_have_is_refused() -> None:
-    with pytest.raises(FetchError, match="lichess Learn has no stage 4"):
+    with pytest.raises(UnknownTarget, match="lichess Learn has no stage 4"):
         await LearnExtractor(f"{ROOT}/learn#/4").discover(FakeFetcher(assets()))

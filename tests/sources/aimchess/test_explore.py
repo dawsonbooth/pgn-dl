@@ -9,7 +9,7 @@ import pytest
 
 from pgn_dl.core import registry
 from pgn_dl.core.extractor import WholeSection
-from pgn_dl.core.fetch import Blocked, FetchError
+from pgn_dl.core.fetch import Blocked, FetchError, UnknownTarget
 from pgn_dl.sources.aimchess.client import Client, DailyLimitReached
 from pgn_dl.sources.aimchess.explore import (
     ExploreExtractor,
@@ -175,8 +175,15 @@ async def test_a_lesson_gets_the_path_the_listing_gives_it() -> None:
     ]
 
 
+async def test_a_listing_without_lessons_means_the_site_changed() -> None:
+    fetcher = FakeFetcher(listing=listing_body(lessons=()))
+    with pytest.raises(FetchError, match="has no lessons") as refused:
+        await ExploreExtractor("17").discover(fetcher)
+    assert not isinstance(refused.value, UnknownTarget)
+
+
 async def test_an_unlisted_lesson_is_refused() -> None:
-    with pytest.raises(FetchError, match="lesson 99 is not a published"):
+    with pytest.raises(UnknownTarget, match="lesson 99 is not a published"):
         await ExploreExtractor("99").discover(FakeFetcher())
 
 

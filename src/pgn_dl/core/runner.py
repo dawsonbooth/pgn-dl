@@ -21,7 +21,7 @@ from pathlib import Path
 from typing import Any
 
 from .extractor import Extractor
-from .fetch import Blocked, Fatal, Fetcher, FetchError, PageFetcher
+from .fetch import Blocked, Fatal, Fetcher, FetchError, PageFetcher, UnknownTarget
 from .io import write_text_atomic
 from .models import GameItem, ItemRef
 from .paths import collection_dir, combine_collection_dir, item_path
@@ -183,6 +183,9 @@ def report_discovery_failure(extractor: Extractor, exc: FetchError, echo: Echo) 
     this account or connection may ask; signing in again fixes neither. A
     challenge often does clear after a fresh sign-in, even at 403, so it keeps
     the hint.
+
+    An :class:`UnknownTarget` gets no advice to sign in again or re-run: the
+    target is the user's to correct.
     """
     if exc.status == 429:
         kind = "Rate limited"
@@ -191,6 +194,9 @@ def report_discovery_failure(extractor: Extractor, exc: FetchError, echo: Echo) 
     else:
         kind = "Failed"
     echo(f"! {kind} before any item could be listed: {exc}")
+    if isinstance(exc, UnknownTarget):
+        echo("  Nothing was downloaded.")
+        return
     denied = exc.status == 429 or (exc.status == 403 and not isinstance(exc, Blocked))
     source = type(extractor).source
     if has_login(source) and not denied:

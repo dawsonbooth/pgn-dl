@@ -17,7 +17,7 @@ import pytest
 
 from pgn_dl.core import registry
 from pgn_dl.core.extractor import WholeSection
-from pgn_dl.core.fetch import Blocked, FetchError
+from pgn_dl.core.fetch import Blocked, FetchError, UnknownTarget
 from pgn_dl.sources.lichess import openings
 from pgn_dl.sources.lichess.openings import (
     EXPLORER,
@@ -437,12 +437,12 @@ async def test_a_continuation_link_to_a_named_opening_is_that_opening() -> None:
 
 async def test_a_line_beyond_a_named_opening_is_refused() -> None:
     target = "https://lichess.org/opening/Sicilian_Defense/e4_c5_d3"
-    with pytest.raises(FetchError, match="does not reach Sicilian Defense"):
+    with pytest.raises(UnknownTarget, match="does not reach Sicilian Defense"):
         await OpeningsExtractor(target).discover(Explorer())
 
 
 async def test_an_opening_lichess_does_not_have_is_refused() -> None:
-    with pytest.raises(FetchError, match="no opening page"):
+    with pytest.raises(UnknownTarget, match="no opening page"):
         await OpeningsExtractor("Nonexistent_Gambit").discover(Explorer())
 
 

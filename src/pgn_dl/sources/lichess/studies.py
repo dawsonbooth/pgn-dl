@@ -49,7 +49,7 @@ from typing import Any
 import chess.pgn
 
 from ...core.extractor import Extractor
-from ...core.fetch import Blocked, Fetcher, FetchError
+from ...core.fetch import Blocked, Fetcher, FetchError, UnknownTarget
 from ...core.models import Collection, GameItem, ItemRef
 from ...core.paths import slugify
 from ...core.pgn import known_site
@@ -474,7 +474,14 @@ class StudiesExtractor(Extractor[_Context]):
     ) -> tuple[Collection, list[ItemRef], _Context]:
         client = Client(fetcher, token=auth.saved_token())
         subject = f"lichess study {self.study}"
-        name, listed, texts = await chapters_of(client, self.study)
+        try:
+            name, listed, texts = await chapters_of(client, self.study)
+        except FetchError as exc:
+            # Only the study's own export answers 404 here: chapter_list turns
+            # its 404 into the export's refusal.
+            if exc.status != 404:
+                raise
+            raise UnknownTarget(str(exc), status=404) from None
         if not listed:
             raise FetchError(f"{subject} has no chapters")
         # Numbered from the whole study, so one chapter asked for by URL lands
@@ -487,7 +494,7 @@ class StudiesExtractor(Extractor[_Context]):
         if self.chapter is not None:
             placed = [(c, path) for c, path in placed if c.id == self.chapter]
             if not placed:
-                raise FetchError(_missing(self.study, self.chapter))
+                raise UnknownTarget(_missing(self.study, self.chapter))
         name = name or self.study
         # The id keeps two studies of one name apart.
         collection = self.collection(

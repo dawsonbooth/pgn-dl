@@ -11,7 +11,7 @@ from typing import Any
 import chess.pgn
 import pytest
 
-from pgn_dl.core.fetch import FetchError
+from pgn_dl.core.fetch import FetchError, UnknownTarget
 from pgn_dl.core.pgn import game_to_pgn
 from pgn_dl.core.registry import UnknownSource, resolve_url
 from pgn_dl.sources.chesscom.opening_courses import OpeningCoursesExtractor, slug_from
@@ -188,7 +188,7 @@ async def test_a_course_naming_no_single_side_keeps_its_own_name(
 
 
 async def test_an_unknown_slug_fails_naming_the_slug() -> None:
-    with pytest.raises(FetchError) as exc:
+    with pytest.raises(UnknownTarget) as exc:
         await OpeningCoursesExtractor("no-such-course-1").discover(
             _OpeningCoursesService()
         )

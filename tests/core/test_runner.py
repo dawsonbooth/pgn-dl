@@ -13,7 +13,14 @@ import pytest
 
 from pgn_dl.core import runner as runner_module
 from pgn_dl.core.extractor import Extractor
-from pgn_dl.core.fetch import Blocked, Fatal, Fetcher, FetchError, PageFetcher
+from pgn_dl.core.fetch import (
+    Blocked,
+    Fatal,
+    Fetcher,
+    FetchError,
+    PageFetcher,
+    UnknownTarget,
+)
 from pgn_dl.core.models import Collection, GameItem, ItemRef, MoveNode
 from pgn_dl.core.runner import Options, run
 
@@ -209,6 +216,15 @@ class BrokenAtDiscoveryExtractor(FakeExtractor):
         raise FetchError("https://fake.test/doc failed: 500 upstream error", status=500)
 
 
+class MissingAtDiscoveryExtractor(FakeExtractor):
+    key = "fake:missing-discovery"
+
+    async def _discover(
+        self, fetcher: object
+    ) -> tuple[Collection, list[ItemRef], None]:
+        raise UnknownTarget("fake has no thing 'nope'")
+
+
 def _pretend_source_has_a_login(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr(runner_module, "has_login", lambda source: source == "fake")
 
@@ -228,6 +244,24 @@ async def test_a_denied_discovery_does_not_blame_the_session(
     assert report.stopped
     assert not any("login" in line for line in lines)
     assert any("Nothing was downloaded" in line for line in lines)
+
+
+async def test_a_target_that_names_nothing_gets_no_advice_to_sign_in_or_re_run(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    # Signing in again or re-running the same command cannot download what the
+    # site does not have.
+    _pretend_source_has_a_login(monkeypatch)
+    lines: list[str] = []
+    report = await run(
+        MissingAtDiscoveryExtractor(), FETCHER, _opts(tmp_path), echo=lines.append
+    )
+
+    assert report.stopped
+    assert lines == [
+        "! Failed before any item could be listed: fake has no thing 'nope'",
+        "  Nothing was downloaded.",
+    ]
 
 
 async def test_another_discovery_failure_still_suggests_logging_in(

@@ -8,7 +8,7 @@ import chess.pgn
 import pytest
 
 from pgn_dl.core import registry
-from pgn_dl.core.fetch import FetchError
+from pgn_dl.core.fetch import FetchError, UnknownTarget
 from pgn_dl.sources.aimchess.motifs import MotifsExtractor, parse_motifs
 
 from .conftest import APP_SCRIPT, SiteFetcher
@@ -42,7 +42,7 @@ async def test_a_motif_keeps_its_number_in_the_site_s_order(key: str) -> None:
 
 async def test_a_motif_the_table_lacks_fails_before_anything_is_listed() -> None:
     extractor = MotifsExtractor("https://aimchess.com/motif/nonesuch")
-    with pytest.raises(FetchError, match="aimchess has no motif 'nonesuch'"):
+    with pytest.raises(UnknownTarget, match="aimchess has no motif 'nonesuch'"):
         await extractor.discover(SiteFetcher())
 
 

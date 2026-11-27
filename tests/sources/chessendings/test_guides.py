@@ -8,7 +8,7 @@ import pytest
 
 from pgn_dl.core import registry
 from pgn_dl.core.extractor import WholeSection
-from pgn_dl.core.fetch import FetchError
+from pgn_dl.core.fetch import FetchError, UnknownTarget
 from pgn_dl.core.models import Collection
 from pgn_dl.core.pgn import game_to_pgn
 from pgn_dl.sources.chessendings import flight
@@ -258,7 +258,7 @@ async def test_a_guide_gets_the_path_the_index_gives_it() -> None:
 
 
 async def test_an_unlisted_guide_is_refused() -> None:
-    with pytest.raises(FetchError, match="no guide 'nope'"):
+    with pytest.raises(UnknownTarget, match="no guide 'nope'"):
         await GuidesExtractor("nope").discover(
             FakeFetcher({INDEX: index_page()}, signed_in=False)
         )

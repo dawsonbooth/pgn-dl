@@ -13,7 +13,7 @@ from __future__ import annotations
 
 import re
 
-from ...core.fetch import FetchError
+from ...core.fetch import FetchError, UnknownTarget
 from .client import OPENING_COURSES, CoursesClient
 from .courses import Course, CoursesServiceExtractor
 
@@ -56,7 +56,7 @@ class OpeningCoursesExtractor(CoursesServiceExtractor):
         except FetchError as exc:
             if exc.status != 404:
                 raise
-            raise FetchError(
+            raise UnknownTarget(
                 f"chess.com has no opening course with the slug {self.slug!r}",
                 status=404,
             ) from None

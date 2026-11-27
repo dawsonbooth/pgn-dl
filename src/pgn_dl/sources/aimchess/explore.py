@@ -19,7 +19,7 @@ from dataclasses import dataclass
 from typing import Any
 
 from ...core.extractor import Extractor, WholeSection
-from ...core.fetch import Fetcher, FetchError
+from ...core.fetch import Fetcher, FetchError, UnknownTarget
 from ...core.models import Collection, GameItem, ItemRef
 from ...core.paths import slugify
 from . import auth
@@ -79,12 +79,15 @@ def parse_listing(data: Mapping[str, Any]) -> tuple[list[str], list[Lesson]]:
 
     A listing whose topics or lesson ids can't be read is refused: the topic
     order numbers the directories and the ids address the lessons, so a guess
-    at either could move every file on a later run.
+    at either could move every file on a later run. An empty listing is refused
+    too, or the extractor would report every lesson as unpublished.
     """
     topics, lessons = data.get("topics"), data.get("lessons")
     if not isinstance(topics, list) or not isinstance(lessons, list):
         raise FetchError("aimchess Explore listing has no topics or lessons array")
-    if lessons and not topics:
+    if not lessons:
+        raise FetchError("aimchess Explore listing has no lessons")
+    if not topics:
         raise FetchError("aimchess Explore listing has lessons but no topics")
     names = []
     for topic in topics:
@@ -209,7 +212,7 @@ class ExploreExtractor(Extractor[_Context]):
             (x, path) for x, path in layout(topics, lessons) if x.id == self.lesson_id
         ]
         if not placed:
-            raise FetchError(
+            raise UnknownTarget(
                 f"aimchess lesson {self.lesson_id} is not a published Explore lesson"
             )
         refs = [ItemRef(id=x.id, path=path) for x, path in placed]

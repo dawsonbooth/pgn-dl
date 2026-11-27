@@ -49,6 +49,12 @@ class Fatal(FetchError):
     not start: the runner stops rather than fail each item in turn."""
 
 
+class UnknownTarget(FetchError):
+    """A target that matches nothing the command downloads, such as a study the
+    site does not have: the runner suggests neither signing in again nor
+    re-running."""
+
+
 # Cloudflare serves interstitial/challenge pages under these statuses with one
 # of these markers in the body. Matching broadly (rather than only a 403 "Just a
 # moment" page) lets the runner back off and resume on a challenge instead of

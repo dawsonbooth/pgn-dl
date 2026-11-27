@@ -24,7 +24,7 @@ import re
 from dataclasses import dataclass
 
 from ...core.extractor import Extractor, WholeSection
-from ...core.fetch import Fetcher, FetchError
+from ...core.fetch import Fetcher, UnknownTarget
 from ...core.models import Collection, GameItem, ItemRef
 from ...core.paths import slugify
 from .client import Client
@@ -200,7 +200,7 @@ class PracticeExtractor(Extractor[Client]):
             and self.target.section in (None, sections[study.id])
         ]
         if not refs:
-            raise FetchError(
+            raise UnknownTarget(
                 f"lichess Practice study {self.target.study} is not in section "
                 f"{self.target.section}"
             )
