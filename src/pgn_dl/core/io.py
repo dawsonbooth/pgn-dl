@@ -21,11 +21,14 @@ def write_text_atomic(path: Path, text: str) -> None:
     owner-only and ``os.replace`` carries that mode over, so the content is never
     readable by anyone else even for an instant, and the rename replaces a
     symlink at ``path`` rather than writing through it.
+
+    Each LF in ``text`` stays an LF on every platform; Windows' text mode would
+    write CRLF.
     """
     path.parent.mkdir(parents=True, exist_ok=True)
     fd, tmp = tempfile.mkstemp(dir=path.parent, suffix=".tmp")
     try:
-        with os.fdopen(fd, "w", encoding="utf-8") as f:
+        with os.fdopen(fd, "w", encoding="utf-8", newline="\n") as f:
             f.write(text)
         os.replace(tmp, path)
     except BaseException:

@@ -6,6 +6,7 @@ import os
 import stat
 from collections.abc import Callable
 from pathlib import Path
+from typing import Any
 
 import pytest
 
@@ -83,6 +84,24 @@ def test_an_atomic_write_never_widens_the_file_it_creates(tmp_path: Path) -> Non
     path = tmp_path / "nested" / "credentials.json"
     write_text_atomic(path, "{}")
     assert stat.S_IMODE(path.stat().st_mode) == 0o600
+
+
+def test_an_atomic_write_ends_lines_in_lf_on_windows_too(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    # On Windows, text mode writes "\n" as "\r\n" unless newline is "" or "\n";
+    # as_on_windows opens the file that way here, on any platform.
+    fdopen = os.fdopen
+
+    def as_on_windows(fd: int, mode: str, **kwargs: Any) -> Any:
+        if kwargs.get("newline") is None:
+            kwargs["newline"] = "\r\n"
+        return fdopen(fd, mode, **kwargs)
+
+    monkeypatch.setattr(io_module.os, "fdopen", as_on_windows)
+    path = tmp_path / "game.pgn"
+    write_text_atomic(path, '[Event "E"]\n\n1. e4 *\n')
+    assert path.read_bytes() == b'[Event "E"]\n\n1. e4 *\n'
 
 
 @posix_only
