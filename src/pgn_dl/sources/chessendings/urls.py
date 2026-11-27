@@ -8,6 +8,8 @@ from __future__ import annotations
 
 import re
 
+from ...core.extractor import WholeSection
+
 SLUG = r"[a-z0-9]+(?:-[a-z0-9]+)*"
 HOST = r"https?://(?:www\.)?chessendings\.com(?:/[a-z]{2}(?:-[a-z]{2})?)?"
 
@@ -19,10 +21,11 @@ def under(*sections: str) -> tuple[re.Pattern[str], ...]:
     return (re.compile(rf"^{HOST}/(?:{'|'.join(sections)})(?:[/?#]|$)", re.IGNORECASE),)
 
 
-def slug_from(target: str, *sections: str, noun: str) -> str | None:
-    """The slug of the item a target names, or None for a whole section.
+def slug_from(target: str, *sections: str, noun: str, whole: str) -> str:
+    """The item slug in a target: an item's URL under ``sections``, or the slug.
 
-    A target is a section's URL, an item's URL under it, or a bare slug.
+    A section's own URL raises ``WholeSection``, whose message calls that URL
+    ``whole`` ("all of Theory").
     """
     cleaned = target.strip().split("#", 1)[0].split("?", 1)[0]
     pattern = (
@@ -33,4 +36,6 @@ def slug_from(target: str, *sections: str, noun: str) -> str | None:
     if m is None:
         raise ValueError(f"could not read a chessendings {noun} from {target!r}")
     found = m.group("url") or m.group("bare")
-    return found.lower() if found else None
+    if found is None:
+        raise WholeSection(f"{target!r} is {whole}; give one {noun}'s URL or slug")
+    return found.lower()

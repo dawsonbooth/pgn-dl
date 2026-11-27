@@ -4,15 +4,14 @@ from __future__ import annotations
 
 import asyncio
 import io
-from pathlib import Path
 
 import chess.pgn
 import pytest
 
 from pgn_dl.core import registry
+from pgn_dl.core.extractor import WholeSection
 from pgn_dl.core.fetch import FetchError
 from pgn_dl.core.pgn import game_to_pgn
-from pgn_dl.core.runner import Options, run
 from pgn_dl.sources.chessendings import auth, flight
 from pgn_dl.sources.chessendings.client import Client
 from pgn_dl.sources.chessendings.pages import ProRequired, SignedOut
@@ -46,7 +45,7 @@ def lesson_url(slug: str) -> str:
 
 
 def parse_listing(tree: object) -> list[Listed]:
-    return TheoryExtractor(LISTING).parse_listing(tree)
+    return TheoryExtractor("lucena-position").parse_listing(tree)
 
 
 @pytest.mark.parametrize(
@@ -58,8 +57,16 @@ def parse_listing(tree: object) -> list[Listed]:
         "https://chessendings.com/endgames",
     ],
 )
-def test_the_theory_page_means_every_lesson(target: str) -> None:
-    assert TheoryExtractor(target).slug is None
+def test_theory_s_own_url_is_refused(target: str) -> None:
+    with pytest.raises(
+        WholeSection, match="is all of Theory; give one Theory lesson's URL"
+    ):
+        TheoryExtractor(target)
+
+
+def test_the_registry_refuses_theory_s_own_url() -> None:
+    with pytest.raises(WholeSection, match="is all of Theory"):
+        registry.resolve_url("https://chessendings.com/train")
 
 
 @pytest.mark.parametrize(
@@ -88,8 +95,11 @@ def test_a_lesson_url_or_slug_means_that_lesson(target: str) -> None:
     ],
 )
 def test_other_targets_are_refused(target: str) -> None:
-    with pytest.raises(ValueError):
+    with pytest.raises(
+        ValueError, match="could not read a chessendings Theory lesson"
+    ) as refused:
         TheoryExtractor(target)
+    assert not isinstance(refused.value, WholeSection)
 
 
 def test_theory_urls_resolve_to_this_extractor() -> None:
@@ -156,45 +166,50 @@ PRO_VIEW = tuple(row | {"pro": False} for row in THEORY_ROWS)
 
 
 @pytest.mark.usefixtures("guest")
-async def test_a_guest_gets_the_free_lessons_and_is_told_what_was_left_out() -> None:
+async def test_a_lesson_is_numbered_from_the_whole_listing() -> None:
     fetcher = FakeFetcher({LISTING: theory_listing()}, signed_in=False)
-    collection, refs = await TheoryExtractor(LISTING).discover(fetcher)
-    assert (collection.source, collection.kind, collection.slug) == (
+    collection, refs = await TheoryExtractor("lucena-position").discover(fetcher)
+    assert (collection.source, collection.kind, collection.slug, collection.name) == (
         "chessendings",
         "theory",
         "theory",
+        "Theory",
     )
-    assert "philidor-position" not in [r.id for r in refs]
-    # Numbering comes from the whole listing, so signing in later moves nothing.
-    assert next(r for r in refs if r.id == "lucena-position").path == (
-        "03-rook-endgames",
-        "001-lucena-position",
-    )
-    assert collection.name == (
-        "Theory (without its 1 Pro lesson; "
-        "run: pgn-dl login chessendings, if your account has Pro)"
-    )
+    assert [(r.id, r.path) for r in refs] == [
+        ("lucena-position", ("03-rook-endgames", "001-lucena-position"))
+    ]
     assert fetcher.gets == [LISTING]
 
 
-@pytest.mark.usefixtures("member")
-async def test_a_pro_account_gets_every_lesson_under_the_plain_name() -> None:
-    fetcher = FakeFetcher(
-        {LISTING: theory_listing(PRO_VIEW, account=ACCOUNT)}, signed_in=True
+@pytest.mark.usefixtures("guest")
+async def test_a_guest_s_numbers_count_the_pro_lessons() -> None:
+    rows = (
+        theory_row("pro-ending", "Rook endgames", 0, pro=True),
+        theory_row("free-ending", "Rook endgames", 1),
     )
-    collection, refs = await TheoryExtractor(LISTING).discover(fetcher)
-    assert [r.id for r in refs] == [
-        x.slug for x, _ in layout(parse_listing(flight.parse(theory_listing(PRO_VIEW))))
-    ]
-    assert collection.name == "Theory"
+    fetcher = FakeFetcher({LISTING: theory_listing(rows)}, signed_in=False)
+    _, refs = await TheoryExtractor("free-ending").discover(fetcher)
+    # Numbered as for a Pro account, so signing in later moves nothing.
+    assert [r.path for r in refs] == [("01-rook-endgames", "002-free-ending")]
 
 
 @pytest.mark.usefixtures("member")
-async def test_an_account_without_pro_leaves_the_locked_lessons_out() -> None:
+async def test_a_pro_account_downloads_a_pro_lesson() -> None:
+    pages = {
+        LISTING: theory_listing(PRO_VIEW, account=ACCOUNT),
+        lesson_url("philidor-position"): drill_page(account=ACCOUNT),
+    }
+    fetcher = FakeFetcher(pages, signed_in=True)
+    pgn = await _fetch(TheoryExtractor("philidor-position"), fetcher)
+    assert '[ChessendingsSlug "philidor-position"]' in pgn
+
+
+@pytest.mark.usefixtures("member")
+async def test_an_account_without_pro_is_told_so_for_a_pro_lesson() -> None:
     fetcher = FakeFetcher({LISTING: theory_listing(account=ACCOUNT)}, signed_in=True)
-    collection, refs = await TheoryExtractor(LISTING).discover(fetcher)
-    assert "philidor-position" not in [r.id for r in refs]
-    assert collection.name.endswith("; this account does not have Pro)")
+    with pytest.raises(ProRequired, match="this account does not have Pro"):
+        await _fetch(TheoryExtractor("philidor-position"), fetcher)
+    assert fetcher.gets == [LISTING]
 
 
 @pytest.mark.usefixtures("member")
@@ -203,19 +218,7 @@ async def test_a_session_answered_as_a_guest_is_refused() -> None:
     # session would pass for an account without Pro.
     fetcher = FakeFetcher({LISTING: theory_listing()}, signed_in=True)
     with pytest.raises(SignedOut, match="session was not accepted"):
-        await TheoryExtractor(LISTING).discover(fetcher)
-
-
-@pytest.mark.usefixtures("guest")
-async def test_one_lesson_gets_the_path_a_full_download_gives_it() -> None:
-    pages = {LISTING: theory_listing()}
-    _, everything = await TheoryExtractor(LISTING).discover(
-        FakeFetcher(pages, signed_in=False)
-    )
-    _, one = await TheoryExtractor("lucena-position").discover(
-        FakeFetcher(pages, signed_in=False)
-    )
-    assert one == [r for r in everything if r.id == "lucena-position"]
+        await TheoryExtractor("lucena-position").discover(fetcher)
 
 
 @pytest.mark.usefixtures("guest")
@@ -225,17 +228,16 @@ async def test_an_unlisted_lesson_is_refused() -> None:
         await TheoryExtractor("nope").discover(fetcher)
 
 
-async def _fetch(extractor: TheoryExtractor, fetcher: FakeFetcher, slug: str) -> str:
-    collection, refs = await extractor.discover(fetcher)
-    item = await extractor.fetch(fetcher, next(r for r in refs if r.id == slug))
-    return game_to_pgn(collection, item)
+async def _fetch(extractor: TheoryExtractor, fetcher: FakeFetcher) -> str:
+    collection, [ref] = await extractor.discover(fetcher)
+    return game_to_pgn(collection, await extractor.fetch(fetcher, ref))
 
 
 @pytest.mark.usefixtures("guest")
 async def test_a_lesson_is_one_annotated_game() -> None:
     pages = {LISTING: theory_listing(), lesson_url("lucena-position"): drill_page()}
     fetcher = FakeFetcher(pages, signed_in=False)
-    pgn = await _fetch(TheoryExtractor(LISTING), fetcher, "lucena-position")
+    pgn = await _fetch(TheoryExtractor("lucena-position"), fetcher)
     game = chess.pgn.read_game(io.StringIO(pgn))
     assert game is not None and not game.errors
     assert game.headers["ChessendingsSlug"] == "lucena-position"
@@ -246,33 +248,22 @@ async def test_a_lesson_is_one_annotated_game() -> None:
 
 
 @pytest.mark.usefixtures("guest")
-async def test_a_locked_lesson_asked_for_by_name_fails_without_a_request() -> None:
+async def test_a_locked_lesson_fails_without_a_request() -> None:
     fetcher = FakeFetcher({LISTING: theory_listing()}, signed_in=False)
     with pytest.raises(ProRequired, match="run: pgn-dl login chessendings"):
-        await _fetch(TheoryExtractor("philidor-position"), fetcher, "philidor-position")
+        await _fetch(TheoryExtractor("philidor-position"), fetcher)
     assert fetcher.gets == [LISTING]
 
 
 @pytest.mark.usefixtures("member")
-async def test_once_a_page_comes_back_signed_out_the_rest_are_not_requested(
-    tmp_path: Path,
-) -> None:
-    rows = tuple(theory_row(f"lesson-{n}", "Checkmates", n) for n in range(3))
-    pages = {LISTING: theory_listing(rows, account=ACCOUNT)}
-    pages[lesson_url("lesson-0")] = drill_page(account=ACCOUNT)
-    pages[lesson_url("lesson-1")] = drill_page()  # the session stopped counting
-    pages[lesson_url("lesson-2")] = drill_page()
+async def test_a_lesson_page_answered_as_a_guest_is_refused() -> None:
+    pages = {
+        LISTING: theory_listing(account=ACCOUNT),
+        lesson_url("lucena-position"): drill_page(),  # the session stopped counting
+    }
     fetcher = FakeFetcher(pages, signed_in=True)
-    lines: list[str] = []
-    report = await run(
-        TheoryExtractor(LISTING),
-        fetcher,
-        Options(out=tmp_path, concurrency=1, delay=0),
-        echo=lines.append,
-    )
-    assert lesson_url("lesson-2") not in fetcher.gets
-    assert (report.written, report.failed) == (1, 2)
-    assert sum("not requested" in line for line in lines) == 1
+    with pytest.raises(SignedOut, match="session was not accepted"):
+        await _fetch(TheoryExtractor("lucena-position"), fetcher)
 
 
 @pytest.mark.usefixtures("guest")
@@ -280,7 +271,7 @@ async def test_an_open_lesson_without_a_drill_means_the_site_changed() -> None:
     pages = {LISTING: theory_listing(), lesson_url("lucena-position"): stream(page())}
     fetcher = FakeFetcher(pages, signed_in=False)
     with pytest.raises(FetchError, match="no drill on its page; the site has changed"):
-        await _fetch(TheoryExtractor(LISTING), fetcher, "lucena-position")
+        await _fetch(TheoryExtractor("lucena-position"), fetcher)
 
 
 @pytest.mark.usefixtures("guest")
@@ -290,7 +281,7 @@ async def test_a_page_rendered_in_another_language_is_refused() -> None:
     # no error at all.
     fetcher = FakeFetcher({LISTING: stream(page(locale="fr"))}, signed_in=False)
     with pytest.raises(FetchError, match="'fr' rather than English"):
-        await TheoryExtractor(LISTING).discover(fetcher)
+        await TheoryExtractor("lucena-position").discover(fetcher)
 
 
 async def test_concurrent_requests_ask_for_the_session_one_at_a_time(
@@ -342,7 +333,7 @@ async def _lesson(pages: dict[str, str]) -> chess.pgn.Game:
         lesson_url("lucena-position"): drill_page(),
     } | pages
     fetcher = FakeFetcher(pages, signed_in=False)
-    pgn = await _fetch(TheoryExtractor("lucena-position"), fetcher, "lucena-position")
+    pgn = await _fetch(TheoryExtractor("lucena-position"), fetcher)
     game = chess.pgn.read_game(io.StringIO(pgn))
     assert game is not None and not game.errors
     return game
@@ -393,8 +384,4 @@ async def test_a_public_page_that_fails_otherwise_fails_the_lesson() -> None:
 
     pages = {LISTING: theory_listing(), lesson_url("lucena-position"): drill_page()}
     with pytest.raises(FetchError, match="503"):
-        await _fetch(
-            TheoryExtractor("lucena-position"),
-            Down(pages, signed_in=False),
-            "lucena-position",
-        )
+        await _fetch(TheoryExtractor("lucena-position"), Down(pages, signed_in=False))

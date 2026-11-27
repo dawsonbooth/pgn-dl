@@ -4,7 +4,7 @@ Theory (/train) is 318 lessons in ten families (checkmates, king and pawn, ...
 queen against rook), each a position of at most seven pieces with the method
 played through move by move (see ``drill.py``), laid out by family (see
 ``section.py``). The free lessons need no account; with a saved session the
-listing is the account's, so an account with Pro gets every lesson.
+listing is the account's, so an account with Pro may download any lesson.
 
 Every lesson also has a public page (/endgames/<slug>) whose "The theory"
 section holds an essay on the ending that the lesson page lacks. The essay is
@@ -52,7 +52,7 @@ def guide_of(tree: Any) -> str | None:
 
 
 class TheoryExtractor(SectionExtractor):
-    """Every Theory lesson the account can open, or one."""
+    """One Theory lesson."""
 
     key = "chessendings:theory"
     url_patterns = under("train", "endgames")
@@ -64,7 +64,13 @@ class TheoryExtractor(SectionExtractor):
 
     def __init__(self, target: str) -> None:
         super().__init__()
-        self.slug = slug_from(target, "train", "endgames", noun="Theory lesson")
+        self.slug = slug_from(
+            target,
+            "train",
+            "endgames",
+            noun=f"{self.title} {self.noun}",
+            whole=f"all of {self.title}",
+        )
 
     def describe(self, row: Mapping[str, Any]) -> tuple[dict[str, str], str]:
         band, elo = row.get("bandLabel"), row.get("elo")

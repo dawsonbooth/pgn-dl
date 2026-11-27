@@ -7,6 +7,7 @@ import chess.pgn
 import pytest
 
 from pgn_dl.core import registry
+from pgn_dl.core.extractor import WholeSection
 from pgn_dl.core.fetch import FetchError
 from pgn_dl.core.models import Collection
 from pgn_dl.core.pgn import game_to_pgn
@@ -45,15 +46,28 @@ KQK = "8/8/3k4/8/8/2Q1K3/8/8 w - - 0 1"
 @pytest.mark.parametrize(
     ("target", "slug"),
     [
-        ("https://chessendings.com/guides", None),
-        ("https://chessendings.com/guides/", None),
         ("https://chessendings.com/guides/zugzwang", "zugzwang"),
         ("https://chessendings.com/fr/guides/zugzwang#faq", "zugzwang"),
         ("zugzwang", "zugzwang"),
     ],
 )
-def test_targets(target: str, slug: str | None) -> None:
+def test_targets(target: str, slug: str) -> None:
     assert GuidesExtractor(target).slug == slug
+
+
+@pytest.mark.parametrize(
+    "target", ["https://chessendings.com/guides", "https://chessendings.com/guides/"]
+)
+def test_the_guides_page_is_refused(target: str) -> None:
+    with pytest.raises(
+        WholeSection, match="is all of the guides; give one guide's URL or slug"
+    ):
+        GuidesExtractor(target)
+
+
+def test_the_registry_refuses_the_guides_page() -> None:
+    with pytest.raises(WholeSection, match="is all of the guides"):
+        registry.resolve_url("https://chessendings.com/guides")
 
 
 @pytest.mark.parametrize(
@@ -61,8 +75,11 @@ def test_targets(target: str, slug: str | None) -> None:
     ["https://example.com/guides/zugzwang", "https://chessendings.com/train", ""],
 )
 def test_other_targets_are_refused(target: str) -> None:
-    with pytest.raises(ValueError):
+    with pytest.raises(
+        ValueError, match="could not read a chessendings guide"
+    ) as refused:
         GuidesExtractor(target)
+    assert not isinstance(refused.value, WholeSection)
 
 
 def test_guide_urls_resolve_to_this_extractor() -> None:
@@ -231,15 +248,13 @@ def test_a_guide_without_lines_or_a_lesson_is_at_the_standard_position() -> None
     assert "ChessendingsLesson" not in item.headers
 
 
-async def test_one_guide_gets_the_path_a_full_download_gives_it() -> None:
-    _, everything = await GuidesExtractor(INDEX).discover(
+async def test_a_guide_gets_the_path_the_index_gives_it() -> None:
+    _, refs = await GuidesExtractor("zugzwang").discover(
         FakeFetcher({INDEX: index_page()}, signed_in=False)
     )
-    _, one = await GuidesExtractor("zugzwang").discover(
-        FakeFetcher({INDEX: index_page()}, signed_in=False)
-    )
-    assert one == [r for r in everything if r.id == "zugzwang"]
-    assert one[0].path == ("02-rules-concepts", "01-zugzwang")
+    assert [(r.id, r.path) for r in refs] == [
+        ("zugzwang", ("02-rules-concepts", "01-zugzwang"))
+    ]
 
 
 async def test_an_unlisted_guide_is_refused() -> None:

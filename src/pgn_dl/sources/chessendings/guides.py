@@ -184,24 +184,25 @@ class _Context:
 
 
 class GuidesExtractor(Extractor[_Context]):
-    """Every guide, or one."""
+    """One endgame guide."""
 
     key = "chessendings:guides"
     url_patterns = under("guides")
 
     def __init__(self, target: str) -> None:
         super().__init__()
-        self.slug = slug_from(target, "guides", noun="guide")
+        self.slug = slug_from(target, "guides", noun="guide", whole="all of the guides")
 
     async def _discover(
         self, fetcher: Fetcher
     ) -> tuple[Collection, list[ItemRef], _Context]:
         client = Client(fetcher, signed_in=False)
-        placed = layout(parse_index(await client.page("/guides")), width=2)
-        if self.slug is not None:
-            placed = [(x, path) for x, path in placed if x.slug == self.slug]
-            if not placed:
-                raise FetchError(f"chessendings has no guide {self.slug!r}")
+        index = parse_index(await client.page("/guides"))
+        placed = [
+            (x, path) for x, path in layout(index, width=2) if x.slug == self.slug
+        ]
+        if not placed:
+            raise FetchError(f"chessendings has no guide {self.slug!r}")
         refs = [ItemRef(id=x.slug, path=path) for x, path in placed]
         collection = self.collection(
             slug=slugify(COLLECTION_NAME), name=COLLECTION_NAME

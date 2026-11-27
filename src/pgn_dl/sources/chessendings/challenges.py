@@ -19,7 +19,7 @@ from typing import Any
 
 import chess
 
-from ...core.extractor import Extractor
+from ...core.extractor import Extractor, WholeSection
 from ...core.fetch import Fetcher, FetchError
 from ...core.models import Collection, GameItem, ItemRef
 from ...core.paths import slugify
@@ -34,7 +34,7 @@ from .urls import HOST, SLUG, under
 COLLECTION_NAME = "Endgame challenges"
 
 #: The challenges page, a theme page, a category page, or a bare category slug.
-_SCOPE_RE = re.compile(
+_TARGET_RE = re.compile(
     rf"^(?:{HOST}/challenges(?:/t/(?P<theme>{SLUG})|/(?!t(?:/|$))(?P<category>{SLUG}))?/?"
     rf"|(?P<bare>{SLUG}))$",
     re.IGNORECASE,
@@ -53,14 +53,6 @@ _CONDITIONS = (
 
 
 @dataclass(frozen=True)
-class Scope:
-    """Which challenges a target names: every one, a theme's, or a category."""
-
-    theme: str | None = None
-    category: str | None = None
-
-
-@dataclass(frozen=True)
 class Challenge:
     number: int
     fen: str
@@ -69,16 +61,19 @@ class Challenge:
     condition: str  # "mate in 6", "hold 8 moves", or "" for a bare win
 
 
-def scope_from(target: str) -> Scope:
+def category_from(target: str) -> str:
+    """The challenge category a target names: its page's URL, or its slug."""
     cleaned = target.strip().split("#", 1)[0].split("?", 1)[0]
-    m = _SCOPE_RE.match(cleaned)
+    m = _TARGET_RE.match(cleaned)
     if m is None:
-        raise ValueError(f"could not read chessendings challenges from {target!r}")
-    theme, category = m.group("theme"), m.group("category") or m.group("bare")
-    return Scope(
-        theme=theme.lower() if theme else None,
-        category=category.lower() if category else None,
-    )
+        raise ValueError(
+            f"could not read a chessendings challenge category from {target!r}"
+        )
+    category = m.group("category") or m.group("bare")
+    if category is None:
+        whole = "a challenge theme" if m.group("theme") else "all of the challenges"
+        raise WholeSection(f"{target!r} is {whole}; give one category's URL or slug")
+    return category.lower()
 
 
 def _hrefs(tree: Any, pattern: re.Pattern[str]) -> list[str]:
@@ -177,14 +172,14 @@ class _Context:
 
 
 class ChallengesExtractor(Extractor[_Context]):
-    """Every challenge category, a theme's, or one."""
+    """One challenge category."""
 
     key = "chessendings:challenges"
     url_patterns = under("challenges")
 
     def __init__(self, target: str) -> None:
         super().__init__()
-        self.scope = scope_from(target)
+        self.category = category_from(target)
 
     async def _discover(
         self, fetcher: Fetcher
@@ -194,10 +189,6 @@ class ChallengesExtractor(Extractor[_Context]):
         if not themes:
             raise FetchError(
                 "found no chessendings challenge themes; the site has changed"
-            )
-        if self.scope.theme is not None and self.scope.theme not in themes:
-            raise FetchError(
-                f"chessendings has no challenge theme {self.scope.theme!r}"
             )
         categories = []
         for theme in themes:
@@ -209,11 +200,10 @@ class ChallengesExtractor(Extractor[_Context]):
         placed = [
             (x, path)
             for x, path in layout(categories, width=2)
-            if self.scope.theme in (None, x.group)
-            and self.scope.category in (None, x.slug)
+            if x.slug == self.category
         ]
-        if self.scope.category is not None and not placed:
-            raise FetchError(f"chessendings has no challenge {self.scope.category!r}")
+        if not placed:
+            raise FetchError(f"chessendings has no challenge {self.category!r}")
         refs = [ItemRef(id=x.slug, path=path) for x, path in placed]
         collection = self.collection(
             slug=slugify(COLLECTION_NAME), name=COLLECTION_NAME

@@ -3,19 +3,17 @@
 A listing page names every item of a section in order and in groups (Theory's
 families, Strategy's ideas, the guides' chapters, the challenges' themes).
 Groups are numbered directories in the listing's order and items are numbered
-within their group, both from the whole listing, so a number never depends on
-what the account may open. An item asked for by name is numbered from the same
-listing, so it lands where a full download puts it. Files are named by the
-site's own slug.
+within their group, both from the whole listing, so a number depends neither on
+what the account may open nor on which item a run asks for. Files are named by
+the site's own slug.
 
 Theory and Strategy also share how an item is fetched: each is a drill page of
 its own (see ``drill.py``). Their listings are rendered for whoever asks: an
 item flagged ``pro`` is one this viewer cannot open (the flag drives the PRO
-badge, which a guest sees on every Pro item and a Pro account on none). A full
-run leaves those items out and says how many as it starts; one asked for by
-name fails without a request. Once a page comes back rendered for a guest
-although the session was sent, the session no longer counts, so the run's
-remaining items fail without a request.
+badge, which a guest sees on every Pro item and a Pro account on none). Such an
+item fails without a request. An item whose page comes back rendered for a
+guest, although the session was sent, fails with ``SignedOut``: the session no
+longer counts.
 """
 
 from __future__ import annotations
@@ -32,7 +30,7 @@ from ...core.paths import slugify
 from . import auth
 from .client import Client
 from .drill import drill_game, parse_drill
-from .pages import ProRequired, SignedOut, check_signed_in, drill_props, listing_rows
+from .pages import ProRequired, check_signed_in, drill_props, listing_rows
 from .urls import SLUG
 
 
@@ -78,11 +76,10 @@ def _without_pro(signed_in: bool) -> str:
 class _Context:
     client: Client
     listed: dict[str, Listed]
-    signed_out: bool = False  # a page came back rendered for a guest
 
 
 class SectionExtractor(Extractor[_Context]):
-    """Every drill in a section the account can open, or one by slug."""
+    """One drill of a section, by its slug."""
 
     #: The section's title on the site, which names its collection.
     title: ClassVar[str] = ""
@@ -96,7 +93,7 @@ class SectionExtractor(Extractor[_Context]):
     #: Whether the listing is for accounts only.
     members_only: ClassVar[bool] = False
 
-    slug: str | None
+    slug: str
 
     def describe(self, row: Mapping[str, Any]) -> tuple[dict[str, str], str]:
         """The headers a listing row adds to its drill's game, and a preface."""
@@ -155,22 +152,14 @@ class SectionExtractor(Extractor[_Context]):
         tree = await client.page(self.listing_path)
         if client.signed_in:
             check_signed_in(tree)
-        placed = layout(self.parse_listing(tree))
-        name = self.title
-        if self.slug is not None:
-            placed = [(x, path) for x, path in placed if x.slug == self.slug]
-            if not placed:
-                raise FetchError(
-                    f"chessendings has no {self.title} {self.noun} {self.slug!r}"
-                )
-        elif locked := sum(x.locked for x, _ in placed):
-            placed = [(x, path) for x, path in placed if not x.locked]
-            nouns = self.noun if locked == 1 else f"{self.noun}s"
-            name += (
-                f" (without its {locked} Pro {nouns}; {_without_pro(client.signed_in)})"
+        listed = self.parse_listing(tree)
+        placed = [(x, path) for x, path in layout(listed) if x.slug == self.slug]
+        if not placed:
+            raise FetchError(
+                f"chessendings has no {self.title} {self.noun} {self.slug!r}"
             )
         refs = [ItemRef(id=x.slug, path=path) for x, path in placed]
-        collection = self.collection(slug=slugify(self.title), name=name)
+        collection = self.collection(slug=slugify(self.title), name=self.title)
         return collection, refs, _Context(client, {x.slug: x for x, _ in placed})
 
     async def _fetch(
@@ -182,18 +171,9 @@ class SectionExtractor(Extractor[_Context]):
             raise ProRequired(
                 f"{subject} is Pro content; {_without_pro(context.client.signed_in)}"
             )
-        if context.signed_out:
-            raise SignedOut(
-                f"not requested: chessendings answered an earlier {self.noun} "
-                "in this run as signed out"
-            )
         tree = await context.client.page(f"{self.listing_path}/{drill.slug}")
         if context.client.signed_in:
-            try:
-                check_signed_in(tree)
-            except SignedOut:
-                context.signed_out = True
-                raise
+            check_signed_in(tree)
         game = parse_drill(drill_props(tree, subject), subject)
         essay, headers = await self.extras(context.client, drill)
         return drill_game(

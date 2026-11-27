@@ -5,13 +5,13 @@ from __future__ import annotations
 import pytest
 
 from pgn_dl.core import registry
+from pgn_dl.core.extractor import WholeSection
 from pgn_dl.core.fetch import FetchError
 from pgn_dl.sources.chessendings import flight
 from pgn_dl.sources.chessendings.challenges import (
     ChallengesExtractor,
-    Scope,
+    category_from,
     parse_challenges,
-    scope_from,
 )
 
 from .conftest import (
@@ -31,20 +31,32 @@ INDEX = f"{ROOT}/challenges"
 
 
 @pytest.mark.parametrize(
-    ("target", "expected"),
+    "target",
     [
-        ("https://chessendings.com/challenges", Scope()),
-        ("https://chessendings.com/challenges/t/rook", Scope(theme="rook")),
-        ("https://chessendings.com/challenges/rook-win", Scope(category="rook-win")),
-        (
-            "https://chessendings.com/challenges/rook-win?tab=practice&level=2",
-            Scope(category="rook-win"),
-        ),
-        ("rook-win", Scope(category="rook-win")),
+        "https://chessendings.com/challenges/rook-win",
+        "https://chessendings.com/challenges/rook-win?tab=practice&level=2",
+        "rook-win",
     ],
 )
-def test_targets(target: str, expected: Scope) -> None:
-    assert scope_from(target) == expected
+def test_targets(target: str) -> None:
+    assert category_from(target) == "rook-win"
+
+
+@pytest.mark.parametrize(
+    ("target", "message"),
+    [
+        ("https://chessendings.com/challenges", "is all of the challenges"),
+        ("https://chessendings.com/challenges/t/rook", "is a challenge theme"),
+    ],
+)
+def test_the_challenges_or_a_theme_is_refused(target: str, message: str) -> None:
+    with pytest.raises(WholeSection, match=f"{message}; give one category's URL"):
+        category_from(target)
+
+
+def test_the_registry_refuses_a_theme_s_url() -> None:
+    with pytest.raises(WholeSection, match="is a challenge theme"):
+        registry.resolve_url("https://chessendings.com/challenges/t/queen")
 
 
 @pytest.mark.parametrize(
@@ -52,55 +64,41 @@ def test_targets(target: str, expected: Scope) -> None:
     ["https://chessendings.com/challenges/t/", "https://example.com/challenges", ""],
 )
 def test_other_targets_are_refused(target: str) -> None:
-    with pytest.raises(ValueError):
-        scope_from(target)
+    with pytest.raises(
+        ValueError, match="could not read a chessendings challenge"
+    ) as refused:
+        category_from(target)
+    assert not isinstance(refused.value, WholeSection)
 
 
 def test_challenge_urls_resolve_to_this_extractor() -> None:
-    found = registry.resolve_url("https://chessendings.com/challenges/t/queen")
+    found = registry.resolve_url("https://chessendings.com/challenges/queen-mate")
     assert isinstance(found, ChallengesExtractor)
-    assert found.scope == Scope(theme="queen")
+    assert found.category == "queen-mate"
 
 
-async def test_themes_and_categories_are_numbered_in_the_site_order() -> None:
-    fetcher = FakeFetcher(challenge_pages(), signed_in=False)
-    collection, refs = await ChallengesExtractor(INDEX).discover(fetcher)
-    assert (collection.kind, collection.slug) == ("challenges", "endgame-challenges")
-    assert [(r.id, r.path) for r in refs] == [
+@pytest.mark.parametrize(
+    ("category", "path"),
+    [
         ("queen-mate", ("01-checkmates", "01-queen-mate")),
         ("rook-win", ("02-rook", "01-rook-win")),
         ("rook-draw", ("02-rook", "02-rook-draw")),
-    ]
+    ],
+)
+async def test_themes_and_categories_are_numbered_in_the_site_order(
+    category: str, path: tuple[str, str]
+) -> None:
+    fetcher = FakeFetcher(challenge_pages(), signed_in=False)
+    collection, refs = await ChallengesExtractor(category).discover(fetcher)
+    assert (collection.kind, collection.slug) == ("challenges", "endgame-challenges")
+    assert [(r.id, r.path) for r in refs] == [(category, path)]
     # Discovery reads the index and the theme pages, no category.
     assert fetcher.gets == [INDEX, f"{INDEX}/t/checkmates", f"{INDEX}/t/rook"]
 
 
-async def test_a_theme_or_a_category_keeps_the_numbers_of_a_full_download() -> None:
-    _, everything = await ChallengesExtractor(INDEX).discover(
-        FakeFetcher(challenge_pages(), signed_in=False)
-    )
-    _, theme = await ChallengesExtractor(f"{INDEX}/t/rook").discover(
-        FakeFetcher(challenge_pages(), signed_in=False)
-    )
-    _, one = await ChallengesExtractor("rook-draw").discover(
-        FakeFetcher(challenge_pages(), signed_in=False)
-    )
-    assert theme == everything[1:]
-    assert one == everything[2:]
-
-
-@pytest.mark.parametrize(
-    ("target", "message"),
-    [
-        (f"{INDEX}/t/pawn", "no challenge theme 'pawn'"),
-        ("pawn-win", "no challenge 'pawn-win'"),
-    ],
-)
-async def test_an_unknown_theme_or_category_is_refused(
-    target: str, message: str
-) -> None:
-    with pytest.raises(FetchError, match=message):
-        await ChallengesExtractor(target).discover(
+async def test_an_unknown_category_is_refused() -> None:
+    with pytest.raises(FetchError, match="no challenge 'pawn-win'"):
+        await ChallengesExtractor("pawn-win").discover(
             FakeFetcher(challenge_pages(), signed_in=False)
         )
 

@@ -20,7 +20,7 @@ from .urls import slug_from, under
 
 
 class StrategyExtractor(SectionExtractor):
-    """Every Strategy position the account can open, or one."""
+    """One Strategy position."""
 
     key = "chessendings:strategy"
     url_patterns = under("practice")
@@ -33,7 +33,12 @@ class StrategyExtractor(SectionExtractor):
 
     def __init__(self, target: str) -> None:
         super().__init__()
-        self.slug = slug_from(target, "practice", noun="Strategy position")
+        self.slug = slug_from(
+            target,
+            "practice",
+            noun=f"{self.title} {self.noun}",
+            whole=f"all of {self.title}",
+        )
 
     def describe(self, row: Mapping[str, Any]) -> tuple[dict[str, str], str]:
         origin = row.get("origin")
