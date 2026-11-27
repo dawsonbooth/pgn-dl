@@ -180,7 +180,7 @@ def parse_payload(text: str) -> ParsedPage:
     else:
         raise FetchError(
             "chessreps payload carries no userCourseData; "
-            "is the target a chessreps opening page?"
+            "is the target a chessreps course?"
         )
 
     root = data[0]

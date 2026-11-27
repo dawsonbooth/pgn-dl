@@ -8,9 +8,9 @@ of the site's own data route, authenticated by the stored session cookie.
 from ...core.declaration import ExtractorDeclaration, SourceDeclaration
 from ...core.registry import register_declaration
 from .auth import login
-from .openings import OpeningsExtractor
+from .courses import CoursesExtractor
 
-_OPENINGS_HELP = """
+_COURSES_HELP = """
 Download an opening course into PGN files (requires `pgn-dl login chessreps`).
 
 The whole repertoire is written as one file, mainline first and every
@@ -24,13 +24,13 @@ declaration = SourceDeclaration(
     login=login,
     extractors=(
         ExtractorDeclaration(
-            extractor=OpeningsExtractor,
-            target_name="opening",
-            target_help="Opening URL or chessreps course slug",
-            help=_OPENINGS_HELP,
+            extractor=CoursesExtractor,
+            target_name="course",
+            target_help="Course URL (chessreps.com/opening/<slug>) or slug",
+            help=_COURSES_HELP,
         ),
     ),
 )
 register_declaration(declaration)
 
-__all__ = ["OpeningsExtractor", "declaration"]
+__all__ = ["CoursesExtractor", "declaration"]

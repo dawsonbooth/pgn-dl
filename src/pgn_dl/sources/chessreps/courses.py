@@ -46,7 +46,7 @@ def slug_from(target: str) -> str:
     cleaned = target.strip().split("#", 1)[0].split("?", 1)[0]
     m = _TARGET_RE.match(cleaned)
     if m is None:
-        raise ValueError(f"could not read a chessreps opening slug from {target!r}")
+        raise ValueError(f"could not read a chessreps course slug from {target!r}")
     return m.group("slug").lower()
 
 
@@ -156,10 +156,10 @@ def _merged_file_slug(name: str) -> str:
     return f"{slug}-repertoire" if f"{slug}.pgn" == COMBINED_NAME else slug
 
 
-class OpeningsExtractor(Extractor[ParsedPage]):
+class CoursesExtractor(Extractor[ParsedPage]):
     """One chessreps opening course: the merged repertoire, plus its lines."""
 
-    key = "chessreps:openings"
+    key = "chessreps:courses"
     url_patterns = (
         re.compile(
             r"^https?://(www\.)?chessreps\.com/([a-z]{2}(-[a-z]{2})?/)?opening/",
@@ -214,7 +214,7 @@ class OpeningsExtractor(Extractor[ParsedPage]):
         self, context: ParsedPage, fetcher: Fetcher, ref: ItemRef
     ) -> GameItem:
         course = context.course
-        headers = {"ChessrepsOpeningId": course.id}
+        headers = {"ChessrepsCourseId": course.id}
         side = _REPERTOIRE_SIDE[course.player_side]
         headers |= {"White": "?", "Black": "?", side: course.name}
 
@@ -224,7 +224,7 @@ class OpeningsExtractor(Extractor[ParsedPage]):
             name = course.line_names.get(line) or f"Line {number}"
             # Readers key on Event, so that names the line; the course keeps
             # its own header so the file still says where it came from.
-            headers |= {"Event": name, "ChessrepsOpening": course.name}
+            headers |= {"Event": name, "ChessrepsCourse": course.name}
             return GameItem(headers=headers, root=build_line(course, number))
 
         return GameItem(

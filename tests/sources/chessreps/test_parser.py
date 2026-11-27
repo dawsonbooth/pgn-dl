@@ -117,6 +117,7 @@ def test_a_payload_without_course_data_is_refused() -> None:
     with pytest.raises(FetchError) as exc:
         parser.parse_payload(json.dumps({"type": "data", "nodes": [None]}))
     assert "userCourseData" in str(exc.value)
+    assert "is the target a chessreps course?" in str(exc.value)
 
 
 def test_empty_lines_are_refused() -> None:
