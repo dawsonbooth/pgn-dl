@@ -71,7 +71,7 @@ def main(ctx: typer.Context) -> None:
 # `sources` package.
 @app.command(name="sources")
 def list_sources() -> None:
-    """List every source's commands and the URLs each one accepts."""
+    """List every source's commands and their URL patterns."""
     # From the declarations, which are what the command line is built from: an
     # extractor no source declares has no command to list.
     declared = sorted(

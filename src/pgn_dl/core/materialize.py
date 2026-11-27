@@ -64,7 +64,7 @@ def _resolve_url_or_exit(target: str) -> Extractor:
         raise typer.Exit(code=1) from None
     except UnknownSource as exc:
         typer.echo(str(exc))
-        typer.echo("`pgn-dl sources` lists the URLs each command accepts.")
+        typer.echo("`pgn-dl sources` lists each command's URL patterns.")
         raise typer.Exit(code=1) from None
 
 

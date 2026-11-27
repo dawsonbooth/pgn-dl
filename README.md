@@ -71,7 +71,7 @@ curl -s https://lichess.org/api/study/by/thibault | jq -r .id \
   | xargs -I{} uv run pgn-dl https://lichess.org/study/{}
 ```
 
-`pgn-dl sources` lists every command and the URLs it accepts.
+`pgn-dl sources` lists every command and its URL patterns.
 
 Options:
 
