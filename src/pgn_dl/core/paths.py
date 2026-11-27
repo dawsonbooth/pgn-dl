@@ -62,12 +62,20 @@ def _order_key(rel: Path) -> tuple[tuple[int, ...], str]:
 
 
 def combine_collection_dir(
-    collection_dir: Path, *, echo: Callable[[str], None] = print
+    collection_dir: Path,
+    *,
+    without: Sequence[str] = (),
+    echo: Callable[[str], None] = print,
 ) -> Path:
-    """Concatenate every item PGN under ``collection_dir`` into ``all.pgn``."""
+    """Concatenate every item PGN under ``collection_dir`` into ``all.pgn``.
+
+    ``without`` names top-level subdirectories to leave out (see
+    ``Extractor.combined_without``). They are kept when nothing else is there,
+    as when a repertoire failed and only its lines were written.
+    """
     out_file = collection_dir / COMBINED_NAME
     # rglob: item files nest (a course's chapter directories, a book's
-    # bookmarks/ subdirectory), and all.pgn is meant to hold all of them.
+    # bookmarks/ subdirectory).
     files = sorted(
         (
             f
@@ -76,6 +84,8 @@ def combine_collection_dir(
         ),
         key=lambda f: _order_key(f.relative_to(collection_dir)),
     )
+    kept = [f for f in files if f.relative_to(collection_dir).parts[0] not in without]
+    files = kept or files
     # Everything pgn-dl wrote is UTF-8, so an unreadable file is someone else's
     # (a GUI's latin-1 export, say) and gets named and left out rather than
     # guessed at. A symlink is left out on the same terms: following one would

@@ -92,6 +92,10 @@ class Extractor[C](ABC):
     #: fetcher it is handed is then a ``PageFetcher``. Not with
     #: ``needs_browser``: the two would open the same profile twice.
     reads_pages: ClassVar[bool] = False
+    #: Top-level subdirectories of a collection whose files repeat what its
+    #: other files already have (a repertoire's lines/). all.pgn is combined
+    #: without them, so it has each line once.
+    combined_without: ClassVar[tuple[str, ...]] = ()
 
     # Both halves of ``key``, split out once. They name the output directory, so
     # a source must never restate them as literals.

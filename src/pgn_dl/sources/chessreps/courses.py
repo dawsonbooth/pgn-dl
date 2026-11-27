@@ -148,9 +148,9 @@ _REPERTOIRE_SIDE = {"w": "White", "b": "Black"}
 def _merged_file_slug(name: str) -> str:
     """The merged game's filename, kept clear of the combined file.
 
-    ``combine_collection_dir`` writes every other PGN into ``all.pgn``, so a
-    course named "All" would otherwise have its tree overwritten by the
-    concatenation. Same guard as noctie's book file.
+    ``combine_collection_dir`` writes ``all.pgn`` beside it, so a course named
+    "All" would otherwise have its tree overwritten by the concatenation. Same
+    guard as noctie's book file.
     """
     slug = slugify(name)
     return f"{slug}-repertoire" if f"{slug}.pgn" == COMBINED_NAME else slug
@@ -160,6 +160,7 @@ class CoursesExtractor(Extractor[ParsedPage]):
     """One chessreps opening course: the merged repertoire, plus its lines."""
 
     key = "chessreps:courses"
+    combined_without = ("lines",)  # the tree has every line as a variation
     url_patterns = (
         re.compile(
             r"^https?://(www\.)?chessreps\.com/([a-z]{2}(-[a-z]{2})?/)?opening/",

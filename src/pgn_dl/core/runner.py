@@ -312,7 +312,9 @@ async def run(
     await asyncio.gather(*(process(ref) for ref in refs))
 
     if root.is_dir():
-        combined = combine_collection_dir(root, echo=echo)
+        combined = combine_collection_dir(
+            root, without=type(extractor).combined_without, echo=echo
+        )
         echo(f"Combined PGN: {combined}")
 
     return report

@@ -105,6 +105,9 @@ output/
             └── 02-<chapter-slug>/
 ```
 
+A chessreps course's `lines/` repeat what its repertoire already has as
+variations, so they are not in `all.pgn`.
+
 Author annotations are preserved where PGN can express them: commentary as
 move comments, sidelines as variations, evaluation glyphs as NAGs, and board
 arrows and highlights as `[%cal]` / `[%csl]` commands.

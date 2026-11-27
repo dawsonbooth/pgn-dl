@@ -16,7 +16,7 @@ Download an opening course into PGN files (requires `pgn-dl login chessreps`).
 The whole repertoire is written as one file, mainline first and every
 other line as a variation, with the author's commentary and the site's
 engine evals as move comments. Each line is written again as a file of its
-own under lines/.
+own under lines/, but not into all.pgn: the repertoire already has every line.
 """
 
 declaration = SourceDeclaration(

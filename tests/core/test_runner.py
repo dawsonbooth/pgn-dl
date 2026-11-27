@@ -746,6 +746,32 @@ async def test_all_pgn_is_written_at_the_collection_root(tmp_path: Path) -> None
     assert combined.count("[Event ") == 2
 
 
+class RepertoireExtractor(FakeExtractor):
+    """A whole, and one line of it written again under lines/."""
+
+    key = "fake:repertoires"
+    combined_without = ("lines",)
+
+    async def _discover(
+        self, fetcher: Fetcher
+    ) -> tuple[Collection, list[ItemRef], None]:
+        refs = [
+            ItemRef(id="0", path=("000-whole",)),
+            ItemRef(id="1", path=("lines", "001-line")),
+        ]
+        return COLLECTION, refs, None
+
+
+async def test_all_pgn_leaves_out_what_the_extractor_writes_again(
+    tmp_path: Path,
+) -> None:
+    await run(RepertoireExtractor(), FETCHER, _opts(tmp_path), echo=lambda _: None)
+    root = tmp_path / "fake/things/c"
+    assert (root / "lines" / "001-line.pgn").is_file()
+    combined = (root / "all.pgn").read_text(encoding="utf-8")
+    assert combined.count("[Event ") == 1
+
+
 class PageRecordingFetcher(RecordingFetcher):
     """A transport that reads pages too, as a run's window makes it."""
 

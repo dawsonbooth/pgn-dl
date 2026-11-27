@@ -60,6 +60,28 @@ def test_combine_handles_flat_single_segment_collections(tmp_path: Path) -> None
     assert combined.index("AAA") < combined.index("BBB")
 
 
+def test_combine_leaves_out_the_subdirectories_it_is_told_to(tmp_path: Path) -> None:
+    # Only the top-level directory of that name is left out.
+    _write(tmp_path / "repertoire.pgn", "TREE")
+    _write(tmp_path / "lines" / "001-a.pgn", "LINE")
+    _write(tmp_path / "01-chapter" / "lines" / "001-b.pgn", "NESTED")
+
+    combined = combine_collection_dir(tmp_path, without=("lines",))
+    text = combined.read_text(encoding="utf-8")
+    assert "TREE" in text
+    assert "NESTED" in text
+    assert "LINE" not in text
+
+
+def test_combine_keeps_what_it_would_leave_out_when_nothing_else_is_there(
+    tmp_path: Path,
+) -> None:
+    # A repertoire that failed to build leaves only its lines.
+    _write(tmp_path / "lines" / "001-a.pgn", "LINE")
+    combined = combine_collection_dir(tmp_path, without=("lines",))
+    assert "LINE" in combined.read_text(encoding="utf-8")
+
+
 def test_combine_never_includes_itself(tmp_path: Path) -> None:
     _write(tmp_path / "001-a.pgn", "AAA")
     first = combine_collection_dir(tmp_path).read_text(encoding="utf-8")

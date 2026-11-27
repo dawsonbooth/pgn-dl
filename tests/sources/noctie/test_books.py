@@ -879,6 +879,26 @@ async def test_a_book_named_all_does_not_overwrite_its_own_file(tmp_path: Path) 
     assert _pgn_node_count(game) == 131  # the whole book, not the bookmark
 
 
+async def test_all_pgn_keeps_each_bookmarks_name_and_description(
+    tmp_path: Path,
+) -> None:
+    # The book's own file has neither, so all.pgn holds the bookmarks too.
+    fetcher = _fetcher()
+    fetcher.pages[f"{BASE}/openingBooks/{BOOK_ID}"] = _book_doc(
+        [{"name": "Italian", "description": "Slow but sound.", "variation": "> e4 e5"}]
+    )
+    await run(
+        OpeningBooksExtractor(BOOK_URL),
+        fetcher,
+        Options(out=tmp_path, concurrency=2, delay=0.0),
+        echo=lambda _: None,
+    )
+    [root] = (tmp_path / "noctie" / "opening-books").iterdir()
+    combined = (root / COMBINED_NAME).read_text(encoding="utf-8")
+    assert '[Event "Italian"]' in combined
+    assert "Slow but sound." in combined
+
+
 async def test_a_book_with_no_bookmarks_is_still_one_item() -> None:
     fetcher = _fetcher()
     fetcher.pages[f"{BASE}/openingBooks/{BOOK_ID}"] = _book_doc([])

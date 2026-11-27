@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import io
 from dataclasses import replace
+from pathlib import Path
 from typing import Any
 
 import chess
@@ -13,7 +14,9 @@ import pytest
 from pgn_dl.core import registry
 from pgn_dl.core.fetch import FetchError
 from pgn_dl.core.models import MoveNode
+from pgn_dl.core.paths import COMBINED_NAME
 from pgn_dl.core.pgn import game_to_pgn
+from pgn_dl.core.runner import Options, run
 from pgn_dl.sources.chessreps import courses
 from pgn_dl.sources.chessreps.courses import CoursesExtractor
 from pgn_dl.sources.chessreps.parser import Course
@@ -196,6 +199,23 @@ async def test_discover_lists_the_merged_game_and_every_line(stub_cookie) -> Non
     ]
     assert refs[0].id == "abc1234"
     assert refs[1].id == "line:1"
+
+
+async def test_all_pgn_holds_the_repertoire_once_and_not_its_lines(
+    stub_cookie, tmp_path: Path
+) -> None:
+    # The merged tree has every line as a variation, so all.pgn is that tree.
+    await run(
+        CoursesExtractor("test-rep"),
+        _fetcher(course_page()),
+        Options(out=tmp_path, concurrency=2, delay=0.0),
+        echo=lambda _: None,
+    )
+    root = tmp_path / "chessreps" / "courses" / "test-rep"
+    assert len(list((root / "lines").glob("*.pgn"))) == 2
+    combined = (root / COMBINED_NAME).read_text(encoding="utf-8")
+    assert combined.count("[Event ") == 1
+    assert '[Event "Test Repertoire"]' in combined
 
 
 async def test_fetch_renders_the_merged_game_and_a_line(stub_cookie) -> None:
