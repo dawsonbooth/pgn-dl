@@ -35,8 +35,7 @@ the study's JSON, and each chapter is a request of its own, which is the text
 the whole export would have held.
 
 A private study needs the saved token of an account that may see it (see
-``auth.py``). Practice (``practice.py``) and a user's studies
-(``user_studies.py``) read their studies through here too.
+``auth.py``). Practice (``practice.py``) reads its studies through here too.
 """
 
 from __future__ import annotations
@@ -184,7 +183,7 @@ async def export(client: Client, study: str, *, send_token: bool = True) -> str:
                 status=403,
             ) from None
         if exc.status == 404:
-            raise FetchError(f"lichess has no study {study}", status=404) from None
+            raise FetchError(_missing(study), status=404) from None
         raise
 
 
@@ -208,7 +207,7 @@ async def chapter_export(
                 status=403,
             ) from None
         if exc.status == 404:
-            raise FetchError(f"lichess has no {subject}", status=404) from None
+            raise FetchError(_missing(study, chapter), status=404) from None
         raise
     chapters = read_chapters(text, subject=subject)
     if [c.id for c in chapters] != [chapter]:
@@ -229,13 +228,14 @@ async def study_json(
     else:
         url = f"{ROOT}/study/{study}/{chapter}"
         subject = f"lichess study {study} chapter {chapter}"
-    data = await _study_json(client, url, subject, send_token=send_token)
+    missing = _missing(study, chapter)
+    data = await _study_json(client, url, subject, missing, send_token=send_token)
     if chapter is not None and _shown(data) != chapter:
         # A study left idle with its position away from a chapter's start is
         # rewound to its first chapter by the next view, and that view gets
         # the first chapter (lila's ``maybeResetAndGetChapter``). Asked again,
         # Lichess answers with the chapter asked for.
-        data = await _study_json(client, url, subject, send_token=send_token)
+        data = await _study_json(client, url, subject, missing, send_token=send_token)
     found = data.get("study") if isinstance(data, dict) else None
     if not isinstance(found, dict) or found.get("id") != study:
         raise FetchError(f"lichess answered for another study than {subject}")
@@ -251,8 +251,15 @@ def _shown(data: object) -> object:
     return shown.get("id") if isinstance(shown, dict) else None
 
 
+def _missing(study: str, chapter: str | None = None) -> str:
+    """What Lichess's 404 for ``study``, or for one of its chapters, means."""
+    if chapter is None:
+        return f"lichess has no study {study}"
+    return f"lichess has no chapter {chapter} in study {study}"
+
+
 async def _study_json(
-    client: Client, url: str, subject: str, *, send_token: bool
+    client: Client, url: str, subject: str, missing: str, *, send_token: bool
 ) -> Any:
     try:
         return await client.json(url, auth=send_token)
@@ -267,7 +274,7 @@ async def _study_json(
                 status=403,
             ) from None
         if exc.status == 404:
-            raise FetchError(f"lichess has no {subject}", status=404) from None
+            raise FetchError(missing, status=404) from None
         raise
 
 
@@ -421,10 +428,10 @@ class _Context:
     first: str
 
 
-class StudyExtractor(Extractor[_Context]):
+class StudiesExtractor(Extractor[_Context]):
     """Every chapter of a study, or one."""
 
-    key = "lichess:study"
+    key = "lichess:studies"
     url_patterns = (re.compile(rf"^https?://(?:www\.)?lichess\.org/study/{ID}\b"),)
 
     def __init__(self, target: str) -> None:
@@ -449,7 +456,7 @@ class StudyExtractor(Extractor[_Context]):
         if self.chapter is not None:
             placed = [(c, path) for c, path in placed if c.id == self.chapter]
             if not placed:
-                raise FetchError(f"{subject} has no chapter {self.chapter}")
+                raise FetchError(_missing(self.study, self.chapter))
         name = name or self.study
         # The id keeps two studies of one name apart.
         collection = self.collection(

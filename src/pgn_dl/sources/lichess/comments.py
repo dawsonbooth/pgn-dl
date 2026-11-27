@@ -2,7 +2,7 @@
 
 Lichess's PGN export of a chapter leaves out some of what the chapter shows:
 its description, the study's own description, and a gamebook's hints and
-replies to wrong moves (see ``study.py``). They are added to the exported
+replies to wrong moves (see ``studies.py``). They are added to the exported
 text as comments. Nothing already in the text moves or changes, so a file
 holds what Lichess sent, plus these.
 """

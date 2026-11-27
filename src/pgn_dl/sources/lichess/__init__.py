@@ -17,8 +17,7 @@ from .auth import login
 from .learn import LearnExtractor
 from .openings import OpeningsExtractor
 from .practice import PracticeExtractor
-from .study import StudyExtractor
-from .user_studies import UserStudiesExtractor
+from .studies import StudiesExtractor
 
 _LEARN_HELP = """
 Download Lichess Learn (Chess basics) into PGN files. No login needed.
@@ -39,7 +38,7 @@ is one file, in a directory per section, with a game per exercise: its goal
 Lichess shows beside the board as its first comment.
 """
 
-_STUDY_HELP = """
+_STUDIES_HELP = """
 Download a Lichess study into PGN files.
 
 Give a study URL for every chapter, or a chapter URL for one. Each chapter is
@@ -49,15 +48,6 @@ the study's own on its first chapter, and a gamebook's hints and replies to
 wrong moves. A study whose owner turned export off is downloaded chapter by
 chapter. Public studies need no login. A private study
 needs `pgn-dl login lichess` as an account that may see it.
-"""
-
-_USER_STUDIES_HELP = """
-Download every study of a Lichess user into PGN files.
-
-Give the user's studies URL (lichess.org/study/by/<user>). Each study is one
-file, its chapters the file's games, written as the study kind writes them.
-Lichess lists a user's public studies to anyone, and all of them when you are
-logged in as that user with `pgn-dl login lichess`.
 """
 
 _OPENINGS_HELP = """
@@ -95,16 +85,10 @@ declaration = SourceDeclaration(
             help=_PRACTICE_HELP,
         ),
         ExtractorDeclaration(
-            extractor=StudyExtractor,
+            extractor=StudiesExtractor,
             target_name="target",
             target_help="Study or chapter URL, or a study id",
-            help=_STUDY_HELP,
-        ),
-        ExtractorDeclaration(
-            extractor=UserStudiesExtractor,
-            target_name="url",
-            target_help="https://lichess.org/study/by/<user>",
-            help=_USER_STUDIES_HELP,
+            help=_STUDIES_HELP,
         ),
         ExtractorDeclaration(
             extractor=OpeningsExtractor,
@@ -120,8 +104,7 @@ __all__ = [
     "LearnExtractor",
     "OpeningsExtractor",
     "PracticeExtractor",
-    "StudyExtractor",
-    "UserStudiesExtractor",
+    "StudiesExtractor",
     "declaration",
     "login",
 ]

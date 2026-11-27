@@ -17,7 +17,7 @@ from pgn_dl.sources.lichess.practice import (
     layout,
     scope_from,
 )
-from pgn_dl.sources.lichess.study import ID
+from pgn_dl.sources.lichess.studies import ID
 
 from .conftest import (
     ROOT,

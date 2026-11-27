@@ -58,9 +58,16 @@ uv run pgn-dl chessreps openings alapin-sicilian-repertoire-ilg8hms
 uv run pgn-dl aimchess explore https://aimchess.com/explore
 uv run pgn-dl chessendings theory lucena-position
 uv run pgn-dl lichess practice https://lichess.org/practice
-uv run pgn-dl lichess study https://lichess.org/study/fE4k21MW
-uv run pgn-dl lichess user-studies https://lichess.org/study/by/thibault
+uv run pgn-dl lichess studies https://lichess.org/study/fE4k21MW
 uv run pgn-dl lichess openings https://lichess.org/opening/London_System
+```
+
+To download many collections, run a command once for each. For example, every
+public study of the Lichess user thibault:
+
+```sh
+curl -s https://lichess.org/api/study/by/thibault | jq -r .id \
+  | xargs -I{} uv run pgn-dl https://lichess.org/study/{}
 ```
 
 `pgn-dl sources` lists every source and the URL patterns it accepts.

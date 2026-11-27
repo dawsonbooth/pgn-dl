@@ -14,8 +14,8 @@ import pytest
 from pgn_dl.core import registry
 from pgn_dl.core.fetch import Blocked, FetchError
 from pgn_dl.sources.lichess.client import Client
-from pgn_dl.sources.lichess.study import (
-    StudyExtractor,
+from pgn_dl.sources.lichess.studies import (
+    StudiesExtractor,
     export,
     parse_target,
     read_chapters,
@@ -91,9 +91,9 @@ def test_other_targets_are_refused(target: str) -> None:
 
 def test_study_and_chapter_urls_resolve_to_this_extractor() -> None:
     found = registry.resolve_url(f"{ROOT}/study/{STUDY}/{DEFENCE_ID}")
-    assert isinstance(found, StudyExtractor)
+    assert isinstance(found, StudiesExtractor)
     assert (found.study, found.chapter) == (STUDY, DEFENCE_ID)
-    assert StudyExtractor.from_url(f"{ROOT}/study/{STUDY}9") is None
+    assert StudiesExtractor.from_url(f"{ROOT}/study/{STUDY}9") is None
 
 
 # Reading an export.
@@ -313,7 +313,7 @@ async def test_a_chapter_s_json_is_the_chapter_s_own_url() -> None:
                 "account may not see it"
             ),
         ),
-        (404, None, f"lichess has no {SUBJECT} chapter {MATE_ID}"),
+        (404, None, f"lichess has no chapter {MATE_ID} in study {STUDY}"),
     ],
 )
 async def test_json_refusals_are_put_in_words(
@@ -366,14 +366,14 @@ def exported(**more: Response) -> FakeFetcher:
 
 
 def test_a_study_opens_no_window() -> None:
-    assert StudyExtractor.reads_pages is False
-    assert StudyExtractor.needs_browser is False
+    assert StudiesExtractor.reads_pages is False
+    assert StudiesExtractor.needs_browser is False
 
 
 async def test_discovery_reads_the_study_once_and_numbers_its_chapters() -> None:
     fetcher = exported()
-    collection, refs = await StudyExtractor(f"{ROOT}/study/{STUDY}").discover(fetcher)
-    assert (collection.source, collection.kind) == ("lichess", "study")
+    collection, refs = await StudiesExtractor(f"{ROOT}/study/{STUDY}").discover(fetcher)
+    assert (collection.source, collection.kind) == ("lichess", "studies")
     # The id keeps two studies of one name apart.
     assert (collection.slug, collection.name) == (
         f"sacrifices-on-h7-{STUDY}",
@@ -389,7 +389,7 @@ async def test_discovery_reads_the_study_once_and_numbers_its_chapters() -> None
 
 async def test_a_chapter_url_gets_that_chapter_under_its_number() -> None:
     fetcher = exported()
-    extractor = StudyExtractor(f"{ROOT}/study/{STUDY}/{DEFENCE_ID}")
+    extractor = StudiesExtractor(f"{ROOT}/study/{STUDY}/{DEFENCE_ID}")
     collection, refs = await extractor.discover(fetcher)
     assert collection.slug == f"sacrifices-on-h7-{STUDY}"
     assert [(r.id, r.path) for r in refs] == [
@@ -401,7 +401,7 @@ async def test_a_chapter_url_gets_that_chapter_under_its_number() -> None:
 
 async def test_each_chapter_is_written_as_exported_after_asking_its_json() -> None:
     fetcher = exported()
-    extractor = StudyExtractor(STUDY)
+    extractor = StudiesExtractor(STUDY)
     _, refs = await extractor.discover(fetcher)
     items = [await extractor.fetch(fetcher, ref) for ref in refs]
     assert [item.pgn for item in items] == [SACRIFICE, DEFENCE, MATE]
@@ -415,20 +415,22 @@ async def test_each_chapter_is_written_as_exported_after_asking_its_json() -> No
 
 async def test_a_chapter_the_study_does_not_have_is_refused() -> None:
     fetcher = exported()
-    with pytest.raises(FetchError, match=f"{SUBJECT} has no chapter ZZZZ9999"):
-        await StudyExtractor(f"{ROOT}/study/{STUDY}/ZZZZ9999").discover(fetcher)
+    with pytest.raises(
+        FetchError, match=f"lichess has no chapter ZZZZ9999 in study {STUDY}"
+    ):
+        await StudiesExtractor(f"{ROOT}/study/{STUDY}/ZZZZ9999").discover(fetcher)
 
 
 async def test_a_study_with_no_chapters_is_refused() -> None:
     fetcher = FakeFetcher({study_url(STUDY): ""})
     with pytest.raises(FetchError, match=f"{SUBJECT} has no chapters"):
-        await StudyExtractor(STUDY).discover(fetcher)
+        await StudiesExtractor(STUDY).discover(fetcher)
 
 
 async def test_a_nameless_study_or_chapter_falls_back_to_id_and_number() -> None:
     unnamed = chapter(MATE_ID, "♕", "1. Qh7# *", StudyName="", Event="♕")
     fetcher = FakeFetcher({study_url(STUDY): study_export(unnamed)})
-    collection, refs = await StudyExtractor(STUDY).discover(fetcher)
+    collection, refs = await StudiesExtractor(STUDY).discover(fetcher)
     assert (collection.slug, collection.name) == (f"h7sac1fz-{STUDY}", STUDY)
     assert [r.path for r in refs] == [("01-chapter",)]
 
@@ -436,7 +438,7 @@ async def test_a_nameless_study_or_chapter_falls_back_to_id_and_number() -> None
 async def test_the_saved_token_goes_with_every_request() -> None:
     save_token()
     fetcher = exported()
-    extractor = StudyExtractor(STUDY)
+    extractor = StudiesExtractor(STUDY)
     _, refs = await extractor.discover(fetcher)
     await extractor.fetch(fetcher, refs[0])
     assert [h.get("Authorization") for _, _, h, _ in fetcher.requests] == [
@@ -447,7 +449,7 @@ async def test_the_saved_token_goes_with_every_request() -> None:
 
 async def test_without_a_saved_token_nothing_is_sent_in_its_place() -> None:
     fetcher = exported()
-    extractor = StudyExtractor(STUDY)
+    extractor = StudiesExtractor(STUDY)
     _, refs = await extractor.discover(fetcher)
     await extractor.fetch(fetcher, refs[0])
     assert not any("Authorization" in h for _, _, h, _ in fetcher.requests)
@@ -460,7 +462,7 @@ async def test_a_private_study_says_to_log_in_when_no_token_is_saved() -> None:
         }
     )
     with pytest.raises(FetchError, match="is private; if your account may see it"):
-        await StudyExtractor(STUDY).discover(fetcher)
+        await StudiesExtractor(STUDY).discover(fetcher)
 
 
 # What the export leaves out: the descriptions.
@@ -474,7 +476,7 @@ async def test_a_chapter_s_description_opens_its_file() -> None:
             )
         }
     )
-    extractor = StudyExtractor(f"{ROOT}/study/{STUDY}/{DEFENCE_ID}")
+    extractor = StudiesExtractor(f"{ROOT}/study/{STUDY}/{DEFENCE_ID}")
     _, [ref] = await extractor.discover(fetcher)
     item = await extractor.fetch(fetcher, ref)
     assert item.pgn == DEFENCE.replace(
@@ -497,7 +499,7 @@ async def test_the_study_s_description_opens_its_first_chapter_only() -> None:
             chapter_json_url(DEFENCE_ID): answer(DEFENCE_ID),
         }
     )
-    extractor = StudyExtractor(STUDY)
+    extractor = StudiesExtractor(STUDY)
     _, refs = await extractor.discover(fetcher)
     first, second = [await extractor.fetch(fetcher, ref) for ref in refs[:2]]
     assert first.pgn == SACRIFICE.replace(
@@ -516,7 +518,7 @@ async def test_a_description_switched_on_but_never_written_is_left_out() -> None
         shows_description=True,
     )
     fetcher = exported(**{chapter_json_url(SACRIFICE_ID): answer})
-    extractor = StudyExtractor(STUDY)
+    extractor = StudiesExtractor(STUDY)
     _, refs = await extractor.discover(fetcher)
     assert (await extractor.fetch(fetcher, refs[0])).pgn == SACRIFICE
 
@@ -535,7 +537,7 @@ class Rewinding(FakeFetcher):
 async def test_a_chapter_answered_with_the_first_is_asked_for_again() -> None:
     asked = chapter_json_url(DEFENCE_ID)
     fetcher = Rewinding(exported(**{asked: json_of(SACRIFICE_ID)}).responses)
-    extractor = StudyExtractor(f"{ROOT}/study/{STUDY}/{DEFENCE_ID}")
+    extractor = StudiesExtractor(f"{ROOT}/study/{STUDY}/{DEFENCE_ID}")
     _, [ref] = await extractor.discover(fetcher)
     assert (await extractor.fetch(fetcher, ref)).pgn == DEFENCE
     assert fetcher.urls == [study_url(STUDY), asked, asked]
@@ -549,7 +551,7 @@ async def test_a_study_description_the_study_does_not_show_is_left_out() -> None
             )
         }
     )
-    extractor = StudyExtractor(STUDY)
+    extractor = StudiesExtractor(STUDY)
     _, refs = await extractor.discover(fetcher)
     assert (await extractor.fetch(fetcher, refs[0])).pgn == SACRIFICE
 
@@ -558,7 +560,7 @@ async def test_a_chapter_whose_json_fails_fails_alone() -> None:
     # Written without its description, it would be skipped by every later run.
     url = chapter_json_url(DEFENCE_ID)
     fetcher = exported(**{url: failure(url, 500)})
-    extractor = StudyExtractor(STUDY)
+    extractor = StudiesExtractor(STUDY)
     _, refs = await extractor.discover(fetcher)
     assert (await extractor.fetch(fetcher, refs[0])).pgn == SACRIFICE
     with pytest.raises(FetchError):
@@ -569,7 +571,7 @@ async def test_a_challenge_on_a_chapter_s_json_is_a_block() -> None:
     url = chapter_json_url(SACRIFICE_ID)
     challenge = failure(url, 403, CHALLENGE_PAGE)
     fetcher = exported(**{url: challenge})
-    extractor = StudyExtractor(STUDY)
+    extractor = StudiesExtractor(STUDY)
     _, refs = await extractor.discover(fetcher)
     with pytest.raises(Blocked) as exc:
         await extractor.fetch(fetcher, refs[0])
@@ -600,7 +602,7 @@ def export_off(**more: Response) -> FakeFetcher:
 
 async def test_a_study_with_export_off_is_read_chapter_by_chapter() -> None:
     fetcher = export_off()
-    extractor = StudyExtractor(f"{ROOT}/study/{STUDY}")
+    extractor = StudiesExtractor(f"{ROOT}/study/{STUDY}")
     collection, refs = await extractor.discover(fetcher)
     # Where its export would have put it, file for file.
     assert (collection.slug, collection.name) == (
@@ -631,7 +633,7 @@ async def test_a_study_with_export_off_is_read_chapter_by_chapter() -> None:
 
 async def test_a_chapter_url_of_such_a_study_keeps_its_number_in_the_study() -> None:
     fetcher = export_off()
-    extractor = StudyExtractor(f"{ROOT}/study/{STUDY}/{MATE_ID}")
+    extractor = StudiesExtractor(f"{ROOT}/study/{STUDY}/{MATE_ID}")
     _, refs = await extractor.discover(fetcher)
     assert [(r.id, r.path) for r in refs] == [(MATE_ID, ("03-queen-and-knight-mate",))]
     assert (await extractor.fetch(fetcher, refs[0])).pgn == MATE
@@ -641,7 +643,7 @@ async def test_a_private_study_you_may_see_but_not_export_is_read() -> None:
     # Its owner keeps export to themselves; the token's account is a member.
     save_token()
     fetcher = export_off()
-    extractor = StudyExtractor(STUDY)
+    extractor = StudiesExtractor(STUDY)
     _, refs = await extractor.discover(fetcher)
     await extractor.fetch(fetcher, refs[0])
     assert all(
@@ -655,7 +657,7 @@ async def test_a_study_whose_json_refuses_too_keeps_lichess_s_refusal(
 ) -> None:
     fetcher = export_off(**{study_json_url(): failure(study_json_url(), status)})
     with pytest.raises(FetchError) as exc:
-        await StudyExtractor(STUDY).discover(fetcher)
+        await StudiesExtractor(STUDY).discover(fetcher)
     assert str(exc.value).startswith(REFUSED)
     assert exc.value.status == 403
 
@@ -664,7 +666,7 @@ async def test_a_bot_challenge_on_the_json_reaches_the_runner_as_a_block() -> No
     challenge = failure(study_json_url(), 403, CHALLENGE_PAGE)
     fetcher = export_off(**{study_json_url(): challenge})
     with pytest.raises(Blocked) as exc:
-        await StudyExtractor(STUDY).discover(fetcher)
+        await StudiesExtractor(STUDY).discover(fetcher)
     assert exc.value is challenge
 
 
@@ -685,7 +687,7 @@ async def test_json_that_does_not_list_the_study_s_chapters_is_refused(
 ) -> None:
     fetcher = export_off(**{study_json_url(): answer})
     with pytest.raises(FetchError, match=message):
-        await StudyExtractor(STUDY).discover(fetcher)
+        await StudiesExtractor(STUDY).discover(fetcher)
 
 
 @pytest.mark.parametrize(
@@ -695,7 +697,10 @@ async def test_json_that_does_not_list_the_study_s_chapters_is_refused(
             failure(chapter_url(STUDY, DEFENCE_ID), 403),
             "refuses its chapters as well as the whole study",
         ),
-        (failure(chapter_url(STUDY, DEFENCE_ID), 404), "lichess has no lichess study"),
+        (
+            failure(chapter_url(STUDY, DEFENCE_ID), 404),
+            f"lichess has no chapter {DEFENCE_ID} in study {STUDY}",
+        ),
         (
             failure(chapter_url(STUDY, DEFENCE_ID), 401),
             "is private; if your account may see it",
@@ -709,7 +714,7 @@ async def test_a_chapter_that_does_not_come_back_as_itself_fails_alone(
     answer: Response, message: str
 ) -> None:
     fetcher = export_off(**{chapter_url(STUDY, DEFENCE_ID): answer})
-    extractor = StudyExtractor(STUDY)
+    extractor = StudiesExtractor(STUDY)
     _, refs = await extractor.discover(fetcher)
     assert (await extractor.fetch(fetcher, refs[0])).pgn == SACRIFICE
     with pytest.raises(FetchError, match=message):
@@ -753,7 +758,7 @@ def gamebook_study(**more: Response) -> FakeFetcher:
 
 async def test_a_gamebook_chapter_gets_its_hints_from_its_json() -> None:
     fetcher = gamebook_study()
-    extractor = StudyExtractor(STUDY)
+    extractor = StudiesExtractor(STUDY)
     _, refs = await extractor.discover(fetcher)
     items = [await extractor.fetch(fetcher, ref) for ref in refs]
     assert [item.pgn for item in items] == [SACRIFICE, BOOK_ANNOTATED]
@@ -762,7 +767,7 @@ async def test_a_gamebook_chapter_gets_its_hints_from_its_json() -> None:
 async def test_a_gamebook_s_description_comes_before_its_first_hint() -> None:
     answer = json_of(BOOK_ID, tree=BOOK_TREE, description="Find White's moves.")
     fetcher = gamebook_study(**{chapter_json_url(BOOK_ID): answer})
-    extractor = StudyExtractor(f"{ROOT}/study/{STUDY}/{BOOK_ID}")
+    extractor = StudiesExtractor(f"{ROOT}/study/{STUDY}/{BOOK_ID}")
     _, [ref] = await extractor.discover(fetcher)
     assert (await extractor.fetch(fetcher, ref)).pgn == BOOK_ANNOTATED.replace(
         "{ Hint:", "{ Find White's moves. } { Hint:"
@@ -774,7 +779,7 @@ async def test_the_tree_of_a_chapter_that_is_no_gamebook_is_not_read() -> None:
     # shows; its export says which mode it is in.
     answer = json_of(SACRIFICE_ID, tree=BOOK_TREE)
     fetcher = gamebook_study(**{chapter_json_url(SACRIFICE_ID): answer})
-    extractor = StudyExtractor(STUDY)
+    extractor = StudiesExtractor(STUDY)
     _, refs = await extractor.discover(fetcher)
     assert (await extractor.fetch(fetcher, refs[0])).pgn == SACRIFICE
 
@@ -791,7 +796,7 @@ async def test_a_gamebook_whose_json_carries_no_tree_fails_alone(
 ) -> None:
     # Written without its hints, it would be skipped by every later run.
     fetcher = gamebook_study(**{chapter_json_url(BOOK_ID): answer})
-    extractor = StudyExtractor(STUDY)
+    extractor = StudiesExtractor(STUDY)
     _, [first, book] = await extractor.discover(fetcher)
     assert (await extractor.fetch(fetcher, first)).pgn == SACRIFICE
     with pytest.raises(FetchError, match=message):

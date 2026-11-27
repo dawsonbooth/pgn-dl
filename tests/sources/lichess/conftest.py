@@ -227,9 +227,9 @@ MATE = chapter(
 # A study's JSON, as lichess.org answers a request for it.
 
 
-def study_json_url(study: str = STUDY) -> str:
-    """Where a study's JSON lists its chapters."""
-    return f"{ROOT}/study/{study}?chapters=true"
+def study_json_url() -> str:
+    """Where the study's JSON lists its chapters."""
+    return f"{ROOT}/study/{STUDY}?chapters=true"
 
 
 def chapter_json_url(chapter_id: str, study: str = STUDY) -> str:

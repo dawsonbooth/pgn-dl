@@ -11,7 +11,7 @@ copied here, with the English strings from Lichess's
 Lichess adds needs adding here.
 
 Each study is one file, its chapters the file's games, in a directory per
-section. They are written as ``study.py`` writes a study: the export, with
+section. They are written as ``studies.py`` writes a study: the export, with
 what it leaves out added as comments. For Practice that is mostly each
 chapter's description, the instructions shown beside the board ("Use your
 queen and rook to restrict the king and deliver checkmate"). The study's own
@@ -28,7 +28,7 @@ from ...core.fetch import Fetcher, FetchError
 from ...core.models import Collection, GameItem, ItemRef
 from ...core.paths import slugify
 from .client import Client
-from .study import ID, whole_study
+from .studies import ID, whole_study
 
 COLLECTION_NAME = "Practice"
 
