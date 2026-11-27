@@ -105,6 +105,29 @@ def test_a_transport_that_cannot_be_built_is_reported_rather_than_raised(
     assert "Nothing was downloaded" in out
 
 
+def test_the_summary_says_1_item_in_the_singular(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
+    async def one_written(extractor: Extractor, opts: Options) -> Report:
+        return Report(total=1, written=1)
+
+    monkeypatch.setattr(driver, "_run", one_written)
+    driver.execute(_EmptyExtractor(), Options(out=tmp_path / "out"))
+    assert "(of 1 item)." in capsys.readouterr().out
+
+
+def test_one_failed_item_is_counted_in_the_singular(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
+    async def one_failed(extractor: Extractor, opts: Options) -> Report:
+        return Report(total=1, failed=1)
+
+    monkeypatch.setattr(driver, "_run", one_failed)
+    with pytest.raises(typer.Exit):
+        driver.execute(_EmptyExtractor(), Options(out=tmp_path / "out"))
+    assert "1 item failed; re-run the same command to retry." in capsys.readouterr().out
+
+
 def test_a_plain_extractor_never_launches_a_browser(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:

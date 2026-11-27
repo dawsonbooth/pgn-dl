@@ -54,6 +54,11 @@ class Report:
 _DEFAULT_OPTIONS = Options()  # frozen, so safe to share as a default
 
 
+def items(count: int) -> str:
+    """A count of items as a run reports it: "1 item", "2 items"."""
+    return f"{count} item" if count == 1 else f"{count} items"
+
+
 async def _pause(opts: Options) -> None:
     """Wait out ``opts.delay``, jittered upward so requests keep no fixed cadence."""
     if opts.delay:
@@ -242,10 +247,10 @@ async def run(
     except _MALFORMED as exc:
         _report_malformed_discovery(extractor, exc, echo)
         return Report(stopped=True)
-    echo(f"{collection.name} - {len(refs)} items")
+    echo(f"{collection.name} - {items(len(refs))}")
     if opts.limit is not None:
         refs = refs[: opts.limit]
-        echo(f"(limiting to first {opts.limit} items)")
+        echo(f"(limiting to first {items(opts.limit)})")
 
     root = collection_dir(opts.out, collection.source, collection.kind, collection.slug)
     report = Report(total=len(refs))

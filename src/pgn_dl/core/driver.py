@@ -11,7 +11,7 @@ import typer
 from .browser import WindowedFetcher, browser_fetcher, page_window
 from .extractor import Extractor
 from .fetch import Fetcher, FetchError, httpx_fetcher
-from .runner import Options, Report, report_discovery_failure, run
+from .runner import Options, Report, items, report_discovery_failure, run
 
 #: Said when the window has opened, which is at the first page read.
 WINDOW_OPENS = (
@@ -76,17 +76,14 @@ def execute(extractor: Extractor, opts: Options) -> None:
     summary = f"Done. Wrote {report.written}, skipped {report.skipped} already-present"
     if report.failed:
         summary += f", failed {report.failed}"
-    summary += f" (of {report.total} items)."
+    summary += f" (of {items(report.total)})."
     typer.echo(summary)
 
     if report.stopped:
         typer.echo("Stopped early. Re-run to resume.")
         raise typer.Exit(code=2)
     if report.failed:
-        typer.echo(
-            f"{report.failed} item(s) failed and were left unwritten; "
-            "re-run the same command to retry them."
-        )
+        typer.echo(f"{items(report.failed)} failed; re-run the same command to retry.")
         if report.failed == report.total:
             # Nothing at all arrived, and a caller reading only the exit code
             # would otherwise take that for a finished download.

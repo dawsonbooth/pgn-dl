@@ -740,6 +740,15 @@ async def test_no_delay_is_paid_when_it_is_switched_off(
     assert slept == []
 
 
+@pytest.mark.parametrize(("count", "line"), [(1, "C - 1 item"), (2, "C - 2 items")])
+async def test_a_run_says_how_many_items_it_has(
+    tmp_path: Path, count: int, line: str
+) -> None:
+    lines: list[str] = []
+    await run(FakeExtractor(count), FETCHER, _opts(tmp_path), echo=lines.append)
+    assert lines[0] == line
+
+
 async def test_all_pgn_is_written_at_the_collection_root(tmp_path: Path) -> None:
     await run(FakeExtractor(2), FETCHER, _opts(tmp_path), echo=lambda _: None)
     combined = (tmp_path / "fake/things/c/all.pgn").read_text(encoding="utf-8")
