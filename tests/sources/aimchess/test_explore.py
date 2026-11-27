@@ -3,15 +3,14 @@
 from __future__ import annotations
 
 import io
-from pathlib import Path
 
 import chess.pgn
 import pytest
 
 from pgn_dl.core import registry
+from pgn_dl.core.extractor import WholeSection
 from pgn_dl.core.fetch import Blocked, FetchError
-from pgn_dl.core.runner import Options, run
-from pgn_dl.sources.aimchess.client import Client
+from pgn_dl.sources.aimchess.client import Client, DailyLimitReached
 from pgn_dl.sources.aimchess.explore import (
     ExploreExtractor,
     layout,
@@ -42,8 +41,16 @@ pytestmark = pytest.mark.usefixtures("stub_token")
         "https://www.aimchess.com/explore?tab=1",
     ],
 )
-def test_the_explore_page_means_every_lesson(target: str) -> None:
-    assert lesson_id_from(target) is None
+def test_explore_s_own_url_is_refused(target: str) -> None:
+    with pytest.raises(
+        WholeSection, match="is all of Explore; give one lesson's URL or id"
+    ):
+        lesson_id_from(target)
+
+
+def test_the_registry_refuses_explore_s_own_url() -> None:
+    with pytest.raises(WholeSection, match="is all of Explore"):
+        registry.resolve_url("https://aimchess.com/explore")
 
 
 @pytest.mark.parametrize(
@@ -70,8 +77,11 @@ def test_a_lesson_url_or_id_means_that_lesson(target: str) -> None:
     ],
 )
 def test_other_targets_are_refused(target: str) -> None:
-    with pytest.raises(ValueError):
+    with pytest.raises(
+        ValueError, match="could not read an aimchess Explore"
+    ) as refused:
         lesson_id_from(target)
+    assert not isinstance(refused.value, WholeSection)
 
 
 def test_explore_urls_resolve_to_this_extractor() -> None:
@@ -149,24 +159,20 @@ def test_a_topic_missing_from_the_tabs_comes_after_them() -> None:
 
 async def test_discovery_reads_only_the_listing() -> None:
     fetcher = FakeFetcher()
-    collection, refs = await ExploreExtractor("https://aimchess.com/explore").discover(
-        fetcher
-    )
+    collection, _ = await ExploreExtractor("17").discover(fetcher)
     assert (collection.source, collection.kind, collection.slug) == (
         "aimchess",
         "explore",
         "explore-chess",
     )
-    assert [r.id for r in refs] == ["24", "1", "17", "2", "40"]
     assert (fetcher.gets, fetcher.posts) == ([LISTING_URL], [])
 
 
-async def test_one_lesson_gets_the_path_a_full_download_gives_it() -> None:
-    _, everything = await ExploreExtractor("https://aimchess.com/explore").discover(
-        FakeFetcher()
-    )
-    _, one = await ExploreExtractor("17").discover(FakeFetcher())
-    assert one == [r for r in everything if r.id == "17"]
+async def test_a_lesson_gets_the_path_the_listing_gives_it() -> None:
+    _, refs = await ExploreExtractor("17").discover(FakeFetcher())
+    assert [(r.id, r.path) for r in refs] == [
+        (lesson, path) for lesson, path in _paths(LESSONS) if lesson == "17"
+    ]
 
 
 async def test_an_unlisted_lesson_is_refused() -> None:
@@ -184,9 +190,9 @@ def _games(text: str) -> list[chess.pgn.Game]:
 
 
 async def _fetch(lesson_id: str, fetcher: FakeFetcher) -> str:
-    extractor = ExploreExtractor("https://aimchess.com/explore")
-    _, refs = await extractor.discover(fetcher)
-    item = await extractor.fetch(fetcher, next(r for r in refs if r.id == lesson_id))
+    extractor = ExploreExtractor(lesson_id)
+    _, [ref] = await extractor.discover(fetcher)
+    item = await extractor.fetch(fetcher, ref)
     assert item.pgn is not None
     return item.pgn
 
@@ -220,22 +226,10 @@ async def test_a_lesson_without_a_section_gets_no_section_header() -> None:
     assert all("AimchessSection" not in g.headers for g in games)
 
 
-async def test_after_the_daily_limit_no_more_lessons_are_requested(
-    tmp_path: Path,
-) -> None:
-    fetcher = FakeFetcher(
-        lessons={str(x["id"]): lesson_body(x) for x in LESSONS}, statuses={"1": 403}
-    )
-    lines: list[str] = []
-    report = await run(
-        ExploreExtractor("https://aimchess.com/explore"),
-        fetcher,
-        Options(out=tmp_path, concurrency=1, delay=0),
-        echo=lines.append,
-    )
-    assert fetcher.posts == [lesson_url(24), lesson_url(1)]
-    assert (report.written, report.failed) == (1, 4)
-    assert sum("daily Explore limit" in line for line in lines) == 1
+async def test_a_lesson_refused_for_the_daily_limit_says_so() -> None:
+    fetcher = FakeFetcher(statuses={"1": 403})
+    with pytest.raises(DailyLimitReached, match="daily Explore limit"):
+        await _fetch("1", fetcher)
 
 
 async def test_other_refusals_pass_through() -> None:

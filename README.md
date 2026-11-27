@@ -55,15 +55,16 @@ uv run pgn-dl chesscom courses 6445752b-f404-4d8f-9397-4fb03f690d8e
 uv run pgn-dl chesscom opening-courses caro-kann-defense-396427
 uv run pgn-dl chessable courses 25098
 uv run pgn-dl chessreps courses alapin-sicilian-repertoire-ilg8hms
-uv run pgn-dl aimchess explore https://aimchess.com/explore
+uv run pgn-dl aimchess explore https://aimchess.com/explore/1
 uv run pgn-dl chessendings theory lucena-position
 uv run pgn-dl lichess practice BJy6fEDf
 uv run pgn-dl lichess studies https://lichess.org/study/fE4k21MW
 uv run pgn-dl lichess openings https://lichess.org/opening/London_System
 ```
 
-To download many collections, run a command once for each. For example, every
-public study of the Lichess user thibault:
+A run downloads a whole course or study, but only one item of a section such
+as Lichess Practice. To download more, run a command once per target. For
+example, every public study of the Lichess user thibault:
 
 ```sh
 curl -s https://lichess.org/api/study/by/thibault | jq -r .id \

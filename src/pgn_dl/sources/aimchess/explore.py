@@ -4,8 +4,8 @@ Explore is a library of lessons under topics (Endgame, Middlegame, ...). A
 lesson is a series of steps, tutorials and exercises, each a complete PGN, and
 is written as one file with a game per step. Topics are numbered directories in
 the site's tab order, and lessons are numbered within their topic in the order
-the site lists them. A single-lesson download is numbered from the same
-listing, so it lands where a full download would put it.
+the site lists them, both counted over the whole listing, so a lesson's number
+does not depend on which lesson a run asks for.
 
 Fetching a lesson opens it, which marks it started in the account's progress.
 """
@@ -18,12 +18,12 @@ from collections.abc import Mapping
 from dataclasses import dataclass
 from typing import Any
 
-from ...core.extractor import Extractor
+from ...core.extractor import Extractor, WholeSection
 from ...core.fetch import Fetcher, FetchError
 from ...core.models import Collection, GameItem, ItemRef
 from ...core.paths import slugify
 from . import auth
-from .client import Client, DailyLimitReached
+from .client import Client
 from .pgn import SITE, rewrite
 
 #: The Explore page's title.
@@ -33,8 +33,8 @@ COLLECTION_NAME = "Explore Chess"
 #: opened, but it keeps its number, so publishing it later moves no file.
 COMING_SOON = "coming soon"
 
-#: The Explore page (every lesson), a lesson page or one of the app's pages
-#: under it, or a bare lesson id.
+#: The Explore page, a lesson page or one of the app's pages under it, or a bare
+#: lesson id.
 _TARGET_RE = re.compile(
     r"^(?:https?://(?:www\.)?aimchess\.com/explore"
     r"(?:/(?P<url_id>\d+)(?:/(?:analysis|done|limit))?)?/?"
@@ -58,14 +58,16 @@ class Step:
     pgn: str
 
 
-def lesson_id_from(target: str) -> str | None:
-    """The lesson id in a lesson URL or bare id; None for the Explore page."""
+def lesson_id_from(target: str) -> str:
+    """The lesson id in a lesson URL or bare id."""
     cleaned = target.strip().split("#", 1)[0].split("?", 1)[0]
     m = _TARGET_RE.match(cleaned)
     if m is None:
         raise ValueError(f"could not read an aimchess Explore lesson from {target!r}")
     found = m.group("url_id") or m.group("bare_id")
-    return str(int(found)) if found else None
+    if found is None:
+        raise WholeSection(f"{target!r} is all of Explore; give one lesson's URL or id")
+    return str(int(found))
 
 
 def _text(value: object) -> str:
@@ -182,13 +184,10 @@ def lesson_to_pgn(lesson: Lesson, steps: list[Step]) -> str:
 class _Context:
     client: Client
     lessons: dict[str, Lesson]
-    # Set when aimchess refuses a lesson for the daily limit. It would refuse
-    # the rest of the run too, so they fail without a request.
-    limit_reached: bool = False
 
 
 class ExploreExtractor(Extractor[_Context]):
-    """Every Explore lesson, or one."""
+    """One Explore lesson."""
 
     key = "aimchess:explore"
     url_patterns = (
@@ -206,13 +205,13 @@ class ExploreExtractor(Extractor[_Context]):
     ) -> tuple[Collection, list[ItemRef], _Context]:
         client = Client(fetcher, token=auth.load_token())
         topics, lessons = parse_listing(await client.explore_listing())
-        placed = layout(topics, lessons)
-        if self.lesson_id is not None:
-            placed = [(x, path) for x, path in placed if x.id == self.lesson_id]
-            if not placed:
-                raise FetchError(
-                    f"aimchess lesson {self.lesson_id} is not a published Explore lesson"
-                )
+        placed = [
+            (x, path) for x, path in layout(topics, lessons) if x.id == self.lesson_id
+        ]
+        if not placed:
+            raise FetchError(
+                f"aimchess lesson {self.lesson_id} is not a published Explore lesson"
+            )
         refs = [ItemRef(id=x.id, path=path) for x, path in placed]
         collection = self.collection(
             slug=slugify(COLLECTION_NAME), name=COLLECTION_NAME
@@ -222,15 +221,6 @@ class ExploreExtractor(Extractor[_Context]):
     async def _fetch(
         self, context: _Context, fetcher: Fetcher, ref: ItemRef
     ) -> GameItem:
-        if context.limit_reached:
-            raise FetchError(
-                "not requested: aimchess refused an earlier lesson in this run "
-                "for the daily limit"
-            )
-        try:
-            data = await context.client.explore_lesson(ref.id)
-        except DailyLimitReached:
-            context.limit_reached = True
-            raise
+        data = await context.client.explore_lesson(ref.id)
         lesson = context.lessons[ref.id]
         return GameItem(pgn=lesson_to_pgn(lesson, parse_steps(data, ref.id)))

@@ -48,7 +48,7 @@ class Client:
                 raise
             raise DailyLimitReached(
                 f"{exc}; the free plan's daily Explore limit is used up. "
-                "Re-run tomorrow to continue.",
+                "Re-run tomorrow.",
                 status=403,
             ) from None
 

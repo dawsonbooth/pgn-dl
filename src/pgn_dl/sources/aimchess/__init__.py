@@ -14,14 +14,13 @@ from .motifs import MotifsExtractor
 from .quiz import QuizExtractor
 
 _EXPLORE_HELP = """
-Download Explore lessons into PGN files (requires `pgn-dl login aimchess`).
+Download an Explore lesson into PGN files (requires `pgn-dl login aimchess`).
 
-Give the Explore URL to download every lesson, or a lesson URL or id for one.
-Each lesson is one file with a game per step, in a directory per topic.
+Give the lesson's URL or id. Each lesson is one file with a game per step, in a
+directory per topic.
 
 Downloading a lesson opens it on aimchess, which marks it as started in your
-progress. On the free plan it also counts toward the daily lesson limit; once
-aimchess refuses a lesson, the rest are left for a later run.
+progress. On the free plan it also counts toward the daily lesson limit.
 """
 
 _CHECKMATE_PATTERNS_HELP = """
@@ -39,10 +38,10 @@ puzzles each, easiest first, with the best move and a wrong one explained.
 """
 
 _MOTIFS_HELP = """
-Download aimchess's 20 tactical motifs. No login needed.
+Download one of aimchess's tactical motifs. No login needed.
 
-Any motif URL downloads all of them, one file per motif with its definition
-and an annotated example.
+Give the motif's URL (aimchess.com/motif/fork). Each motif is one file,
+numbered in the site's order, with its definition and an annotated example.
 """
 
 declaration = SourceDeclaration(
@@ -52,7 +51,7 @@ declaration = SourceDeclaration(
         ExtractorDeclaration(
             extractor=ExploreExtractor,
             target_name="target",
-            target_help="Explore URL for every lesson, or a lesson URL or id",
+            target_help="Lesson URL or id",
             help=_EXPLORE_HELP,
         ),
         ExtractorDeclaration(
@@ -70,7 +69,7 @@ declaration = SourceDeclaration(
         ExtractorDeclaration(
             extractor=MotifsExtractor,
             target_name="url",
-            target_help="Any motif URL, e.g. https://aimchess.com/motif/fork",
+            target_help="Motif URL (aimchess.com/motif/fork)",
             help=_MOTIFS_HELP,
         ),
     ),
