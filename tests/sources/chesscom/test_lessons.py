@@ -261,7 +261,7 @@ def test_lesson_with_no_questions_raises_instead_of_exporting_nothing() -> None:
 def test_query_and_fragment_do_not_defeat_the_end_anchored_pattern(suffix: str) -> None:
     assert parse_target(LESSON_URL + suffix) == ("learn-to-play", "the-king")
     # And the same URL still resolves through the bare-URL sugar, which
-    # otherwise swallows the ValueError into "no source handles ...".
+    # otherwise swallows the ValueError into "no command handles ...".
     assert isinstance(resolve_url(LESSON_URL + suffix), LessonsExtractor)
 
 

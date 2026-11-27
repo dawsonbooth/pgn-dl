@@ -22,7 +22,14 @@ from .extractor import Extractor
 from .registry import UnknownSource, resolve_url
 from .runner import Options
 
-OutOpt = Annotated[Path, typer.Option("--out", help="Output directory")]
+OutOpt = Annotated[
+    Path,
+    typer.Option(
+        "--out",
+        help="Output directory. Files already in it are skipped, so running a "
+        "command again resumes it.",
+    ),
+]
 ConcurrencyOpt = Annotated[
     int, typer.Option("--concurrency", "-j", help="Parallel item requests")
 ]
@@ -49,6 +56,7 @@ def _resolve_url_or_exit(target: str) -> Extractor:
         return resolve_url(target)
     except UnknownSource as exc:
         typer.echo(str(exc))
+        typer.echo("`pgn-dl sources` lists the URLs each command accepts.")
         raise typer.Exit(code=1) from None
 
 

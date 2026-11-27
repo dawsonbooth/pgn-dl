@@ -18,7 +18,7 @@ from typer.core import TyperGroup
 from . import sources  # noqa: F401  - importing registers the built-in sources
 from .core.fetch import FetchError
 from .core.materialize import build_source_app, build_url_command
-from .core.registry import declarations, iter_extractors
+from .core.registry import declarations
 
 _URL = re.compile(r"^https?://")
 
@@ -61,7 +61,7 @@ mount_sources(app)
 
 @app.callback(invoke_without_command=True)
 def main(ctx: typer.Context) -> None:
-    """Download PGN from chess.com and other sources."""
+    """Download chess courses, lessons and studies as annotated PGN files."""
     if ctx.invoked_subcommand is None:
         typer.echo(ctx.get_help())
         raise typer.Exit(code=0)
@@ -71,10 +71,18 @@ def main(ctx: typer.Context) -> None:
 # `sources` package.
 @app.command(name="sources")
 def list_sources() -> None:
-    """List every source this build knows how to download from."""
-    for cls in iter_extractors():
+    """List every source's commands and the URLs each one accepts."""
+    # From the declarations, which are what the command line is built from: an
+    # extractor no source declares has no command to list.
+    declared = sorted(
+        (entry.extractor for d in declarations().values() for entry in d.extractors),
+        key=lambda cls: cls.key,
+    )
+    commands = [(f"{cls.source} {cls.kind}", cls) for cls in declared]
+    width = max((len(command) for command, _ in commands), default=0)
+    for command, cls in commands:
         patterns = ", ".join(p.pattern for p in cls.url_patterns) or "-"
-        typer.echo(f"{cls.key:<24} {patterns}")
+        typer.echo(f"{command:<{width}}  {patterns}")
 
 
 @app.command()

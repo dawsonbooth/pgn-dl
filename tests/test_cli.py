@@ -39,10 +39,14 @@ def test_root_help_lists_sources_and_login() -> None:
     assert "sources" in result.output
 
 
-def test_sources_command_lists_registered_keys() -> None:
+def test_sources_lists_every_command_as_it_is_typed() -> None:
     result = runner.invoke(app, ["sources"])
     assert result.exit_code == 0
-    assert "chesscom:courses" in result.output
+    rows = [line.split() for line in result.output.splitlines() if line.strip()]
+    assert ["chesscom", "courses"] in [row[:2] for row in rows]
+    for source, kind, *_ in rows:
+        typed = runner.invoke(app, [source, kind, "--help"])
+        assert typed.exit_code == 0, f"{source} {kind}"
 
 
 def test_chesscom_courses_subcommand_exists() -> None:
@@ -54,18 +58,20 @@ def test_chesscom_courses_subcommand_exists() -> None:
     assert "--out" in result.output
 
 
-def test_unknown_url_reports_known_sources() -> None:
+def test_unknown_url_points_to_the_list_of_supported_urls() -> None:
     # Bare-URL sugar: an unrecognized URL reaches the resolver, not Click's
-    # unknown-command error, and the message names what IS supported.
+    # unknown-command error, and the message says where the supported URLs
+    # are listed.
     result = runner.invoke(app, ["https://example.com/nope"])
     assert result.exit_code != 0
-    assert "chesscom:courses" in result.output
+    assert "no command handles 'https://example.com/nope'" in result.output
+    assert "pgn-dl sources" in result.output
 
 
-def test_explicit_url_command_reports_known_sources() -> None:
+def test_explicit_url_command_points_to_the_list_of_supported_urls() -> None:
     result = runner.invoke(app, ["url", "https://example.com/nope"])
     assert result.exit_code != 0
-    assert "chesscom:courses" in result.output
+    assert "pgn-dl sources" in result.output
 
 
 def test_bare_chesscom_course_url_resolves_to_the_courses_extractor() -> None:
@@ -129,13 +135,13 @@ def test_bare_url_accepts_the_same_flags_as_the_url_command(tmp_path: Path) -> N
     # Exit code 1 is the resolver rejecting the URL; a rejected option would be 2.
     result = runner.invoke(app, ["https://example.com/nope", "--out", str(tmp_path)])
     assert result.exit_code == 1
-    assert "chesscom:courses" in result.output
+    assert "pgn-dl sources" in result.output
 
 
 def test_a_mistyped_command_is_not_treated_as_a_url() -> None:
     result = runner.invoke(app, ["chesscomm"])
     assert result.exit_code != 0
-    assert "no source handles" not in result.output
+    assert "no command handles" not in result.output
 
 
 def test_no_arguments_prints_help() -> None:

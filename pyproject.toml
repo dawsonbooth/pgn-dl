@@ -1,7 +1,7 @@
 [project]
 name = "pgn-dl"
 version = "0.1.0"
-description = "Download PGN from chess.com, and other sources over time"
+description = "Download chess courses, lessons and studies as annotated PGN files"
 readme = "README.md"
 requires-python = ">=3.14"
 dependencies = [

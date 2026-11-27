@@ -53,8 +53,7 @@ def resolve_url(url: str) -> Extractor:
     for cls in iter_extractors():
         if (got := cls.from_url(url)) is not None:
             return got
-    known = ", ".join(sorted(_EXTRACTORS)) or "none"
-    raise UnknownSource(f"no source handles {url!r}; known: {known}")
+    raise UnknownSource(f"no command handles {url!r}")
 
 
 def register_declaration(declaration: SourceDeclaration) -> None:

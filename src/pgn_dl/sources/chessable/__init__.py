@@ -14,9 +14,9 @@ from .courses import CoursesExtractor
 _COURSES_HELP = """
 Download a Chessable course into PGN files (requires `pgn-dl login chessable`).
 
-One PGN game per variation, laid out Course -> Chapter -> Variation, with the
-author's comments, evaluation glyphs, and board drawings preserved. Re-running
-with the same out dir resumes, skipping PGNs that already exist.
+Each variation is one file, in a directory per chapter, both numbered in the
+course's order, with the author's comments, evaluation glyphs, and board
+drawings preserved.
 """
 
 declaration = SourceDeclaration(

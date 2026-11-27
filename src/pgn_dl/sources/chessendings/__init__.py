@@ -20,8 +20,7 @@ Download Theory lessons into PGN files.
 Give the Theory URL (chessendings.com/train) for every lesson, or a lesson URL
 or slug for one. Each lesson is one file, in a directory per family, with the
 lesson's essay on the ending, the method move by move with the coach's
-comments, and the coach's demonstrations. Re-running with the same out dir
-resumes.
+comments, and the coach's demonstrations.
 
 The free lessons need no account. For the Pro lessons, sign in with
 `pgn-dl login chessendings` as an account with Pro.

@@ -10,24 +10,25 @@ from .opening_courses import OpeningCoursesExtractor
 _COURSES_HELP = """
 Download a course into PGN files (requires `pgn-dl login chesscom`).
 
-Re-running with the same out dir resumes, skipping PGNs that already exist.
-For an opening course (chess.com/openings/courses), use
+Each lesson is one file, in a directory per chapter, both numbered in the
+course's order. For an opening course (chess.com/openings/courses), use
 `pgn-dl chesscom opening-courses`.
 """
 
 _OPENING_COURSES_HELP = """
 Download an opening course into PGN files (requires `pgn-dl login chesscom`).
 
-Give a chess.com/openings/courses/<slug> URL, or just the slug.
-Re-running with the same out dir resumes, skipping PGNs that already exist.
+Give a chess.com/openings/courses/<slug> URL, or just the slug. Each lesson is
+one file, in a directory per chapter, both numbered in the course's order.
 """
 
 _LESSONS_HELP = """
-Download chess.com lessons (requires `pgn-dl login chesscom`).
+Download chess.com lessons into PGN files (requires `pgn-dl login chesscom`).
 
 Give a lesson-course URL to download every lesson in it, or a single lesson
-URL. A lesson course is not a chess.com Course; those are
-`pgn-dl chesscom courses`. Re-running with the same out dir resumes.
+URL. Each lesson is one file with a game per question, numbered in the lesson
+course's order. A lesson course is not a chess.com Course; those are
+`pgn-dl chesscom courses`.
 """
 
 declaration = SourceDeclaration(

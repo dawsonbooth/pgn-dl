@@ -18,7 +18,6 @@ Download Explore lessons into PGN files (requires `pgn-dl login aimchess`).
 
 Give the Explore URL to download every lesson, or a lesson URL or id for one.
 Each lesson is one file with a game per step, in a directory per topic.
-Re-running with the same out dir resumes.
 
 Downloading a lesson opens it on aimchess, which marks it as started in your
 progress. On the free plan it also counts toward the daily lesson limit; once

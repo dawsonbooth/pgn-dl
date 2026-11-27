@@ -32,10 +32,11 @@ which many GUIs will not open; they are written as Lichess has them.
 _PRACTICE_HELP = """
 Download Lichess Practice into PGN files. No login needed.
 
-Give the practice URL for all 32 studies, or a study URL for one. Each study
-is one file, in a directory per section, with a game per exercise: its goal
-(mate in 2, draw in 30, ...) in the Termination header, and the instructions
-Lichess shows beside the board as its first comment.
+Give the practice URL for all 32 studies, a section's URL for its studies, or
+a study's URL or id for one. Each study is one file, in a directory per
+section, with a game per exercise: its goal (mate in 2, draw in 30, ...) in
+the Termination header, and the instructions Lichess shows beside the board as
+its first comment.
 """
 
 _STUDIES_HELP = """
@@ -55,17 +56,17 @@ Download Lichess's opening pages into PGN files (requires
 `pgn-dl login lichess`, and Google Chrome).
 
 Give the openings URL (lichess.org/opening) for every named opening and the
-openings page itself, or an opening's page for one. Each opening is one file,
-in a directory per family: the line with the page's description and its
-results in Lichess games, the popular continuations as the moves after it with
-their popularity and results, then the example games. The numbers are those
-the page shows under its default settings.
+openings page itself, or an opening's page or its key (London_System) for one.
+Each opening is one file, in a directory per family: the line with the page's
+description and its results in Lichess games, the popular continuations as the
+moves after it with their popularity and results, then the example games. The
+numbers are those the page shows under its default settings.
 
 Lichess serves the descriptions only to a browser, so a Chrome window opens to
 read them, signed out. Lichess allows a signed-out visitor 30 opening pages
 per 10 minutes, so a full run reads one page every 21 seconds and takes about
-18 hours. Stop it whenever you like, with Ctrl-C or by closing the window:
-re-running with the same out dir resumes.
+18 hours. Stop it whenever you like, with Ctrl-C or by closing the window, and
+run it again to resume.
 """
 
 declaration = SourceDeclaration(
@@ -81,7 +82,8 @@ declaration = SourceDeclaration(
         ExtractorDeclaration(
             extractor=PracticeExtractor,
             target_name="target",
-            target_help="https://lichess.org/practice, or a practice study URL",
+            target_help="https://lichess.org/practice, a section or study URL, "
+            "or a study id",
             help=_PRACTICE_HELP,
         ),
         ExtractorDeclaration(
@@ -93,7 +95,8 @@ declaration = SourceDeclaration(
         ExtractorDeclaration(
             extractor=OpeningsExtractor,
             target_name="target",
-            target_help="https://lichess.org/opening, or an opening's page",
+            target_help="https://lichess.org/opening, or an opening's page or key "
+            "(London_System)",
             help=_OPENINGS_HELP,
         ),
     ),

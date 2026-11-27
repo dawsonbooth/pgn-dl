@@ -14,8 +14,7 @@ from .themes import ThemesExtractor
 _THEMES_HELP = """
 Download a theme into PGN files (requires `pgn-dl login noctie`).
 
-One file per element, numbered in the theme's own order. Re-running with
-the same out dir resumes, skipping PGNs that already exist.
+Each element is one file, numbered in the theme's own order.
 """
 
 _OPENING_BOOKS_HELP = """

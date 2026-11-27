@@ -158,12 +158,11 @@ def test_url_command_is_built_from_the_same_internals(
     assert extractor.target == "https://example.com/w1"
 
 
-def test_url_command_reports_unknown_sources_and_exits_nonzero(
+def test_url_command_reports_an_unknown_url_and_exits_nonzero(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     def _reject(target: str) -> object:
-        msg = f"no source handles {target!r}; known: widgetsource:widgets"
-        raise UnknownSource(msg)
+        raise UnknownSource(f"no command handles {target!r}")
 
     monkeypatch.setattr(materialize, "resolve_url", _reject)
 
@@ -172,4 +171,5 @@ def test_url_command_reports_unknown_sources_and_exits_nonzero(
     result = runner.invoke(app, ["https://example.com/nope"])
 
     assert result.exit_code == 1
-    assert "widgetsource:widgets" in result.output
+    assert "no command handles 'https://example.com/nope'" in result.output
+    assert "pgn-dl sources" in result.output

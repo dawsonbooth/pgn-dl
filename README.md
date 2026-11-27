@@ -1,7 +1,7 @@
 # pgn-dl
 
-Download chess courses you own as annotated PGN files, for offline study or
-import into any chess GUI.
+Download chess courses, lessons and studies as annotated PGN files, for
+offline study or import into any chess GUI.
 
 Supported sources:
 
@@ -70,7 +70,7 @@ curl -s https://lichess.org/api/study/by/thibault | jq -r .id \
   | xargs -I{} uv run pgn-dl https://lichess.org/study/{}
 ```
 
-`pgn-dl sources` lists every source and the URL patterns it accepts.
+`pgn-dl sources` lists every command and the URLs it accepts.
 
 Options:
 
