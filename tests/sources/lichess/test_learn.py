@@ -368,7 +368,7 @@ def test_each_level_is_a_game_of_its_position_named_for_its_stage() -> None:
     first, second = written("rook")
     assert dict(first.headers) == {
         "Event": "The rook",
-        "Site": "https://lichess.org/learn#/1/1",
+        "Site": "lichess.org",
         "Date": "????.??.??",
         "Round": "1",
         "White": "?",
@@ -377,10 +377,7 @@ def test_each_level_is_a_game_of_its_position_named_for_its_stage() -> None:
         "FEN": "8/8/8/8/8/8/4R3/8 w - - 0 1",
         "SetUp": "1",
     }
-    assert (second.headers["Site"], second.headers["Round"]) == (
-        "https://lichess.org/learn#/1/2",
-        "2",
-    )
+    assert (second.headers["Site"], second.headers["Round"]) == ("lichess.org", "2")
     assert second.headers["FEN"] == "8/8/8/8/3R4/8/8/8 w - - 0 1"
 
 
@@ -613,9 +610,9 @@ async def test_a_stage_s_url_downloads_that_stage_at_its_place() -> None:
     assert len(fetcher.requests) == asked  # discovery already holds every stage
     assert item.pgn is not None
     played = games(item.pgn)
-    assert [g.headers["Site"] for g in played] == [
-        "https://lichess.org/learn#/3/1",
-        "https://lichess.org/learn#/3/2",
+    assert [(g.headers["Event"], g.headers["Round"]) for g in played] == [
+        ("En passant", "1"),
+        ("En passant", "2"),
     ]
     assert played[-1].end().comment == "You can take en passant."
 

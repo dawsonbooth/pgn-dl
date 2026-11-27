@@ -404,7 +404,7 @@ async def test_the_openings_page_lists_the_first_moves_by_family() -> None:
     assert item.pgn is not None
     text = flat(item.pgn)
     assert '[Event "Chess openings"]' in text
-    assert '[Site "https://lichess.org/opening"]' in text
+    assert '[Site "lichess.org"]' in text
     assert f"{{ {SETTINGS} }} 1. e4 {{ King's Pawn Game. Popularity 59%." in text
     assert "( 1. d4 { Queen's Pawn Game. Popularity 35%." in text
     assert "( 1. h4 { Popularity 6%." in text
@@ -493,7 +493,7 @@ async def test_the_explorer_is_asked_what_lila_asks_for_a_page() -> None:
 async def test_the_page_s_line_results_and_settings_are_written() -> None:
     pgn = await fetch_one("Sicilian_Defense", Explorer())
     assert '[Event "Sicilian Defense"]' in pgn
-    assert '[Site "https://lichess.org/opening/Sicilian_Defense"]' in pgn
+    assert '[Site "lichess.org"]' in pgn
     assert '[ECO "B20"]' in pgn
     assert f"{{ {SETTINGS} }}" in flat(pgn)
     assert "1. e4 c5 { White wins 48%, draws 4%, Black wins 48% }" in flat(pgn)

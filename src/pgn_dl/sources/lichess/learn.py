@@ -37,11 +37,10 @@ from ...core.fetch import Fetcher, FetchError
 from ...core.models import Arrow, Collection, GameItem, Highlight, ItemRef, MoveNode
 from ...core.paths import slugify
 from ...core.pgn import game_to_pgn
-from .client import ASSETS, ROOT, Client
+from .client import ASSETS, SITE, Client
 from .script import Arrow as ArrowFn
 from .script import Call, Mapped, Name, Obj, Reader, ScriptError, Spread
 
-PAGE = f"{ROOT}/learn"
 MANIFEST_URL = f"{ASSETS}/manifest.json"
 COLLECTION_NAME = "Chess basics"
 
@@ -456,7 +455,7 @@ def level_game(stage: Stage, level: Level, *, first: bool, last: bool) -> GameIt
     return GameItem(
         headers={
             "Event": stage.title,
-            "Site": f"{PAGE}#/{stage.id}/{level.id}",
+            "Site": SITE,
             "Round": str(level.id),
         },
         starting_fen=level.fen,

@@ -66,6 +66,15 @@ def header_value(value: str) -> str:
     return _CONTROL.sub(" ", value).translate(_HEADER_ESCAPE).strip()
 
 
+def known_site(site: str) -> bool:
+    """Whether a ``Site`` value names where a game was played.
+
+    PGN's "?" for unknown, and an empty value, name no place; a game with
+    either gets its source's domain instead.
+    """
+    return site.strip() not in ("", "?")
+
+
 def reexport_pgn(
     pgn: str,
     headers: dict[str, str],
@@ -76,10 +85,11 @@ def reexport_pgn(
 ) -> str:
     """Re-export upstream PGN text under our headers, keeping everything else.
 
-    For sources whose material arrives as PGN already. ``subject`` names the
-    item in an error message, ``error`` builds the exception the caller's
-    runner path expects, and ``transform`` may rewrite the parsed game before
-    it is exported.
+    For sources whose material arrives as PGN already. ``headers`` replace the
+    game's own, except ``Site``: a game that names where it was played keeps
+    it (see :func:`known_site`). ``subject`` names the item in an error
+    message, ``error`` builds the exception the caller's runner path expects,
+    and ``transform`` may rewrite the parsed game before it is exported.
     """
     game = chess.pgn.read_game(io.StringIO(pgn))
     if game is None:
@@ -93,6 +103,8 @@ def reexport_pgn(
         # retried. Fail the item instead.
         raise error(f"{subject} has an unreadable move: {game.errors[0]}")
     for k, v in headers.items():
+        if k == "Site" and known_site(game.headers["Site"]):
+            continue
         game.headers[k] = header_value(v)
     if transform is not None:
         transform(game)

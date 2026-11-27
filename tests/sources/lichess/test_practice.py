@@ -24,6 +24,7 @@ from .conftest import (
     SACRIFICE_FEN,
     USER_AGENT,
     FakeFetcher,
+    as_written,
     chapter,
     chapter_json_url,
     save_token,
@@ -200,7 +201,7 @@ async def test_a_study_is_one_file_of_its_chapters_as_lichess_exports_them() -> 
     # study's line from the practice page first, then each chapter's own
     # description.
     assert item.pgn == (
-        GREEK_GIFT_EXPORT.strip()
+        as_written(GREEK_GIFT_EXPORT.strip())
         .replace(
             "{ [%cal Gd3h7] }",
             "{ Study the greek gift sacrifice } { Take on h7 with check. } "

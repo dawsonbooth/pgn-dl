@@ -52,8 +52,9 @@ from ...core.extractor import Extractor
 from ...core.fetch import Blocked, Fetcher, FetchError
 from ...core.models import Collection, GameItem, ItemRef
 from ...core.paths import slugify
+from ...core.pgn import known_site
 from . import auth, comments, gamebook
-from .client import ROOT, Client
+from .client import ROOT, SITE, Client
 
 #: Lichess's ids: eight letters and digits, case-sensitive.
 ID = r"[A-Za-z0-9]{8}"
@@ -355,6 +356,36 @@ def descriptions(data: dict[str, Any], *, first: bool) -> list[str]:
     return [t for t in texts if t and t != _UNWRITTEN]
 
 
+#: A tag pair alone on its line, as an export writes them before the moves.
+_TAG_LINE = re.compile(r'\[(?P<name>\w+) "(?P<value>(?:[^"\\]|\\.)*)"\]')
+
+
+def with_site(text: str) -> str:
+    """A chapter's export with a Site that says where its game was played.
+
+    A chapter that is a game names its venue (or the Lichess game it was
+    imported from), and keeps it. Any other chapter gets lichess.org: in place
+    of an empty or "?" Site, or else on the line after its Event, where Lichess
+    writes a chapter's own Site. The rest of the text is left as Lichess sent
+    it.
+    """
+    lines = text.split("\n")
+    event = None
+    for i, line in enumerate(lines):
+        tag = _TAG_LINE.fullmatch(line.strip())
+        if tag is None:
+            break  # the moves begin
+        if tag["name"] == "Site":
+            if known_site(tag["value"]):
+                return text
+            lines[i] = f'[Site "{SITE}"]'
+            return "\n".join(lines)
+        if tag["name"] == "Event" and event is None:
+            event = i
+    lines.insert(0 if event is None else event + 1, f'[Site "{SITE}"]')
+    return "\n".join(lines)
+
+
 async def finish(
     client: Client,
     study: str,
@@ -378,7 +409,7 @@ async def finish(
         parts = analysis.get("treeParts") if isinstance(analysis, dict) else None
         notes = gamebook.notes(parts, subject)
     texts = [*intro, *descriptions(data, first=first)]
-    return comments.annotate(text, notes, subject, intro=texts)
+    return with_site(comments.annotate(text, notes, subject, intro=texts))
 
 
 async def whole_study(

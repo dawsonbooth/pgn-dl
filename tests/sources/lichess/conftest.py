@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import io
 import json
+import re
 from collections.abc import Callable, Mapping, Sequence
 from pathlib import Path
 
@@ -191,6 +192,15 @@ def chapter(
     tags |= headers
     lines = [f'[{key} "{value}"]' for key, value in tags.items() if value is not None]
     return "\n".join(lines) + "\n\n" + moves
+
+
+def as_written(text: str) -> str:
+    """Chapters as pgn-dl writes them when their export has no Site: each gets
+    ``[Site "lichess.org"]`` on the line after its Event, where Lichess writes a
+    chapter's own Site."""
+    return re.sub(
+        r'^(\[Event "[^\n]*"\])$', r'\1\n[Site "lichess.org"]', text, flags=re.MULTILINE
+    )
 
 
 def study_export(*chapters: str) -> str:

@@ -56,7 +56,7 @@ from ...core.models import Collection, GameItem, ItemRef, MoveNode
 from ...core.paths import slugify
 from ...core.pgn import game_to_pgn
 from . import auth, wiki
-from .client import EXPLORER, ROOT, Client
+from .client import EXPLORER, ROOT, SITE, Client
 
 COLLECTION_NAME = "Chess openings"
 PAGE = f"{ROOT}/opening"
@@ -295,7 +295,7 @@ def opening_game(
     return GameItem(
         headers={
             "Event": opening.name,
-            "Site": f"{PAGE}/{opening.key}",
+            "Site": SITE,
             "ECO": opening.eco,
             "Opening": opening.name,
         },
@@ -316,7 +316,7 @@ def index_game(table: Table, explored: dict[str, Any] | None) -> GameItem:
     else:
         _continue(root, chess.Board(), table, explored, None)
     return GameItem(
-        headers={"Event": COLLECTION_NAME, "Site": PAGE}, comment=comment, root=root
+        headers={"Event": COLLECTION_NAME, "Site": SITE}, comment=comment, root=root
     )
 
 

@@ -31,6 +31,8 @@ from typing import Any
 from ...core.fetch import Blocked, Fetcher, PageFetcher
 
 ROOT = "https://lichess.org"
+#: The Site of a file pgn-dl writes from Lichess, when its game names no place.
+SITE = "lichess.org"
 EXPLORER = "https://explorer.lichess.org"
 ASSETS = "https://lichess1.org/assets/compiled"
 

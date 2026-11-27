@@ -37,6 +37,7 @@ from .conftest import (
     TOKEN,
     FakeFetcher,
     Response,
+    as_written,
     chapter,
     chapter_json_url,
     failure,
@@ -387,6 +388,32 @@ async def test_discovery_reads_the_study_once_and_numbers_its_chapters() -> None
     assert fetcher.urls == [study_url(STUDY)]
 
 
+async def written_sites(own: str) -> list[str]:
+    """The Site lines pgn-dl writes for a chapter whose export has ``own``."""
+    played = chapter(
+        DEFENCE_ID,
+        "The knight on f6 defends",
+        "1. e4 $1 { [%csl Ge4] } 1... Nf6 2. e5 *",
+        Site=own,
+    )
+    fetcher = exported(**{study_url(STUDY): study_export(SACRIFICE, played, MATE)})
+    extractor = StudiesExtractor(f"{ROOT}/study/{STUDY}/{DEFENCE_ID}")
+    _, [ref] = await extractor.discover(fetcher)
+    item = await extractor.fetch(fetcher, ref)
+    assert item.pgn is not None
+    return [line for line in item.pgn.splitlines() if line.startswith("[Site ")]
+
+
+@pytest.mark.parametrize("own", ["Paris FRA", "https://lichess.org/abcdEFGH"])
+async def test_a_chapter_keeps_the_site_its_game_was_played_at(own: str) -> None:
+    assert await written_sites(own) == [f'[Site "{own}"]']
+
+
+@pytest.mark.parametrize("own", ["?", ""])
+async def test_a_chapter_whose_site_names_no_place_gets_lichess_org(own: str) -> None:
+    assert await written_sites(own) == ['[Site "lichess.org"]']
+
+
 async def test_a_chapter_url_gets_that_chapter_under_its_number() -> None:
     fetcher = exported()
     extractor = StudiesExtractor(f"{ROOT}/study/{STUDY}/{DEFENCE_ID}")
@@ -396,7 +423,7 @@ async def test_a_chapter_url_gets_that_chapter_under_its_number() -> None:
         (DEFENCE_ID, ("02-the-knight-on-f6-defends",))
     ]
     item = await extractor.fetch(fetcher, refs[0])
-    assert item.pgn == DEFENCE
+    assert item.pgn == as_written(DEFENCE)
 
 
 async def test_each_chapter_is_written_as_exported_after_asking_its_json() -> None:
@@ -404,7 +431,9 @@ async def test_each_chapter_is_written_as_exported_after_asking_its_json() -> No
     extractor = StudiesExtractor(STUDY)
     _, refs = await extractor.discover(fetcher)
     items = [await extractor.fetch(fetcher, ref) for ref in refs]
-    assert [item.pgn for item in items] == [SACRIFICE, DEFENCE, MATE]
+    assert [item.pgn for item in items] == [
+        as_written(c) for c in (SACRIFICE, DEFENCE, MATE)
+    ]
     assert fetcher.urls == [
         study_url(STUDY),
         chapter_json_url(SACRIFICE_ID),
@@ -479,7 +508,7 @@ async def test_a_chapter_s_description_opens_its_file() -> None:
     extractor = StudiesExtractor(f"{ROOT}/study/{STUDY}/{DEFENCE_ID}")
     _, [ref] = await extractor.discover(fetcher)
     item = await extractor.fetch(fetcher, ref)
-    assert item.pgn == DEFENCE.replace(
+    assert item.pgn == as_written(DEFENCE).replace(
         "\n\n1. e4", "\n\n{ Defend h7 with the knight. } 1. e4"
     )
 
@@ -502,11 +531,11 @@ async def test_the_study_s_description_opens_its_first_chapter_only() -> None:
     extractor = StudiesExtractor(STUDY)
     _, refs = await extractor.discover(fetcher)
     first, second = [await extractor.fetch(fetcher, ref) for ref in refs[:2]]
-    assert first.pgn == SACRIFICE.replace(
+    assert first.pgn == as_written(SACRIFICE).replace(
         "{ [%cal Gd3h7] }",
         "{ Attacks on the king. } { Take on h7. } { [%cal Gd3h7] }",
     )
-    assert second.pgn == DEFENCE
+    assert second.pgn == as_written(DEFENCE)
 
 
 async def test_a_description_switched_on_but_never_written_is_left_out() -> None:
@@ -520,7 +549,7 @@ async def test_a_description_switched_on_but_never_written_is_left_out() -> None
     fetcher = exported(**{chapter_json_url(SACRIFICE_ID): answer})
     extractor = StudiesExtractor(STUDY)
     _, refs = await extractor.discover(fetcher)
-    assert (await extractor.fetch(fetcher, refs[0])).pgn == SACRIFICE
+    assert (await extractor.fetch(fetcher, refs[0])).pgn == as_written(SACRIFICE)
 
 
 class Rewinding(FakeFetcher):
@@ -539,7 +568,7 @@ async def test_a_chapter_answered_with_the_first_is_asked_for_again() -> None:
     fetcher = Rewinding(exported(**{asked: json_of(SACRIFICE_ID)}).responses)
     extractor = StudiesExtractor(f"{ROOT}/study/{STUDY}/{DEFENCE_ID}")
     _, [ref] = await extractor.discover(fetcher)
-    assert (await extractor.fetch(fetcher, ref)).pgn == DEFENCE
+    assert (await extractor.fetch(fetcher, ref)).pgn == as_written(DEFENCE)
     assert fetcher.urls == [study_url(STUDY), asked, asked]
 
 
@@ -553,7 +582,7 @@ async def test_a_study_description_the_study_does_not_show_is_left_out() -> None
     )
     extractor = StudiesExtractor(STUDY)
     _, refs = await extractor.discover(fetcher)
-    assert (await extractor.fetch(fetcher, refs[0])).pgn == SACRIFICE
+    assert (await extractor.fetch(fetcher, refs[0])).pgn == as_written(SACRIFICE)
 
 
 async def test_a_chapter_whose_json_fails_fails_alone() -> None:
@@ -562,7 +591,7 @@ async def test_a_chapter_whose_json_fails_fails_alone() -> None:
     fetcher = exported(**{url: failure(url, 500)})
     extractor = StudiesExtractor(STUDY)
     _, refs = await extractor.discover(fetcher)
-    assert (await extractor.fetch(fetcher, refs[0])).pgn == SACRIFICE
+    assert (await extractor.fetch(fetcher, refs[0])).pgn == as_written(SACRIFICE)
     with pytest.raises(FetchError):
         await extractor.fetch(fetcher, refs[1])
 
@@ -618,7 +647,9 @@ async def test_a_study_with_export_off_is_read_chapter_by_chapter() -> None:
     # requests, so a resumed run asks nothing for the chapters it already has.
     assert fetcher.urls == [study_url(STUDY), study_json_url()]
     items = [await extractor.fetch(fetcher, ref) for ref in refs]
-    assert [item.pgn for item in items] == [SACRIFICE, DEFENCE, MATE]
+    assert [item.pgn for item in items] == [
+        as_written(c) for c in (SACRIFICE, DEFENCE, MATE)
+    ]
     assert fetcher.urls[2:] == [
         chapter_url(STUDY, SACRIFICE_ID),
         chapter_json_url(SACRIFICE_ID),
@@ -636,7 +667,7 @@ async def test_a_chapter_url_of_such_a_study_keeps_its_number_in_the_study() -> 
     extractor = StudiesExtractor(f"{ROOT}/study/{STUDY}/{MATE_ID}")
     _, refs = await extractor.discover(fetcher)
     assert [(r.id, r.path) for r in refs] == [(MATE_ID, ("03-queen-and-knight-mate",))]
-    assert (await extractor.fetch(fetcher, refs[0])).pgn == MATE
+    assert (await extractor.fetch(fetcher, refs[0])).pgn == as_written(MATE)
 
 
 async def test_a_private_study_you_may_see_but_not_export_is_read() -> None:
@@ -716,7 +747,7 @@ async def test_a_chapter_that_does_not_come_back_as_itself_fails_alone(
     fetcher = export_off(**{chapter_url(STUDY, DEFENCE_ID): answer})
     extractor = StudiesExtractor(STUDY)
     _, refs = await extractor.discover(fetcher)
-    assert (await extractor.fetch(fetcher, refs[0])).pgn == SACRIFICE
+    assert (await extractor.fetch(fetcher, refs[0])).pgn == as_written(SACRIFICE)
     with pytest.raises(FetchError, match=message):
         await extractor.fetch(fetcher, refs[1])
 
@@ -761,7 +792,9 @@ async def test_a_gamebook_chapter_gets_its_hints_from_its_json() -> None:
     extractor = StudiesExtractor(STUDY)
     _, refs = await extractor.discover(fetcher)
     items = [await extractor.fetch(fetcher, ref) for ref in refs]
-    assert [item.pgn for item in items] == [SACRIFICE, BOOK_ANNOTATED]
+    assert [item.pgn for item in items] == [
+        as_written(c) for c in (SACRIFICE, BOOK_ANNOTATED)
+    ]
 
 
 async def test_a_gamebook_s_description_comes_before_its_first_hint() -> None:
@@ -769,9 +802,9 @@ async def test_a_gamebook_s_description_comes_before_its_first_hint() -> None:
     fetcher = gamebook_study(**{chapter_json_url(BOOK_ID): answer})
     extractor = StudiesExtractor(f"{ROOT}/study/{STUDY}/{BOOK_ID}")
     _, [ref] = await extractor.discover(fetcher)
-    assert (await extractor.fetch(fetcher, ref)).pgn == BOOK_ANNOTATED.replace(
-        "{ Hint:", "{ Find White's moves. } { Hint:"
-    )
+    assert (await extractor.fetch(fetcher, ref)).pgn == as_written(
+        BOOK_ANNOTATED
+    ).replace("{ Hint:", "{ Find White's moves. } { Hint:")
 
 
 async def test_the_tree_of_a_chapter_that_is_no_gamebook_is_not_read() -> None:
@@ -781,7 +814,7 @@ async def test_the_tree_of_a_chapter_that_is_no_gamebook_is_not_read() -> None:
     fetcher = gamebook_study(**{chapter_json_url(SACRIFICE_ID): answer})
     extractor = StudiesExtractor(STUDY)
     _, refs = await extractor.discover(fetcher)
-    assert (await extractor.fetch(fetcher, refs[0])).pgn == SACRIFICE
+    assert (await extractor.fetch(fetcher, refs[0])).pgn == as_written(SACRIFICE)
 
 
 @pytest.mark.parametrize(
@@ -798,6 +831,6 @@ async def test_a_gamebook_whose_json_carries_no_tree_fails_alone(
     fetcher = gamebook_study(**{chapter_json_url(BOOK_ID): answer})
     extractor = StudiesExtractor(STUDY)
     _, [first, book] = await extractor.discover(fetcher)
-    assert (await extractor.fetch(fetcher, first)).pgn == SACRIFICE
+    assert (await extractor.fetch(fetcher, first)).pgn == as_written(SACRIFICE)
     with pytest.raises(FetchError, match=message):
         await extractor.fetch(fetcher, book)

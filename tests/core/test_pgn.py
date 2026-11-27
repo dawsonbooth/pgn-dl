@@ -9,7 +9,7 @@ import chess.pgn
 import pytest
 
 from pgn_dl.core.models import Arrow, Collection, GameItem, Highlight, MoveNode
-from pgn_dl.core.pgn import game_to_pgn
+from pgn_dl.core.pgn import game_to_pgn, reexport_pgn
 
 COLLECTION = Collection(
     source="fake",
@@ -220,3 +220,33 @@ def test_a_quote_or_backslash_in_a_header_is_escaped() -> None:
     stream = io.StringIO(pgn)
     assert chess.pgn.read_game(stream) is not None
     assert chess.pgn.read_game(stream) is None
+
+
+# Re-exporting a site's own PGN under pgn-dl's headers.
+
+
+def _reexported_site(pgn: str) -> str | None:
+    text = reexport_pgn(
+        pgn, {"Event": "Ours", "Site": "example.com"}, subject="game", error=ValueError
+    )
+    game = chess.pgn.read_game(io.StringIO(text))
+    assert game is not None
+    return game.headers.get("Site")
+
+
+def test_a_reexported_game_keeps_the_site_it_was_played_at() -> None:
+    # Site is where a game was played; where pgn-dl got it is only a fallback.
+    played = '[Event "Paris"]\n[Site "Paris FRA"]\n\n1. e4 e5 *'
+    assert _reexported_site(played) == "Paris FRA"
+
+
+@pytest.mark.parametrize(
+    "pgn",
+    [
+        '[Event "Lesson"]\n[Site "?"]\n\n1. e4 e5 *',
+        '[Event "Lesson"]\n[Site ""]\n\n1. e4 e5 *',
+        '[Event "Lesson"]\n\n1. e4 e5 *',
+    ],
+)
+def test_a_reexported_game_with_no_known_site_gets_the_sites_domain(pgn: str) -> None:
+    assert _reexported_site(pgn) == "example.com"
