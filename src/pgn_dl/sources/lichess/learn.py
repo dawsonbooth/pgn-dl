@@ -32,7 +32,7 @@ from typing import Any
 
 import chess
 
-from ...core.extractor import Extractor
+from ...core.extractor import Extractor, WholeSection
 from ...core.fetch import Fetcher, FetchError
 from ...core.models import Arrow, Collection, GameItem, Highlight, ItemRef, MoveNode
 from ...core.paths import slugify
@@ -476,20 +476,33 @@ def stage_pgn(collection: Collection, stage: Stage) -> str:
 
 
 _TARGET = re.compile(
-    r"^https?://(?:www\.)?lichess\.org/learn/?(?:#/(?P<stage>\d+)(?:/\d+)?/?)?$"
+    r"^https?://(?:www\.)?lichess\.org/learn/?(?:#/(?P<stage>\d+)(?:/\d+)?/?|#/?)?$"
 )
 
 
-def stage_from(target: str) -> int | None:
-    """The stage a Learn URL points at (``/learn#/3``), or None for all of them.
+def stage_from(target: str) -> int:
+    """The stage a Learn URL points at (``/learn#/3``).
 
     The stage is in the fragment, so a query (a share link's ``?utm_...``) is
     dropped only up to it.
     """
     m = _TARGET.match(re.sub(r"\?[^#]*", "", target.strip(), count=1))
     if m is None:
-        raise ValueError(f"could not read lichess learn from {target!r}")
-    return int(m.group("stage")) if m.group("stage") else None
+        raise ValueError(f"could not read a lichess Learn stage from {target!r}")
+    if m.group("stage") is None:
+        raise WholeSection(
+            f"{target!r} is all of Learn; give one stage's URL (lichess.org/learn#/3)"
+        )
+    return int(m.group("stage"))
+
+
+def layout(categories: list[Category]) -> list[tuple[Stage, tuple[str, str]]]:
+    """Every stage with its path: category directory, then stage, both numbered."""
+    return [
+        (stage, (f"{n:02d}-{category.key}", f"{m:02d}-{slugify(stage.title)}"))
+        for n, category in enumerate(categories, start=1)
+        for m, stage in enumerate(category.stages, start=1)
+    ]
 
 
 @dataclass
@@ -499,7 +512,7 @@ class _Context:
 
 
 class LearnExtractor(Extractor[_Context]):
-    """Every stage of Learn, or the one a URL points at."""
+    """The stage of Learn a URL points at."""
 
     key = "lichess:learn"
     url_patterns = (re.compile(r"^https?://(?:www\.)?lichess\.org/learn(?:[/?#]|$)"),)
@@ -512,15 +525,9 @@ class LearnExtractor(Extractor[_Context]):
         self, fetcher: Fetcher
     ) -> tuple[Collection, list[ItemRef], _Context]:
         categories = await fetch_learn(Client(fetcher))
-        placed = [
-            (stage, (f"{n:02d}-{category.key}", f"{m:02d}-{slugify(stage.title)}"))
-            for n, category in enumerate(categories, start=1)
-            for m, stage in enumerate(category.stages, start=1)
-        ]
-        if self.stage is not None:
-            placed = [(s, path) for s, path in placed if s.id == self.stage]
-            if not placed:
-                raise FetchError(f"lichess learn has no stage {self.stage}")
+        placed = [(s, path) for s, path in layout(categories) if s.id == self.stage]
+        if not placed:
+            raise FetchError(f"lichess Learn has no stage {self.stage}")
         collection = self.collection(
             slug=slugify(COLLECTION_NAME), name=COLLECTION_NAME
         )

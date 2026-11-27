@@ -88,22 +88,14 @@ class Client:
 
         return await self._send(request, accept=accept, auth=auth)
 
-    async def page(
-        self,
-        url: str,
-        *,
-        rate_limit_wait: float = RATE_LIMIT_WAIT,
-        turn: Callable[[], Awaitable[None]] | None = None,
-    ) -> str:
+    async def page(self, url: str, *, rate_limit_wait: float = RATE_LIMIT_WAIT) -> str:
         """One of lichess.org's own pages, as a signed-out visitor is served it.
 
         Needs the window an extractor gets by setting ``reads_pages``. The
         page goes to the window's browser, which sends neither the token nor
         a User-Agent of pgn-dl's: it is the browser asking, as itself.
         ``rate_limit_wait`` is how long a 429 is waited out, for pages whose
-        limit runs longer than the API's minute. ``turn``, a pace, is awaited
-        just before the page goes out, so a pace counts from pages sent rather
-        than from turns handed out while a wait held everything up.
+        limit runs longer than the API's minute.
         """
         fetcher = self._fetcher
         if not isinstance(fetcher, PageFetcher):
@@ -115,9 +107,7 @@ class Client:
         def request(headers: dict[str, str]) -> Awaitable[str]:
             return fetcher.get_page(url)
 
-        return await self._send(
-            request, accept=None, auth=False, wait=rate_limit_wait, before=turn
-        )
+        return await self._send(request, accept=None, auth=False, wait=rate_limit_wait)
 
     async def _send(
         self,
@@ -126,7 +116,6 @@ class Client:
         accept: str | None,
         auth: bool,
         wait: float = RATE_LIMIT_WAIT,
-        before: Callable[[], Awaitable[None]] | None = None,
     ) -> str:
         headers = {"User-Agent": USER_AGENT}
         if accept is not None:
@@ -138,8 +127,6 @@ class Client:
             while True:
                 if (left := self._resume_at - monotonic()) > 0:
                     await asyncio.sleep(left)
-                if before is not None:
-                    await before()
                 try:
                     return await request(headers)
                 except Blocked as exc:

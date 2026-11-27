@@ -57,7 +57,7 @@ uv run pgn-dl chessable courses 25098
 uv run pgn-dl chessreps courses alapin-sicilian-repertoire-ilg8hms
 uv run pgn-dl aimchess explore https://aimchess.com/explore
 uv run pgn-dl chessendings theory lucena-position
-uv run pgn-dl lichess practice https://lichess.org/practice
+uv run pgn-dl lichess practice BJy6fEDf
 uv run pgn-dl lichess studies https://lichess.org/study/fE4k21MW
 uv run pgn-dl lichess openings https://lichess.org/opening/London_System
 ```
@@ -84,10 +84,8 @@ Options:
 Only chess.com and Lichess's opening pages need a browser for downloads (their
 pages are served only to one). chess.com's runs headless on the saved session.
 Lichess's opens a Chrome window, signed out, that stays open until the run
-ends; Lichess allows a signed-out visitor 30 opening pages per 10 minutes, so
-all of its openings take about 18 hours, and a run that stops picks up where
-it left off. The other sources use a browser just for `login` and download
-over plain HTTPS.
+ends. The other sources use a browser just for `login` and download over plain
+HTTPS.
 
 ## Output
 

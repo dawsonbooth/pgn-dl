@@ -31,9 +31,7 @@ def test_the_help_says_which_kinds_need_an_account() -> None:
 
 def test_each_kind_owns_its_urls() -> None:
     owners = {
-        "https://lichess.org/learn": "lichess:learn",
         "https://lichess.org/learn#/3": "lichess:learn",
-        "https://lichess.org/practice": "lichess:practice",
         "https://lichess.org/practice/checkmates/piece-checkmates-i/BJy6fEDf": (
             "lichess:practice"
         ),

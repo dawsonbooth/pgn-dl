@@ -34,14 +34,11 @@ first moves the same way, is ``index.pgn`` beside them.
 
 from __future__ import annotations
 
-import asyncio
 import io
 import math
 import re
 import struct
-import time
 import unicodedata
-from collections.abc import Awaitable, Callable
 from dataclasses import dataclass
 from functools import cached_property
 from typing import Any
@@ -50,7 +47,7 @@ from urllib.parse import parse_qs, unquote, urlencode
 import chess
 import chess.pgn
 
-from ...core.extractor import Extractor
+from ...core.extractor import Extractor, WholeSection
 from ...core.fetch import Blocked, Fetcher, FetchError
 from ...core.models import Collection, GameItem, ItemRef, MoveNode
 from ...core.paths import slugify
@@ -80,13 +77,9 @@ NOT_IN_DATABASE = "This opening is not in our database."
 #: The example games as the page embeds them.
 GAMES_EXPORT = f"{ROOT}/api/games/export/_ids?clocks=true&evals=false&opening=false"
 
-#: Seconds between two opening pages. lila limits them per address
-#: (``controllers/Opening.scala``: 60 credits per 10 minutes, a signed-out
-#: page costing 2), so the window may read 30 in 10 minutes; one every 21
-#: seconds stays under that with room to spare, and makes the page the
-#: pace of a full run.
-PAGE_INTERVAL = 21.0
-#: How long a page refused for that limit is waited out: its whole window.
+#: How long a page refused for lila's limit on opening pages is waited out: the
+#: limit's whole window. lila allows each address 60 credits per 10 minutes for
+#: them (``controllers/Opening.scala``), and a signed-out page costs 2.
 PAGE_LIMIT_WINDOW = 600.0
 
 _VERSION = re.compile(r'object chess\s*:\s*val version\s*=\s*"([^"]+)"')
@@ -378,14 +371,14 @@ _TARGET = re.compile(
 
 @dataclass(frozen=True)
 class Target:
-    """The opening a target names, or every one (``key`` None)."""
+    """The page a target names; ``key`` None is the openings page itself."""
 
     key: str | None = None
     line: tuple[str, ...] = ()  # the SAN moves a page URL carries, if any
 
 
 def target_from(target: str) -> Target:
-    """Read ``/opening``, ``/opening/tree``, ``/opening/<Key>`` or a bare key.
+    """Read ``/opening``, ``/opening/<Key>`` or a bare key.
 
     A page URL may carry moves after the key, as the continuation links do
     (``/opening/Sicilian_Defense_Closed/e4_c5_Nc3``); which page that is
@@ -393,14 +386,18 @@ def target_from(target: str) -> Target:
     """
     cleaned, _, query = target.strip().split("#", 1)[0].partition("?")
     if "q" in parse_qs(query):
-        # A search on the openings page names no page, and every opening
-        # would be a full run.
-        raise ValueError(f"{target!r} is a search, not a lichess opening page")
+        raise WholeSection(
+            f"{target!r} is a search of the openings; give one opening's page or key"
+        )
     m = _TARGET.match(cleaned)
     if m is None:
         raise ValueError(f"could not read a lichess opening from {target!r}")
     key = m.group("key") or m.group("bare")
-    if key is None or key == "tree":
+    if key == "tree":
+        raise WholeSection(
+            f"{target!r} is the tree of every opening; give one opening's page or key"
+        )
+    if key is None:
         return Target()
     line = tuple(s for s in unquote(m.group("line") or "").strip("/").split("_") if s)
     return Target(unquote(key).replace("Defence", "Defense"), line)
@@ -425,49 +422,20 @@ def find_page(pages: dict[str, Opening], key: str) -> Opening | None:
     return lower.get(name_to_key(key.lower()).lower())
 
 
-class Pace:
-    """One turn per ``interval`` seconds, shared by every worker of a run.
-
-    A page takes its turn just before it goes out, inside the client's lock
-    (``Client.page``), so turns count from pages sent: a long wait there, a
-    429 waited out, leaves no turns stacked up to be spent at once.
-    """
-
-    def __init__(
-        self,
-        interval: float,
-        *,
-        clock: Callable[[], float] = time.monotonic,
-        sleep: Callable[[float], Awaitable[None]] = asyncio.sleep,
-    ) -> None:
-        self._interval = interval
-        self._clock = clock
-        self._sleep = sleep
-        self._lock = asyncio.Lock()
-        self._next: float | None = None
-
-    async def turn(self) -> None:
-        async with self._lock:
-            if self._next is not None and (wait := self._next - self._clock()) > 0:
-                await self._sleep(wait)
-            self._next = self._clock() + self._interval
-
-
 @dataclass
 class _Context:
     client: Client
     table: Table
     collection: Collection
     start: dict[str, Any] | None  # the explorer's answer for the first move
-    pages: Pace
 
 
-#: The openings page itself, listed before the openings.
+#: The openings page itself, written beside the openings.
 INDEX = "index"
 
 
 class OpeningsExtractor(Extractor[_Context]):
-    """Every opening page, or one (requires `pgn-dl login lichess`)."""
+    """One opening's page, or the openings page (requires `pgn-dl login lichess`)."""
 
     key = "lichess:openings"
     reads_pages = True  # the descriptions; nothing else is read from a page
@@ -482,15 +450,13 @@ class OpeningsExtractor(Extractor[_Context]):
     ) -> tuple[Collection, list[ItemRef], _Context]:
         client = Client(fetcher, token=auth.load_token())
         table = await read_table(client)
-        # Asked once before anything is listed, so a refused token stops the
-        # run here with the login hint rather than failing every opening. It
-        # is also what the openings page itself shows.
+        # Asked before anything is listed, so a refused token stops the run
+        # here with the login hint. It is also what the openings page shows.
         start = await explore(client, "")
-        pages = table.pages
         wanted = self.target
         if wanted.key is None:
-            chosen = sorted(pages.values(), key=lambda o: o.name)
-        elif (found := find_page(pages, wanted.key)) is None:
+            ref = ItemRef(id=INDEX, path=(INDEX,))
+        elif (found := find_page(table.pages, wanted.key)) is None:
             raise FetchError(f"lichess has no opening page {wanted.key!r}")
         elif wanted.line and not _reaches(found, wanted.line):
             raise FetchError(
@@ -498,24 +464,14 @@ class OpeningsExtractor(Extractor[_Context]):
                 "named openings' own pages are downloaded"
             )
         else:
-            chosen = [found]
-        refs = [
-            ItemRef(
-                id=opening.key,
-                path=(slugify(name_to_key(opening.family)), slugify(opening.key)),
+            ref = ItemRef(
+                id=found.key,
+                path=(slugify(name_to_key(found.family)), slugify(found.key)),
             )
-            for opening in chosen
-        ]
-        if wanted.key is None:
-            refs.insert(0, ItemRef(id=INDEX, path=(INDEX,)))
         collection = self.collection(
             slug=slugify(COLLECTION_NAME), name=COLLECTION_NAME
         )
-        return (
-            collection,
-            refs,
-            _Context(client, table, collection, start, Pace(PAGE_INTERVAL)),
-        )
+        return collection, [ref], _Context(client, table, collection, start)
 
     async def _fetch(
         self, context: _Context, fetcher: Fetcher, ref: ItemRef
@@ -527,9 +483,7 @@ class OpeningsExtractor(Extractor[_Context]):
         # Read first and failing the item if it fails: a file written without
         # its description would be skipped by every later run.
         url = f"{PAGE}/{opening.key}"
-        page = await context.client.page(
-            url, rate_limit_wait=PAGE_LIMIT_WINDOW, turn=context.pages.turn
-        )
+        page = await context.client.page(url, rate_limit_wait=PAGE_LIMIT_WINDOW)
         about = wiki.description(page, url)
         explored = await explore(context.client, opening.uci)
         games = [

@@ -271,18 +271,6 @@ async def test_a_429_on_a_page_is_waited_out_too(
     assert asked == [RATE_LIMIT_WAIT]
 
 
-async def test_a_page_s_turn_is_taken_just_before_it_goes_out() -> None:
-    fetcher = FakeFetcher({PAGE: "<html>the page</html>"})
-    seen: list[int] = []
-
-    async def turn() -> None:
-        seen.append(len(fetcher.requests))
-
-    await Client(fetcher).page(PAGE, turn=turn)
-    assert seen == [0]
-    assert fetcher.urls == [PAGE]
-
-
 async def test_a_challenged_page_is_not_waited_out(waits: list[float]) -> None:
     fetcher = FakeFetcher({PAGE: failure(PAGE, 403, CHALLENGE_PAGE)})
     with pytest.raises(Blocked):

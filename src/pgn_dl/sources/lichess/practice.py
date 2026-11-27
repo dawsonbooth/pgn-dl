@@ -23,7 +23,7 @@ from __future__ import annotations
 import re
 from dataclasses import dataclass
 
-from ...core.extractor import Extractor
+from ...core.extractor import Extractor, WholeSection
 from ...core.fetch import Fetcher, FetchError
 from ...core.models import Collection, GameItem, ItemRef
 from ...core.paths import slugify
@@ -143,24 +143,27 @@ _TARGET = re.compile(
 
 
 @dataclass(frozen=True)
-class Scope:
-    """Which studies a target names: every one, a section's, or one."""
+class Target:
+    """The study a target names, and the section in its URL, if any."""
 
+    study: str
     section: str | None = None
-    study: str | None = None
 
 
-def scope_from(target: str) -> Scope:
+def target_from(target: str) -> Target:
     cleaned = target.strip().split("#", 1)[0].split("?", 1)[0]
     m = _TARGET.match(cleaned)
     if m is None:
-        raise ValueError(f"could not read lichess practice from {target!r}")
-    scope = Scope(section=m.group("section"), study=m.group("study") or m.group("bare"))
-    if scope.section is not None and scope.section not in {s.id for s in SECTIONS}:
-        raise ValueError(f"lichess practice has no section {scope.section!r}")
-    if scope.study is not None and scope.study not in _STUDIES:
-        raise ValueError(f"{scope.study!r} is not a lichess practice study")
-    return scope
+        raise ValueError(f"could not read a lichess Practice study from {target!r}")
+    section, study = m.group("section"), m.group("study") or m.group("bare")
+    if section is not None and section not in {s.id for s in SECTIONS}:
+        raise ValueError(f"lichess Practice has no section {section!r}")
+    if study is None:
+        whole = "all of Practice" if section is None else "a Practice section"
+        raise WholeSection(f"{target!r} is {whole}; give one study's URL or id")
+    if study not in _STUDIES:
+        raise ValueError(f"{study!r} is not a lichess Practice study")
+    return Target(study=study, section=section)
 
 
 def layout() -> list[tuple[PracticeStudy, tuple[str, str]]]:
@@ -173,7 +176,7 @@ def layout() -> list[tuple[PracticeStudy, tuple[str, str]]]:
 
 
 class PracticeExtractor(Extractor[Client]):
-    """Every practice study, a section's, or one."""
+    """One Lichess Practice study."""
 
     key = "lichess:practice"
     url_patterns = (
@@ -182,7 +185,7 @@ class PracticeExtractor(Extractor[Client]):
 
     def __init__(self, target: str) -> None:
         super().__init__()
-        self.scope = scope_from(target)
+        self.target = target_from(target)
 
     async def _discover(
         self, fetcher: Fetcher
@@ -193,13 +196,13 @@ class PracticeExtractor(Extractor[Client]):
         refs = [
             ItemRef(id=study.id, path=path)
             for study, path in layout()
-            if self.scope.section in (None, sections[study.id])
-            and self.scope.study in (None, study.id)
+            if study.id == self.target.study
+            and self.target.section in (None, sections[study.id])
         ]
         if not refs:
             raise FetchError(
-                f"lichess practice study {self.scope.study} is not in section "
-                f"{self.scope.section}"
+                f"lichess Practice study {self.target.study} is not in section "
+                f"{self.target.section}"
             )
         collection = self.collection(
             slug=slugify(COLLECTION_NAME), name=COLLECTION_NAME

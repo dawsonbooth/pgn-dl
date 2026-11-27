@@ -144,6 +144,22 @@ def test_a_mistyped_command_is_not_treated_as_a_url() -> None:
     assert "no command handles" not in result.output
 
 
+@pytest.mark.parametrize(
+    "argv",
+    [
+        ["https://lichess.org/practice"],
+        ["url", "https://lichess.org/practice"],
+        ["lichess", "practice", "https://lichess.org/practice"],
+    ],
+)
+def test_practice_s_own_url_is_refused_by_every_way_of_giving_it(
+    argv: list[str],
+) -> None:
+    result = runner.invoke(app, argv)
+    assert result.exit_code == 1
+    assert "is all of Practice; give one study's URL or id" in result.output
+
+
 def test_no_arguments_prints_help() -> None:
     result = runner.invoke(app, [])
     assert result.exit_code == 0

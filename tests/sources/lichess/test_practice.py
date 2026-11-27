@@ -9,13 +9,14 @@ import re
 import pytest
 
 from pgn_dl.core import registry
+from pgn_dl.core.extractor import WholeSection
 from pgn_dl.core.fetch import FetchError
 from pgn_dl.sources.lichess.practice import (
     SECTIONS,
     PracticeExtractor,
-    Scope,
+    Target,
     layout,
-    scope_from,
+    target_from,
 )
 from pgn_dl.sources.lichess.studies import ID
 
@@ -99,48 +100,76 @@ def test_practice_is_five_sections_of_thirty_two_studies() -> None:
 @pytest.mark.parametrize(
     ("target", "expected"),
     [
-        (PRACTICE, Scope()),
-        (f"{PRACTICE}/", Scope()),
-        ("https://www.lichess.org/practice?x=1#y", Scope()),
-        (f"{PRACTICE}/rook-endgames", Scope(section="rook-endgames")),
-        (f"{PRACTICE}/rook-endgames/", Scope(section="rook-endgames")),
         (
             f"{PRACTICE}/advanced-tactics/greek-gift/{GREEK_GIFT}",
-            Scope(section="advanced-tactics", study=GREEK_GIFT),
+            Target(section="advanced-tactics", study=GREEK_GIFT),
         ),
         (
             f"{PRACTICE}/advanced-tactics/greek-gift/{GREEK_GIFT}/uV9wX1yZ",
-            Scope(section="advanced-tactics", study=GREEK_GIFT),
+            Target(section="advanced-tactics", study=GREEK_GIFT),
         ),
-        (GREEK_GIFT, Scope(study=GREEK_GIFT)),
-        (f"  {GREEK_GIFT}\n", Scope(study=GREEK_GIFT)),
+        (GREEK_GIFT, Target(study=GREEK_GIFT)),
+        (f"  {GREEK_GIFT}\n", Target(study=GREEK_GIFT)),
     ],
 )
-def test_targets(target: str, expected: Scope) -> None:
-    assert scope_from(target) == expected
+def test_targets(target: str, expected: Target) -> None:
+    assert target_from(target) == expected
+
+
+@pytest.mark.parametrize(
+    ("target", "message"),
+    [
+        (PRACTICE, "is all of Practice"),
+        (f"{PRACTICE}/", "is all of Practice"),
+        ("https://www.lichess.org/practice?x=1#y", "is all of Practice"),
+        (f"{PRACTICE}/rook-endgames", "is a Practice section"),
+        (f"{PRACTICE}/rook-endgames/", "is a Practice section"),
+    ],
+)
+def test_practice_or_a_section_of_it_is_refused(target: str, message: str) -> None:
+    with pytest.raises(WholeSection, match=f"{message}; give one study's URL or id"):
+        target_from(target)
+
+
+@pytest.mark.parametrize(
+    ("target", "message"),
+    [
+        (PRACTICE, "is all of Practice"),
+        (f"{PRACTICE}/pawn-endgames", "is a Practice section"),
+    ],
+)
+def test_the_registry_refuses_practice_or_a_section_of_it(
+    target: str, message: str
+) -> None:
+    with pytest.raises(WholeSection, match=message):
+        registry.resolve_url(target)
 
 
 @pytest.mark.parametrize(
     ("target", "message"),
     [
         (f"{PRACTICE}/openings", "has no section 'openings'"),
-        ("h7Sac1fz", "'h7Sac1fz' is not a lichess practice study"),
-        (f"{PRACTICE}/checkmates/a-study/h7Sac1fz", "is not a lichess practice study"),
-        (f"{ROOT}/study/{GREEK_GIFT}", "could not read lichess practice"),
-        (f"{PRACTICE}/advanced-tactics/greek-gift", "could not read lichess practice"),
-        ("https://example.com/practice", "could not read lichess practice"),
-        ("", "could not read lichess practice"),
+        ("h7Sac1fz", "'h7Sac1fz' is not a lichess Practice study"),
+        (f"{PRACTICE}/checkmates/a-study/h7Sac1fz", "is not a lichess Practice study"),
+        (f"{ROOT}/study/{GREEK_GIFT}", "could not read a lichess Practice study"),
+        (
+            f"{PRACTICE}/advanced-tactics/greek-gift",
+            "could not read a lichess Practice study",
+        ),
+        ("https://example.com/practice", "could not read a lichess Practice study"),
+        ("", "could not read a lichess Practice study"),
     ],
 )
 def test_other_targets_are_refused(target: str, message: str) -> None:
-    with pytest.raises(ValueError, match=message):
-        scope_from(target)
+    with pytest.raises(ValueError, match=message) as refused:
+        target_from(target)
+    assert not isinstance(refused.value, WholeSection)
 
 
 def test_practice_urls_resolve_to_this_extractor() -> None:
-    found = registry.resolve_url(f"{PRACTICE}/pawn-endgames")
+    found = registry.resolve_url(f"{PRACTICE}/advanced-tactics/greek-gift/{GREEK_GIFT}")
     assert isinstance(found, PracticeExtractor)
-    assert found.scope == Scope(section="pawn-endgames")
+    assert found.target == Target(study=GREEK_GIFT, section="advanced-tactics")
     assert PracticeExtractor.from_url(f"{ROOT}/practices") is None
 
 
@@ -160,30 +189,22 @@ def test_each_study_has_a_path_of_its_own_in_a_numbered_directory_per_section() 
     assert paths["MkDViieT"] == ("05-rook-endgames", "01-7th-rank-rook-pawn")
 
 
-async def test_discovery_lists_every_study_without_asking_lichess() -> None:
+async def test_discovery_asks_lichess_nothing() -> None:
     fetcher = FakeFetcher({})
-    collection, refs = await PracticeExtractor(PRACTICE).discover(fetcher)
+    collection, _ = await PracticeExtractor(GREEK_GIFT).discover(fetcher)
     assert (collection.source, collection.kind) == ("lichess", "practice")
     assert (collection.slug, collection.name) == ("practice", "Practice")
-    assert [(r.id, r.path) for r in refs] == [(s.id, path) for s, path in layout()]
     assert fetcher.requests == []
 
 
 @pytest.mark.parametrize(
-    ("target", "ids"),
-    [
-        (f"{PRACTICE}/pawn-endgames", ["xebrDvFe", "A4ujYOer", "pt20yRkT"]),
-        (f"{PRACTICE}/advanced-tactics/greek-gift/{GREEK_GIFT}", [GREEK_GIFT]),
-        (GREEK_GIFT, [GREEK_GIFT]),
-    ],
+    "target", [f"{PRACTICE}/advanced-tactics/greek-gift/{GREEK_GIFT}", GREEK_GIFT]
 )
-async def test_a_section_or_a_study_keeps_the_paths_of_a_full_download(
-    target: str, ids: list[str]
-) -> None:
-    _, everything = await PracticeExtractor(PRACTICE).discover(FakeFetcher({}))
-    _, some = await PracticeExtractor(target).discover(FakeFetcher({}))
-    assert [r.id for r in some] == ids
-    assert some == [r for r in everything if r.id in ids]
+async def test_a_study_gets_the_path_the_layout_gives_it(target: str) -> None:
+    _, refs = await PracticeExtractor(target).discover(FakeFetcher({}))
+    assert [(r.id, r.path) for r in refs] == [
+        (study.id, path) for study, path in layout() if study.id == GREEK_GIFT
+    ]
 
 
 async def test_a_study_under_another_section_s_url_is_refused() -> None:

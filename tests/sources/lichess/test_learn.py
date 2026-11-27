@@ -17,6 +17,7 @@ import chess.pgn
 import pytest
 
 from pgn_dl.core import registry
+from pgn_dl.core.extractor import WholeSection
 from pgn_dl.core.fetch import FetchError
 from pgn_dl.core.models import Collection
 from pgn_dl.sources.lichess.client import Client
@@ -29,6 +30,7 @@ from pgn_dl.sources.lichess.learn import (
     Step,
     _prose,
     fetch_learn,
+    layout,
     level_game,
     parse_strings,
     read_learn,
@@ -543,21 +545,38 @@ async def test_no_module_holding_the_stages_fails() -> None:
 @pytest.mark.parametrize(
     ("target", "expected"),
     [
-        ("https://lichess.org/learn", None),
-        ("https://lichess.org/learn/", None),
-        ("http://www.lichess.org/learn", None),
         ("https://lichess.org/learn#/3", 3),
         ("https://lichess.org/learn/#/3", 3),
         ("https://lichess.org/learn#/3/2", 3),
         ("https://lichess.org/learn#/12/", 12),
         ("  https://lichess.org/learn#/3\n", 3),
-        ("https://lichess.org/learn?utm_source=x", None),
         # The query comes before the stage in a URL; the stage is still there.
         ("https://lichess.org/learn?utm_source=x#/3", 3),
     ],
 )
-def test_targets(target: str, expected: int | None) -> None:
+def test_targets(target: str, expected: int) -> None:
     assert stage_from(target) == expected
+
+
+@pytest.mark.parametrize(
+    "target",
+    [
+        "https://lichess.org/learn",
+        "https://lichess.org/learn/",
+        "https://lichess.org/learn#",
+        "https://lichess.org/learn#/",
+        "http://www.lichess.org/learn",
+        "https://lichess.org/learn?utm_source=x",
+    ],
+)
+def test_learn_s_own_url_is_refused(target: str) -> None:
+    with pytest.raises(WholeSection, match="is all of Learn; give one stage's URL"):
+        stage_from(target)
+
+
+def test_the_registry_refuses_learn_s_own_url() -> None:
+    with pytest.raises(WholeSection, match="is all of Learn"):
+        registry.resolve_url("https://lichess.org/learn")
 
 
 @pytest.mark.parametrize(
@@ -566,15 +585,17 @@ def test_targets(target: str, expected: int | None) -> None:
         "",
         "learn",
         "https://lichess.org/learning",
-        "https://lichess.org/learn#/",
         "https://lichess.org/learn#/three",
         "https://lichess.org/practice",
         "https://example.com/learn",
     ],
 )
 def test_other_targets_are_refused(target: str) -> None:
-    with pytest.raises(ValueError):
+    with pytest.raises(
+        ValueError, match="could not read a lichess Learn stage"
+    ) as refused:
         stage_from(target)
+    assert not isinstance(refused.value, WholeSection)
 
 
 def test_learn_urls_resolve_to_this_extractor() -> None:
@@ -585,13 +606,8 @@ def test_learn_urls_resolve_to_this_extractor() -> None:
 
 
 async def test_each_stage_is_a_file_in_a_numbered_directory_per_category() -> None:
-    fetcher = FakeFetcher(assets())
-    collection, refs = await LearnExtractor("https://lichess.org/learn").discover(
-        fetcher
-    )
-    assert (collection.source, collection.kind) == ("lichess", "learn")
-    assert (collection.slug, collection.name) == ("chess-basics", "Chess basics")
-    assert [(r.id, r.path) for r in refs] == [
+    categories = await fetch_learn(Client(FakeFetcher(assets())))
+    assert [(stage.key, path) for stage, path in layout(categories)] == [
         ("rook", ("01-chess-pieces", "01-the-rook")),
         ("check1", ("02-fundamentals", "01-check-in-one")),
         ("enpassant", ("02-fundamentals", "02-en-passant")),
@@ -601,7 +617,9 @@ async def test_each_stage_is_a_file_in_a_numbered_directory_per_category() -> No
 async def test_a_stage_s_url_downloads_that_stage_at_its_place() -> None:
     fetcher = FakeFetcher(assets())
     extractor = LearnExtractor(f"{ROOT}/learn#/3")
-    _, refs = await extractor.discover(fetcher)
+    collection, refs = await extractor.discover(fetcher)
+    assert (collection.source, collection.kind) == ("lichess", "learn")
+    assert (collection.slug, collection.name) == ("chess-basics", "Chess basics")
     assert [(r.id, r.path) for r in refs] == [
         ("enpassant", ("02-fundamentals", "02-en-passant"))
     ]
@@ -618,5 +636,5 @@ async def test_a_stage_s_url_downloads_that_stage_at_its_place() -> None:
 
 
 async def test_a_stage_learn_does_not_have_is_refused() -> None:
-    with pytest.raises(FetchError, match="lichess learn has no stage 4"):
+    with pytest.raises(FetchError, match="lichess Learn has no stage 4"):
         await LearnExtractor(f"{ROOT}/learn#/4").discover(FakeFetcher(assets()))

@@ -15,6 +15,8 @@ from urllib.parse import parse_qs, urlsplit
 import chess
 import pytest
 
+from pgn_dl.core import registry
+from pgn_dl.core.extractor import WholeSection
 from pgn_dl.core.fetch import Blocked, FetchError
 from pgn_dl.sources.lichess import openings
 from pgn_dl.sources.lichess.openings import (
@@ -217,12 +219,6 @@ class Explorer:
 
 
 @pytest.fixture(autouse=True)
-def no_page_pace(monkeypatch: pytest.MonkeyPatch) -> None:
-    """Pages one after another: the pace itself is tested on its own."""
-    monkeypatch.setattr(openings, "PAGE_INTERVAL", 0.0)
-
-
-@pytest.fixture(autouse=True)
 def saved_token(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr(openings.auth, "load_token", lambda: TOKEN)
 
@@ -323,15 +319,23 @@ def test_a_continuation_is_named_as_lila_names_it(
 
 
 @pytest.mark.parametrize(
-    "target",
-    [
-        "https://lichess.org/opening",
-        "https://lichess.org/opening/",
-        "https://lichess.org/opening/tree",
-    ],
+    "target", ["https://lichess.org/opening", "https://lichess.org/opening/"]
 )
-def test_the_openings_page_and_the_tree_mean_every_opening(target: str) -> None:
+def test_the_openings_url_names_the_openings_page_itself(target: str) -> None:
     assert target_from(target).key is None
+
+
+@pytest.mark.parametrize("target", ["https://lichess.org/opening/tree", "tree"])
+def test_the_tree_of_every_opening_is_refused(target: str) -> None:
+    with pytest.raises(
+        WholeSection, match="is the tree of every opening; give one opening's"
+    ):
+        target_from(target)
+
+
+def test_the_registry_refuses_the_tree_s_url() -> None:
+    with pytest.raises(WholeSection, match="is the tree of every opening"):
+        registry.resolve_url("https://lichess.org/opening/tree")
 
 
 def test_a_page_url_or_a_bare_key_names_one_opening() -> None:
@@ -354,37 +358,45 @@ def test_a_page_url_keeps_the_moves_it_carries() -> None:
 
 
 def test_anything_else_is_not_an_opening_target() -> None:
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="could not read a lichess opening") as refused:
         target_from("https://lichess.org/study/abcdefgh")
+    assert not isinstance(refused.value, WholeSection)
 
 
 @pytest.mark.parametrize(
     "target",
     ["https://lichess.org/opening?q=sicilian", "https://lichess.org/opening/?q=caro"],
 )
-def test_a_search_is_not_taken_for_every_opening(target: str) -> None:
-    with pytest.raises(ValueError, match="is a search"):
+def test_a_search_of_the_openings_is_refused(target: str) -> None:
+    with pytest.raises(WholeSection, match="is a search of the openings"):
         target_from(target)
 
 
 # Discovery.
 
 
-async def test_every_page_lands_in_its_family_s_directory_unnumbered() -> None:
-    collection, refs = await OpeningsExtractor("https://lichess.org/opening").discover(
+@pytest.mark.parametrize(
+    ("key", "path"),
+    [
+        ("Sicilian_Defense_Closed", ("sicilian-defense", "sicilian-defense-closed")),
+        ("Grunfeld_Defense", ("grunfeld-defense", "grunfeld-defense")),
+        ("Queens_Pawn_Game", ("queens-pawn-game", "queens-pawn-game")),
+        ("London_System", ("london-system", "london-system")),
+    ],
+)
+async def test_a_page_is_written_in_its_family_s_directory_unnumbered(
+    key: str, path: tuple[str, str]
+) -> None:
+    collection, refs = await OpeningsExtractor(key).discover(Explorer())
+    assert collection.slug == "chess-openings"
+    assert [(ref.id, ref.path) for ref in refs] == [(key, path)]
+
+
+async def test_the_openings_url_downloads_the_openings_page_as_index() -> None:
+    _, refs = await OpeningsExtractor("https://lichess.org/opening").discover(
         Explorer()
     )
-    assert collection.slug == "chess-openings"
-    paths = {ref.id: ref.path for ref in refs}
-    assert paths["Sicilian_Defense_Closed"] == (
-        "sicilian-defense",
-        "sicilian-defense-closed",
-    )
-    assert paths["Grunfeld_Defense"] == ("grunfeld-defense", "grunfeld-defense")
-    assert paths["Queens_Pawn_Game"] == ("queens-pawn-game", "queens-pawn-game")
-    # The openings page itself comes first, then the seven pages.
-    assert refs[0].path == ("index",)
-    assert len(refs) == 8
+    assert [(ref.id, ref.path) for ref in refs] == [("index", ("index",))]
 
 
 async def test_the_openings_page_lists_the_first_moves_by_family() -> None:
@@ -410,11 +422,6 @@ async def test_the_openings_page_lists_the_first_moves_by_family() -> None:
     assert "( 1. h4 { Popularity 6%." in text
     assert fetcher.posts == []  # the page shows no example games
     assert fetcher.read == []  # nor a description
-
-
-async def test_one_opening_asked_for_brings_no_index() -> None:
-    _, refs = await OpeningsExtractor("London_System").discover(Explorer())
-    assert [ref.path for ref in refs] == [("london-system", "london-system")]
 
 
 async def test_one_page_is_found_by_key_ignoring_case() -> None:
@@ -619,34 +626,7 @@ async def test_a_page_without_its_wiki_block_fails_the_opening() -> None:
         await fetch_one("Sicilian_Defense", fetcher)
 
 
-# The pace of pages.
-
-
-#: As the module has it, before ``no_page_pace`` sets it aside for a test.
-INTERVAL = openings.PAGE_INTERVAL
-
-
-def test_the_pace_stays_under_lila_s_limit_on_opening_pages() -> None:
-    # 60 credits per address per 10 minutes, 2 for a signed-out page.
-    assert INTERVAL * 30 > 600
-    assert openings.PAGE_LIMIT_WINDOW == 600
-
-
-async def test_pages_are_read_one_per_interval_whoever_asks() -> None:
-    now = [1000.0]
-    slept: list[float] = []
-
-    async def sleep(seconds: float) -> None:
-        slept.append(seconds)
-        now[0] += seconds
-
-    pace = openings.Pace(21.0, clock=lambda: now[0], sleep=sleep)
-    await pace.turn()  # the first page waits for nothing
-    now[0] += 5.0
-    await pace.turn()  # the next waits out the rest of the interval
-    now[0] += 60.0
-    await pace.turn()  # long after, nothing to wait for
-    assert slept == [16.0]
+# lila's limit on opening pages.
 
 
 async def test_a_page_refused_for_the_limit_is_waited_out_for_its_window(
@@ -666,19 +646,3 @@ async def test_a_page_refused_for_the_limit_is_waited_out_for_its_window(
     await fetch_one("Sicilian_Defense", fetcher)
     assert waits == [openings.PAGE_LIMIT_WINDOW]
     assert fetcher.read == ["https://lichess.org/opening/Sicilian_Defense"] * 2
-
-
-async def test_a_page_takes_its_turn_just_before_it_goes_out(
-    monkeypatch: pytest.MonkeyPatch,
-) -> None:
-    # Taken inside the client's lock, a turn counts from the page sent.
-    fetcher = Explorer()
-    taken: list[int] = []
-
-    async def turn(self: openings.Pace) -> None:
-        taken.append(len(fetcher.read))
-
-    monkeypatch.setattr(openings.Pace, "turn", turn)
-    await fetch_one("Sicilian_Defense", fetcher)
-    assert taken == [0]
-    assert fetcher.read == ["https://lichess.org/opening/Sicilian_Defense"]
