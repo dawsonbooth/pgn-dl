@@ -8,13 +8,14 @@ prove the base's own behavior once, generically, rather than per source.
 from __future__ import annotations
 
 import asyncio
+import re
 from collections.abc import Mapping
 from dataclasses import dataclass
 from typing import Any
 
 import pytest
 
-from pgn_dl.core.extractor import Extractor, NotDiscovered, Once
+from pgn_dl.core.extractor import Extractor, NotDiscovered, Once, WholeSection
 from pgn_dl.core.fetch import Fetcher
 from pgn_dl.core.models import Collection, GameItem, ItemRef
 
@@ -138,3 +139,27 @@ def test_a_page_reading_extractor_lives_in_its_source_s_profile(
 
     assert reader.browser_profile() == tmp_path / "fake"
     assert ContextExtractor().browser_profile() is None
+
+
+class ShelfExtractor(ContextExtractor):
+    """Takes one book's URL; the shelf's own URL names every book on it."""
+
+    key = "fake:shelf"
+    url_patterns = (re.compile(r"^https://shelf\.example/"),)
+
+    def __init__(self, target: str) -> None:
+        super().__init__()
+        if target == "https://shelf.example/":
+            raise WholeSection(f"{target!r} is the whole shelf; give one book's URL")
+        if not target.startswith("https://shelf.example/book/"):
+            raise ValueError(f"could not read a book from {target!r}")
+
+
+def test_a_url_this_extractor_cannot_read_is_declined() -> None:
+    # Declining lets the registry ask the other extractors.
+    assert ShelfExtractor.from_url("https://shelf.example/cart") is None
+
+
+def test_a_url_naming_a_whole_section_is_raised_not_declined() -> None:
+    with pytest.raises(WholeSection, match="the whole shelf; give one book's URL"):
+        ShelfExtractor.from_url("https://shelf.example/")

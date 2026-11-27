@@ -18,7 +18,7 @@ import typer
 
 from .declaration import SourceDeclaration
 from .driver import execute
-from .extractor import Extractor
+from .extractor import Extractor, WholeSection
 from .registry import UnknownSource, resolve_url
 from .runner import Options
 
@@ -44,9 +44,14 @@ LimitOpt = Annotated[
 
 def _construct(extractor: type[Extractor]) -> Callable[[str], Extractor]:
     def make(target: str) -> Extractor:
-        # Same one-positional-arg convention extractor.py's from_url() relies
-        # on, and the same ignore it carries for it.
-        return extractor(target)  # ty: ignore[too-many-positional-arguments]
+        try:
+            # Same one-positional-arg convention extractor.py's from_url()
+            # relies on, and the same ignore it carries for it.
+            return extractor(target)  # ty: ignore[too-many-positional-arguments]
+        except ValueError as exc:
+            # The target is the user's to correct: say what is wrong with it.
+            typer.echo(str(exc))
+            raise typer.Exit(code=1) from None
 
     return make
 
@@ -54,6 +59,9 @@ def _construct(extractor: type[Extractor]) -> Callable[[str], Extractor]:
 def _resolve_url_or_exit(target: str) -> Extractor:
     try:
         return resolve_url(target)
+    except WholeSection as exc:
+        typer.echo(str(exc))
+        raise typer.Exit(code=1) from None
     except UnknownSource as exc:
         typer.echo(str(exc))
         typer.echo("`pgn-dl sources` lists the URLs each command accepts.")

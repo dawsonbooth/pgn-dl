@@ -40,6 +40,15 @@ class NotDiscovered(RuntimeError):
     """
 
 
+class WholeSection(ValueError):
+    """A target naming a whole section of a site, or a part with many items.
+
+    A section kind downloads one item per run and refuses such a target, saying
+    what to give instead. ``from_url`` raises it rather than declining the URL,
+    so the user reads what to give, not "no command handles".
+    """
+
+
 class _Unset:
     """Sentinel for "no fetch context yet", distinct from every real one.
 
@@ -135,7 +144,8 @@ class Extractor[C](ABC):
 
         A URL under this source's patterns whose target still cannot be parsed
         is declined rather than raised: declining lets the registry keep
-        looking rather than ending the command.
+        looking rather than ending the command. A URL naming a whole section,
+        or a part with many items, raises ``WholeSection``.
         """
         if not any(p.search(url) for p in cls.url_patterns):
             return None
@@ -144,6 +154,8 @@ class Extractor[C](ABC):
             # id; the base cannot declare that constructor without breaking
             # subclasses built differently, hence the ignore.
             return cls(url)  # ty: ignore[too-many-positional-arguments]
+        except WholeSection:
+            raise
         except ValueError:
             return None
 

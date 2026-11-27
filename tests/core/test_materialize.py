@@ -10,7 +10,7 @@ from typer.testing import CliRunner
 
 from pgn_dl.core import materialize
 from pgn_dl.core.declaration import ExtractorDeclaration, SourceDeclaration
-from pgn_dl.core.extractor import Extractor
+from pgn_dl.core.extractor import Extractor, WholeSection
 from pgn_dl.core.materialize import build_source_app, build_url_command
 from pgn_dl.core.models import Collection, GameItem, ItemRef
 from pgn_dl.core.registry import UnknownSource
@@ -53,6 +53,28 @@ _DECLARATION = SourceDeclaration(
             help="Download gadgets into PGN files.",
             target_name="gadget",
             target_help="Gadget id.",
+        ),
+    ),
+)
+
+
+class UnreadableExtractor(WidgetExtractor):
+    key = "widgetsource:unreadable"
+
+    def __init__(self, target: str) -> None:
+        raise ValueError(f"could not read a widget from {target!r}")
+
+
+# Two commands, since a single-command Typer app collapses to that command.
+_UNREADABLE = SourceDeclaration(
+    label="Widget Source",
+    extractors=(
+        _DECLARATION.extractors[0],
+        ExtractorDeclaration(
+            extractor=UnreadableExtractor,
+            help="Download a widget into PGN files.",
+            target_name="widget",
+            target_help="Widget id.",
         ),
     ),
 )
@@ -173,3 +195,34 @@ def test_url_command_reports_an_unknown_url_and_exits_nonzero(
     assert result.exit_code == 1
     assert "no command handles 'https://example.com/nope'" in result.output
     assert "pgn-dl sources" in result.output
+
+
+def test_a_target_the_command_cannot_read_is_reported_not_raised(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    calls: list[object] = []
+
+    def _record(extractor: object, opts: Options) -> None:
+        calls.append(extractor)
+
+    monkeypatch.setattr(materialize, "execute", _record)
+    result = runner.invoke(build_source_app(_UNREADABLE), ["unreadable", "nope"])
+    assert result.exit_code == 1
+    assert "could not read a widget from 'nope'" in result.output
+    assert calls == []
+
+
+def test_url_command_reports_a_url_naming_a_whole_section(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    def _refuse(target: str) -> object:
+        raise WholeSection(f"{target!r} is every widget; give one widget's URL")
+
+    monkeypatch.setattr(materialize, "resolve_url", _refuse)
+
+    app = typer.Typer()
+    app.command(name="url")(build_url_command())
+    result = runner.invoke(app, ["https://example.com/widgets"])
+
+    assert result.exit_code == 1
+    assert "'https://example.com/widgets' is every widget" in result.output
